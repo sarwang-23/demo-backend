@@ -22,6 +22,8 @@
     "test:university": "node --test tests/university/core.test.mjs tests/university/domain.test.mjs tests/university/http.test.mjs tests/university/store.test.mjs",
     "test:university:postgres": "node --env-file-if-exists=.env tests/university/postgres.integration.mjs",
     "university:smoke": "node --env-file-if-exists=.env examples/university/smoke.mjs",
+    "university:seed-demo": "node --env-file-if-exists=.env scripts/seed-university-demo.mjs",
+    "university:verify-demo": "node --env-file-if-exists=.env scripts/verify-university-demo.mjs",
     "check:university": "node scripts/check-university.mjs",
     "test:carbon": "node --test tests/carbon/core.test.mjs tests/carbon/domain.test.mjs tests/carbon/contract.test.mjs",
     "test:carbon:postgres": "node --env-file-if-exists=.env tests/carbon/postgres.integration.mjs",
