@@ -1,0 +1,120 @@
+# NEON + LOCAL SUPPORT SERVICES ONLY. Use --env-file .env -f compose.neon.yaml.
+# No local PostgreSQL service. API/worker never receive DATABASE_OWNER_URL.
+# Keep this off the public Internet. The .env file is interpolation input, not env_file.
+name: carbonsynq-neon-local
+x-app: &app
+  build: .
+  init: true
+  read_only: true
+  tmpfs: ['/tmp:size=96m,mode=1777']
+  cap_drop: [ALL]
+  security_opt: [no-new-privileges:true]
+  stop_grace_period: 100s
+x-runtime-env: &runtime-env
+  NODE_ENV: development
+  HOST: 0.0.0.0
+  PORT: '8080'
+  DB_SSL: 'true'
+  DB_CHANNEL_BINDING: 'true'
+  DB_POOL_MAX: ${DB_POOL_MAX:-5}
+  S3_BUCKET: ${S3_BUCKET:?Prepare .env first}
+  S3_ENDPOINT: http://object-store:9000
+  S3_FORCE_PATH_STYLE: 'true'
+  AWS_REGION: ${AWS_REGION:-us-east-1}
+  AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:?Prepare .env first}
+  AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:?Prepare .env first}
+  CLAMAV_HOST: scanner
+  CLAMAV_PORT: '3310'
+  MAX_UPLOAD_BYTES: ${MAX_UPLOAD_BYTES:-10485760}
+  MAX_INFLIGHT_UPLOADS: ${MAX_INFLIGHT_UPLOADS:-4}
+  MAX_INFLIGHT_REQUESTS: ${MAX_INFLIGHT_REQUESTS:-64}
+  WORKER_POLL_MS: ${WORKER_POLL_MS:-1000}
+  JOB_LEASE_SECONDS: ${JOB_LEASE_SECONDS:-180}
+  SCAN_TIMEOUT_MS: ${SCAN_TIMEOUT_MS:-45000}
+  SESSION_HOURS: ${SESSION_HOURS:-8}
+  TRUST_PROXY: 'false'
+  PUBLIC_BASE_URL: ${PUBLIC_BASE_URL:?Set the localhost public origin}
+  MAIL_MODE: capture
+  MAIL_ENCRYPTION_KEY: ${MAIL_ENCRYPTION_KEY:?Prepare .env first}
+  MAIL_CAPTURE_DIR: /private-mail
+  OCR_ENABLED: 'true'
+services:
+  object-store:
+    build:
+      context: .
+      dockerfile: deploy/Dockerfile.object-store
+    command: server /data --console-address ':9001'
+    environment:
+      MINIO_ROOT_USER: ${AWS_ACCESS_KEY_ID:?Prepare .env first}
+      MINIO_ROOT_PASSWORD: ${AWS_SECRET_ACCESS_KEY:?Prepare .env first}
+      MINIO_REGION_NAME: ${AWS_REGION:-us-east-1}
+    ports: ['127.0.0.1:9000:9000', '127.0.0.1:9001:9001']
+    volumes: [object-data:/data]
+  storage-init:
+    <<: *app
+    depends_on: [object-store]
+    environment:
+      S3_BUCKET: ${S3_BUCKET:?Prepare .env first}
+      S3_ENDPOINT: http://object-store:9000
+      S3_FORCE_PATH_STYLE: 'true'
+      AWS_REGION: ${AWS_REGION:-us-east-1}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:?Prepare .env first}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:?Prepare .env first}
+    command: ['node','scripts/storage-init.mjs']
+  scanner:
+    image: clamav/clamav:stable
+    volumes:
+      - clam-db:/var/lib/clamav
+      - ./deploy/clamd.conf:/etc/clamav/clamd.conf:ro
+    ports: ['127.0.0.1:3310:3310']
+    healthcheck:
+      test: ['CMD-SHELL',"printf 'PING\n' | nc -w 3 127.0.0.1 3310 | grep -q PONG"]
+      interval: 15s
+      timeout: 5s
+      retries: 60
+  migrate:
+    <<: *app
+    environment:
+      NODE_ENV: development
+      DB_SSL: 'true'
+      DB_CHANNEL_BINDING: 'true'
+      DATABASE_OWNER_URL: ${DATABASE_OWNER_URL:?Set the rotated direct Neon owner URL}
+      DB_API_PASSWORD: ${DB_API_PASSWORD:?Prepare .env first}
+      DB_WORKER_PASSWORD: ${DB_WORKER_PASSWORD:?Prepare .env first}
+      TENANT_NAME: ${TENANT_NAME:-University Demo}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@university.example}
+      REVIEWER_EMAIL: ${REVIEWER_EMAIL:-reviewer@university.example}
+    command: ['node','scripts/migrate.mjs']
+  worker:
+    <<: *app
+    tmpfs: ['/tmp:size=96m,mode=1777', '/private-mail:size=16m,mode=700,uid=1000,gid=1000']
+    environment:
+      <<: *runtime-env
+      WORKER_DATABASE_URL: ${WORKER_DATABASE_URL:?Prepare .env first}
+    command: ['node','src/worker-main.mjs']
+    restart: unless-stopped
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+      storage-init: {condition: service_completed_successfully}
+      scanner: {condition: service_healthy}
+  api:
+    <<: *app
+    environment:
+      <<: *runtime-env
+      DATABASE_URL: ${DATABASE_URL:?Prepare .env first}
+      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:?Set permitted origins}
+      METRICS_TOKEN: ${METRICS_TOKEN:?Prepare .env first}
+      REQUEST_HASH_SECRET: ${REQUEST_HASH_SECRET:?Prepare .env first}
+    ports: ['127.0.0.1:${PORT:-5000}:8080']
+    restart: unless-stopped
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+      storage-init: {condition: service_completed_successfully}
+    healthcheck:
+      test: ['CMD','node','-e',"fetch('http://127.0.0.1:8080/readyz').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 15s
+      timeout: 12s
+      retries: 10
+volumes:
+  object-data:
+  clam-db:

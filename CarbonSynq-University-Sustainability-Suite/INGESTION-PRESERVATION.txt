@@ -1,0 +1,27 @@
+CarbonSynq import upgrade - original file verification
+
+Original files: 483
+Unchanged at original path: 465
+Updated with byte-identical original backup: 18
+Missing original paths: 0
+
+Backups: upgrade-backup/scope12-v2.2/<original path>
+
+scale-api/Dockerfile
+scale-api/package.json
+scale-api/scripts/build-university-docs.mjs
+scale-api/docs/openapi.json
+scale-api/src/worker-main.mjs
+scale-api/src/http.mjs
+scale-api/src/storage.mjs
+scale-api/tests/carbon/postgres.integration.mjs
+scale-api/tests/carbon/contract.test.mjs
+scale-api/tests/university/store.test.mjs
+scale-api/tests/university/http.test.mjs
+scale-api/tests/university/postgres.integration.mjs
+scale-api/public/university/index.html
+scale-api/src/university/store.mjs
+scale-api/src/university/router.mjs
+scale-api/docs/university/ENDPOINTS.md
+scale-api/docs/university/openapi.json
+.github/workflows/scale-ci.yml

@@ -1,0 +1,1291 @@
+{
+  "Empty": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {},
+    "required": []
+  },
+  "Action": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "version": {
+        "type": "integer",
+        "minimum": 1
+      },
+      "reason": {
+        "type": "string",
+        "minLength": 10,
+        "maxLength": 2000
+      }
+    },
+    "required": [
+      "version"
+    ]
+  },
+  "ReasonAction": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "version": {
+        "type": "integer",
+        "minimum": 1
+      },
+      "reason": {
+        "type": "string",
+        "minLength": 10,
+        "maxLength": 2000
+      }
+    },
+    "required": [
+      "version",
+      "reason"
+    ]
+  },
+  "VersionOnly": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "version": {
+        "type": "integer",
+        "minimum": 1
+      }
+    },
+    "required": [
+      "version"
+    ]
+  },
+  "Department": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "campusId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "name": {
+        "type": "string",
+        "minLength": 1
+      },
+      "code": {
+        "type": "string",
+        "minLength": 1
+      },
+      "ownerId": {
+        "type": "string",
+        "format": "uuid"
+      }
+    },
+    "required": [
+      "campusId",
+      "name",
+      "code",
+      "ownerId"
+    ]
+  },
+  "KPI": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "code": {
+        "type": "string",
+        "minLength": 1
+      },
+      "name": {
+        "type": "string",
+        "minLength": 1
+      },
+      "domain": {
+        "type": "string",
+        "enum": [
+          "ENERGY",
+          "WATER",
+          "WASTE",
+          "TRANSPORT",
+          "SOCIAL",
+          "GOVERNANCE",
+          "ACADEMIC",
+          "NORMALIZATION"
+        ]
+      },
+      "unit": {
+        "type": "string",
+        "enum": [
+          "kWh",
+          "m3",
+          "kg",
+          "litre",
+          "passenger_km",
+          "vehicle_km",
+          "FTE",
+          "m2",
+          "hour",
+          "count",
+          "percent",
+          "INR"
+        ]
+      },
+      "aggregation": {
+        "type": "string",
+        "enum": [
+          "SUM",
+          "LATEST"
+        ]
+      },
+      "evidenceRequired": {
+        "type": "boolean"
+      },
+      "maxValue": {
+        "type": "string",
+        "pattern": "^\\d+(\\.\\d{1,6})?$",
+        "description": "Exact decimal string; scientific notation and JSON numbers are rejected."
+      },
+      "guidance": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "required": [
+      "code",
+      "name",
+      "domain",
+      "unit",
+      "aggregation",
+      "evidenceRequired",
+      "guidance"
+    ]
+  },
+  "Task": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "periodId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "campusId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "departmentId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "kpiId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "assigneeId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "reviewerId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "bucket": {
+        "type": "string",
+        "minLength": 1
+      },
+      "intervalStart": {
+        "type": "string",
+        "format": "date"
+      },
+      "intervalEnd": {
+        "type": "string",
+        "format": "date"
+      },
+      "dueDate": {
+        "type": "string",
+        "format": "date"
+      }
+    },
+    "required": [
+      "periodId",
+      "campusId",
+      "kpiId",
+      "assigneeId",
+      "reviewerId",
+      "bucket",
+      "intervalStart",
+      "intervalEnd",
+      "dueDate"
+    ]
+  },
+  "Submission": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "taskVersion": {
+        "type": "integer",
+        "minimum": 1
+      },
+      "value": {
+        "type": "string",
+        "pattern": "^\\d+(\\.\\d{1,6})?$",
+        "description": "Exact decimal string; scientific notation and JSON numbers are rejected."
+      },
+      "unit": {
+        "type": "string",
+        "minLength": 1
+      },
+      "notes": {
+        "type": "string"
+      },
+      "evidenceIds": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "maxItems": 20,
+        "uniqueItems": true
+      },
+      "correctionReason": {
+        "type": "string",
+        "minLength": 10
+      }
+    },
+    "required": [
+      "taskVersion",
+      "value",
+      "unit"
+    ]
+  },
+  "SubmissionEdit": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "version": {
+        "type": "integer",
+        "minimum": 1
+      },
+      "value": {
+        "type": "string",
+        "pattern": "^\\d+(\\.\\d{1,6})?$",
+        "description": "Exact decimal string; scientific notation and JSON numbers are rejected."
+      },
+      "unit": {
+        "type": "string",
+        "minLength": 1
+      },
+      "notes": {
+        "type": "string"
+      },
+      "evidenceIds": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "maxItems": 20,
+        "uniqueItems": true
+      }
+    },
+    "required": [
+      "version",
+      "value",
+      "unit"
+    ]
+  },
+  "Factor": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "category": {
+        "type": "string",
+        "minLength": 1
+      },
+      "unit": {
+        "type": "string",
+        "minLength": 1
+      },
+      "value": {
+        "type": "string",
+        "pattern": "^\\d+(\\.\\d{1,9})?$"
+      },
+      "method": {
+        "type": "string",
+        "enum": [
+          "ACTIVITY_BASED",
+          "SPEND_BASED"
+        ]
+      },
+      "source": {
+        "type": "string",
+        "minLength": 1
+      },
+      "sourceUrl": {
+        "type": "string",
+        "format": "uri",
+        "pattern": "^https://"
+      },
+      "region": {
+        "type": "string",
+        "minLength": 1
+      },
+      "boundary": {
+        "type": "string",
+        "minLength": 10
+      },
+      "versionLabel": {
+        "type": "string",
+        "minLength": 1
+      },
+      "validFrom": {
+        "type": "string",
+        "format": "date"
+      },
+      "validTo": {
+        "type": "string",
+        "format": "date"
+      },
+      "currency": {
+        "type": "string",
+        "enum": [
+          "INR"
+        ]
+      },
+      "priceYear": {
+        "type": "integer",
+        "minimum": 1990,
+        "maximum": 2100
+      }
+    },
+    "required": [
+      "category",
+      "unit",
+      "value",
+      "method",
+      "source",
+      "sourceUrl",
+      "region",
+      "boundary",
+      "versionLabel",
+      "validFrom",
+      "validTo"
+    ]
+  },
+  "Emission": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "periodId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "campusId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "departmentId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "category": {
+        "type": "string",
+        "minLength": 1
+      },
+      "unit": {
+        "type": "string",
+        "minLength": 1
+      },
+      "quantity": {
+        "type": "string",
+        "pattern": "^\\d+(\\.\\d{1,6})?$",
+        "description": "Exact decimal string; scientific notation and JSON numbers are rejected."
+      },
+      "activityDate": {
+        "type": "string",
+        "format": "date"
+      },
+      "externalKey": {
+        "type": "string",
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]*$"
+      },
+      "description": {
+        "type": "string",
+        "minLength": 1
+      },
+      "factorId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "dataQuality": {
+        "type": "string",
+        "enum": [
+          "MEASURED",
+          "ESTIMATED",
+          "SPEND_PROXY"
+        ]
+      },
+      "assumptions": {
+        "type": "string"
+      },
+      "currency": {
+        "type": "string",
+        "enum": [
+          "INR"
+        ]
+      },
+      "priceYear": {
+        "type": "integer",
+        "minimum": 1990,
+        "maximum": 2100
+      },
+      "evidenceIds": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "maxItems": 20,
+        "uniqueItems": true
+      },
+      "replacesId": {
+        "type": "string",
+        "format": "uuid"
+      }
+    },
+    "required": [
+      "periodId",
+      "campusId",
+      "category",
+      "unit",
+      "quantity",
+      "activityDate",
+      "externalKey",
+      "description",
+      "factorId",
+      "dataQuality"
+    ]
+  },
+  "EmissionEdit": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "periodId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "campusId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "departmentId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "category": {
+        "type": "string",
+        "minLength": 1
+      },
+      "unit": {
+        "type": "string",
+        "minLength": 1
+      },
+      "quantity": {
+        "type": "string",
+        "pattern": "^\\d+(\\.\\d{1,6})?$",
+        "description": "Exact decimal string; scientific notation and JSON numbers are rejected."
+      },
+      "activityDate": {
+        "type": "string",
+        "format": "date"
+      },
+      "externalKey": {
+        "type": "string",
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]*$"
+      },
+      "description": {
+        "type": "string",
+        "minLength": 1
+      },
+      "factorId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "dataQuality": {
+        "type": "string",
+        "enum": [
+          "MEASURED",
+          "ESTIMATED",
+          "SPEND_PROXY"
+        ]
+      },
+      "assumptions": {
+        "type": "string"
+      },
+      "currency": {
+        "type": "string",
+        "enum": [
+          "INR"
+        ]
+      },
+      "priceYear": {
+        "type": "integer",
+        "minimum": 1990,
+        "maximum": 2100
+      },
+      "evidenceIds": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "maxItems": 20,
+        "uniqueItems": true
+      },
+      "replacesId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "version": {
+        "type": "integer",
+        "minimum": 1
+      }
+    },
+    "required": [
+      "periodId",
+      "campusId",
+      "category",
+      "unit",
+      "quantity",
+      "activityDate",
+      "externalKey",
+      "description",
+      "factorId",
+      "dataQuality",
+      "version"
+    ]
+  },
+  "Screening": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "periodId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "categoryNumber": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 15
+      },
+      "decision": {
+        "type": "string",
+        "enum": [
+          "INCLUDED",
+          "EXCLUDED",
+          "NOT_ASSESSED"
+        ]
+      },
+      "rationale": {
+        "type": "string",
+        "minLength": 10
+      },
+      "version": {
+        "type": "integer",
+        "minimum": 1
+      }
+    },
+    "required": [
+      "periodId",
+      "categoryNumber",
+      "decision",
+      "rationale"
+    ]
+  },
+  "CSVImport": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "csv": {
+        "type": "string",
+        "maxLength": 50000
+      }
+    },
+    "required": [
+      "csv"
+    ]
+  },
+  "Supplier": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "name": {
+        "type": "string",
+        "minLength": 1
+      },
+      "code": {
+        "type": "string",
+        "minLength": 1
+      },
+      "contactEmail": {
+        "type": "string",
+        "format": "email"
+      },
+      "category": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "required": [
+      "name",
+      "code",
+      "contactEmail",
+      "category"
+    ]
+  },
+  "Question": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "key": {
+        "type": "string",
+        "minLength": 1
+      },
+      "label": {
+        "type": "string",
+        "minLength": 1
+      },
+      "type": {
+        "type": "string",
+        "enum": [
+          "TEXT",
+          "NUMBER",
+          "CHOICE"
+        ]
+      },
+      "required": {
+        "type": "boolean"
+      },
+      "unit": {
+        "type": "string",
+        "minLength": 1
+      },
+      "options": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "minLength": 1
+        },
+        "minItems": 2,
+        "maxItems": 20
+      }
+    },
+    "required": [
+      "key",
+      "label",
+      "type",
+      "required"
+    ]
+  },
+  "SupplierRequest": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "supplierId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "periodId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "title": {
+        "type": "string",
+        "minLength": 1
+      },
+      "questions": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/Question"
+        },
+        "minItems": 1,
+        "maxItems": 30
+      },
+      "dueDate": {
+        "type": "string",
+        "format": "date"
+      }
+    },
+    "required": [
+      "supplierId",
+      "periodId",
+      "title",
+      "questions",
+      "dueDate"
+    ]
+  },
+  "SupplierInvite": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "version": {
+        "type": "integer",
+        "minimum": 1
+      },
+      "expiresInDays": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 30
+      }
+    },
+    "required": [
+      "version",
+      "expiresInDays"
+    ]
+  },
+  "MaterialityInvite": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "version": {
+        "type": "integer",
+        "minimum": 1
+      },
+      "expiresInDays": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 30
+      },
+      "stakeholderGroup": {
+        "type": "string",
+        "enum": [
+          "STUDENTS",
+          "FACULTY",
+          "STAFF",
+          "SUPPLIERS",
+          "COMMUNITY",
+          "LEADERSHIP"
+        ]
+      }
+    },
+    "required": [
+      "version",
+      "expiresInDays",
+      "stakeholderGroup"
+    ]
+  },
+  "EvidenceAttach": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "version": {
+        "type": "integer",
+        "minimum": 1
+      },
+      "evidenceIds": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "maxItems": 20,
+        "uniqueItems": true
+      }
+    },
+    "required": [
+      "version",
+      "evidenceIds"
+    ]
+  },
+  "Topic": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "code": {
+        "type": "string",
+        "minLength": 1
+      },
+      "label": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "required": [
+      "code",
+      "label"
+    ]
+  },
+  "Materiality": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "periodId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "title": {
+        "type": "string",
+        "minLength": 1
+      },
+      "topics": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/Topic"
+        },
+        "minItems": 1,
+        "maxItems": 30
+      },
+      "impactThreshold": {
+        "type": "string",
+        "pattern": "^[1-5](\\.\\d{1,2})?$"
+      },
+      "financialThreshold": {
+        "type": "string",
+        "pattern": "^[1-5](\\.\\d{1,2})?$"
+      },
+      "minResponses": {
+        "type": "integer",
+        "minimum": 5,
+        "maximum": 100
+      }
+    },
+    "required": [
+      "periodId",
+      "title",
+      "topics",
+      "impactThreshold",
+      "financialThreshold",
+      "minResponses"
+    ]
+  },
+  "Revoke": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "reason": {
+        "type": "string",
+        "minLength": 10
+      }
+    },
+    "required": [
+      "reason"
+    ]
+  },
+  "Report": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "periodId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "title": {
+        "type": "string",
+        "minLength": 1
+      },
+      "purpose": {
+        "type": "string",
+        "enum": [
+          "INVENTORY_EVIDENCE",
+          "UNIVERSITY_SUSTAINABILITY",
+          "INTERNAL_ESG"
+        ]
+      },
+      "boundaryStatement": {
+        "type": "string",
+        "minLength": 10
+      }
+    },
+    "required": [
+      "periodId",
+      "title",
+      "purpose",
+      "boundaryStatement"
+    ]
+  },
+  "Target": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "name": {
+        "type": "string",
+        "minLength": 1
+      },
+      "baselineReportId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "scopes": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "enum": [
+            "SCOPE_1",
+            "SCOPE_2",
+            "SCOPE_3"
+          ]
+        },
+        "minItems": 1,
+        "maxItems": 3
+      },
+      "reductionPercent": {
+        "type": "string",
+        "pattern": "^\\d+(\\.\\d{1,4})?$"
+      },
+      "targetDate": {
+        "type": "string",
+        "format": "date"
+      },
+      "ownerId": {
+        "type": "string",
+        "format": "uuid"
+      }
+    },
+    "required": [
+      "name",
+      "baselineReportId",
+      "scopes",
+      "reductionPercent",
+      "targetDate",
+      "ownerId"
+    ]
+  },
+  "Initiative": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "targetId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "campusId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "name": {
+        "type": "string",
+        "minLength": 1
+      },
+      "ownerId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "startDate": {
+        "type": "string",
+        "format": "date"
+      },
+      "endDate": {
+        "type": "string",
+        "format": "date"
+      },
+      "estimatedReductionKg": {
+        "type": "string",
+        "pattern": "^\\d+(\\.\\d{1,6})?$",
+        "description": "Exact decimal string; scientific notation and JSON numbers are rejected."
+      },
+      "investmentInr": {
+        "type": "string",
+        "pattern": "^\\d+(\\.\\d{1,2})?$"
+      },
+      "annualSavingsInr": {
+        "type": "string",
+        "pattern": "^\\d+(\\.\\d{1,2})?$"
+      },
+      "assumptions": {
+        "type": "string",
+        "minLength": 10
+      }
+    },
+    "required": [
+      "targetId",
+      "campusId",
+      "name",
+      "ownerId",
+      "startDate",
+      "endDate",
+      "estimatedReductionKg",
+      "investmentInr",
+      "annualSavingsInr",
+      "assumptions"
+    ]
+  },
+  "InitiativeEdit": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "version": {
+        "type": "integer",
+        "minimum": 1
+      },
+      "status": {
+        "type": "string",
+        "enum": [
+          "PLANNED",
+          "IN_PROGRESS",
+          "ON_HOLD",
+          "COMPLETED"
+        ]
+      },
+      "progress": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 100
+      },
+      "reason": {
+        "type": "string",
+        "minLength": 10
+      }
+    },
+    "required": [
+      "version",
+      "status",
+      "progress",
+      "reason"
+    ]
+  },
+  "BOMLine": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "name": {
+        "type": "string",
+        "minLength": 1
+      },
+      "stage": {
+        "type": "string",
+        "enum": [
+          "MATERIALS",
+          "TRANSPORT",
+          "MANUFACTURING",
+          "USE",
+          "END_OF_LIFE"
+        ]
+      },
+      "quantity": {
+        "type": "string",
+        "pattern": "^\\d+(\\.\\d{1,6})?$",
+        "description": "Exact decimal string; scientific notation and JSON numbers are rejected."
+      },
+      "unit": {
+        "type": "string",
+        "minLength": 1
+      },
+      "factorId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "allocationPercent": {
+        "type": "string",
+        "pattern": "^\\d+(\\.\\d{1,4})?$"
+      }
+    },
+    "required": [
+      "name",
+      "stage",
+      "quantity",
+      "unit",
+      "factorId",
+      "allocationPercent"
+    ]
+  },
+  "PCF": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "name": {
+        "type": "string",
+        "minLength": 1
+      },
+      "functionalUnit": {
+        "type": "string",
+        "minLength": 1
+      },
+      "outputQuantity": {
+        "type": "string",
+        "pattern": "^\\d+(\\.\\d{1,6})?$",
+        "description": "Exact decimal string; scientific notation and JSON numbers are rejected."
+      },
+      "boundary": {
+        "type": "string",
+        "minLength": 10
+      },
+      "studyDate": {
+        "type": "string",
+        "format": "date"
+      },
+      "bom": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/BOMLine"
+        },
+        "minItems": 1,
+        "maxItems": 100
+      }
+    },
+    "required": [
+      "name",
+      "functionalUnit",
+      "outputQuantity",
+      "boundary",
+      "studyDate",
+      "bom"
+    ]
+  },
+  "Insights": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "periodId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "questionId": {
+        "type": "string",
+        "enum": [
+          "EMISSIONS_SUMMARY",
+          "MISSING_SUBMISSIONS",
+          "TOP_HOTSPOTS",
+          "EVIDENCE_GAPS",
+          "SCOPE3_COVERAGE"
+        ]
+      }
+    },
+    "required": [
+      "periodId",
+      "questionId"
+    ]
+  },
+  "Commuting": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "oneWayKm": {
+        "type": "string",
+        "pattern": "^\\d+(\\.\\d{1,6})?$",
+        "description": "Exact decimal string; scientific notation and JSON numbers are rejected."
+      },
+      "days": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 366
+      },
+      "participants": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 1000000
+      },
+      "mode": {
+        "type": "string",
+        "minLength": 1
+      },
+      "basis": {
+        "type": "string",
+        "enum": [
+          "passenger_km",
+          "vehicle_km"
+        ]
+      },
+      "occupancy": {
+        "type": "string",
+        "pattern": "^\\d+(\\.\\d{1,6})?$",
+        "description": "Exact decimal string; scientific notation and JSON numbers are rejected."
+      },
+      "sampleSize": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 1000000
+      },
+      "population": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 10000000
+      },
+      "extrapolate": {
+        "type": "boolean"
+      }
+    },
+    "required": [
+      "oneWayKm",
+      "days",
+      "participants",
+      "mode",
+      "basis",
+      "sampleSize",
+      "population",
+      "extrapolate"
+    ]
+  },
+  "SupplierResponse": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "version": {
+        "type": "integer",
+        "minimum": 1
+      },
+      "answers": {
+        "type": "object",
+        "description": "Keys must match the invitation questions. NUMBER answers are decimal strings."
+      },
+      "attestation": {
+        "type": "boolean",
+        "const": true
+      }
+    },
+    "required": [
+      "version",
+      "answers",
+      "attestation"
+    ]
+  },
+  "Score": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "topic": {
+        "type": "string",
+        "minLength": 1
+      },
+      "impact": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 5
+      },
+      "financial": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 5
+      },
+      "rationale": {
+        "type": "string",
+        "maxLength": 1000
+      }
+    },
+    "required": [
+      "topic",
+      "impact",
+      "financial"
+    ]
+  },
+  "SurveyResponse": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "version": {
+        "type": "integer",
+        "minimum": 1
+      },
+      "scores": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/Score"
+        },
+        "minItems": 1,
+        "maxItems": 30
+      },
+      "consent": {
+        "type": "boolean",
+        "const": true
+      }
+    },
+    "required": [
+      "version",
+      "scores",
+      "consent"
+    ]
+  }
+}

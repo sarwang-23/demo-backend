@@ -1,0 +1,17 @@
+node_modules/
+.local-data/
+.backups/
+.local-data-before-reset-*/
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+.env
+.env.*
+!.env.example
+!.env.neon.example
+*.log
+.private-mail/
+private-backups/
+*.backup-bundle/
+.env.prepare.lock/
+.env.preparing-*

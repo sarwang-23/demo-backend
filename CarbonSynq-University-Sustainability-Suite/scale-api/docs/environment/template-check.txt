@@ -1,0 +1,5 @@
+
+> carbonsynq-scale-api@2.4.0-operations-rc.1.env.1 env:check
+> node scripts/check-neon-env.mjs
+
+DATABASE_OWNER_URL: replace the placeholder with a freshly rotated, correctly encoded Neon connection string.

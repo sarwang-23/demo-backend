@@ -1,0 +1,3446 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "CarbonSynq University Intake",
+    "version": "2.3.0-ingestion-rc.1",
+    "description": "Human-reviewed spreadsheet normalization and PDF invoice batches within the existing /api/v2 service. Original files pass private-storage/scanning first. Import writes drafts, never approvals or emissions totals. PDF extraction requires a readable text layer; OCR is not configured. Domain constraints additionally apply; production acceptance is pending."
+  },
+  "servers": [
+    {
+      "url": "/"
+    }
+  ],
+  "security": [
+    {
+      "Session": []
+    }
+  ],
+  "paths": {
+    "/api/v2/university/ingestion/capabilities": {
+      "get": {
+        "summary": "Read import formats, normalization fields, limits and review requirements",
+        "tags": [
+          "University ingestion"
+        ],
+        "operationId": "get__api_v2_university_ingestion_capabilities",
+        "x-roles": [
+          "ADMIN",
+          "ENTRY",
+          "REVIEWER",
+          "LEADERSHIP"
+        ],
+        "x-idempotent-cache": false,
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportSuccess"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Role/ownership restriction",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Tenant-hidden or missing record",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "State/version/duplicate/overlap conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Upload, row or request bound exceeded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Unsupported format",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Mapping/measurement validation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limited",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Dependency unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/university/ingestion/references": {
+      "get": {
+        "summary": "Read same-tenant sources, tasks and approved factors",
+        "tags": [
+          "University ingestion"
+        ],
+        "operationId": "get__api_v2_university_ingestion_references",
+        "x-roles": [
+          "ADMIN",
+          "ENTRY",
+          "REVIEWER",
+          "LEADERSHIP"
+        ],
+        "x-idempotent-cache": false,
+        "parameters": [
+          {
+            "name": "periodId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportSuccess"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Role/ownership restriction",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Tenant-hidden or missing record",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "State/version/duplicate/overlap conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Upload, row or request bound exceeded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Unsupported format",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Mapping/measurement validation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limited",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Dependency unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/university/ingestion/batches": {
+      "get": {
+        "summary": "List saved import batches",
+        "tags": [
+          "University ingestion"
+        ],
+        "operationId": "get__api_v2_university_ingestion_batches",
+        "x-roles": [
+          "ADMIN",
+          "ENTRY",
+          "REVIEWER",
+          "LEADERSHIP"
+        ],
+        "x-idempotent-cache": false,
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportSuccess"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Role/ownership restriction",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Tenant-hidden or missing record",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "State/version/duplicate/overlap conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Upload, row or request bound exceeded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Unsupported format",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Mapping/measurement validation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limited",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Dependency unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create an Excel/CSV or multi-invoice import batch",
+        "tags": [
+          "University ingestion"
+        ],
+        "operationId": "post__api_v2_university_ingestion_batches",
+        "x-roles": [
+          "ADMIN",
+          "ENTRY"
+        ],
+        "x-idempotent-cache": true,
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            },
+            "description": "Reuse the same key only for the exact same request. Use a new key after a changed version/payload."
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportSuccess"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Role/ownership restriction",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Tenant-hidden or missing record",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "State/version/duplicate/overlap conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Upload, row or request bound exceeded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Unsupported format",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Mapping/measurement validation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limited",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Dependency unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ImportCreate"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/university/ingestion/batches/{id}/rows": {
+      "get": {
+        "summary": "Read all current staged rows across batch files",
+        "tags": [
+          "University ingestion"
+        ],
+        "operationId": "get__api_v2_university_ingestion_batches_id_rows",
+        "x-roles": [
+          "ADMIN",
+          "ENTRY",
+          "REVIEWER",
+          "LEADERSHIP"
+        ],
+        "x-idempotent-cache": false,
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportSuccess"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Role/ownership restriction",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Tenant-hidden or missing record",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "State/version/duplicate/overlap conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Upload, row or request bound exceeded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Unsupported format",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Mapping/measurement validation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limited",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Dependency unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/university/ingestion/batches/{id}": {
+      "get": {
+        "summary": "Read durable per-file processing and import status",
+        "tags": [
+          "University ingestion"
+        ],
+        "operationId": "get__api_v2_university_ingestion_batches_id_",
+        "x-roles": [
+          "ADMIN",
+          "ENTRY",
+          "REVIEWER",
+          "LEADERSHIP"
+        ],
+        "x-idempotent-cache": false,
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportSuccess"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Role/ownership restriction",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Tenant-hidden or missing record",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "State/version/duplicate/overlap conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Upload, row or request bound exceeded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Unsupported format",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Mapping/measurement validation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limited",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Dependency unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/university/ingestion/batches/{id}/files": {
+      "post": {
+        "summary": "Attach uploaded document IDs to the batch",
+        "tags": [
+          "University ingestion"
+        ],
+        "operationId": "post__api_v2_university_ingestion_batches_id_files",
+        "x-roles": [
+          "ADMIN",
+          "ENTRY"
+        ],
+        "x-idempotent-cache": true,
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            },
+            "description": "Reuse the same key only for the exact same request. Use a new key after a changed version/payload."
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportSuccess"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Role/ownership restriction",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Tenant-hidden or missing record",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "State/version/duplicate/overlap conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Upload, row or request bound exceeded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Unsupported format",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Mapping/measurement validation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limited",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Dependency unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ImportAttach"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/university/ingestion/files/{id}": {
+      "get": {
+        "summary": "Read sheet/page previews, mapping suggestions and staged rows",
+        "tags": [
+          "University ingestion"
+        ],
+        "operationId": "get__api_v2_university_ingestion_files_id_",
+        "x-roles": [
+          "ADMIN",
+          "ENTRY",
+          "REVIEWER",
+          "LEADERSHIP"
+        ],
+        "x-idempotent-cache": false,
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportSuccess"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Role/ownership restriction",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Tenant-hidden or missing record",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "State/version/duplicate/overlap conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Upload, row or request bound exceeded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Unsupported format",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Mapping/measurement validation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limited",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Dependency unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/university/ingestion/files/{id}/preview": {
+      "post": {
+        "summary": "Normalize selected sheets or invoice page groups into staging only",
+        "tags": [
+          "University ingestion"
+        ],
+        "operationId": "post__api_v2_university_ingestion_files_id_preview",
+        "x-roles": [
+          "ADMIN",
+          "ENTRY"
+        ],
+        "x-idempotent-cache": true,
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            },
+            "description": "Reuse the same key only for the exact same request. Use a new key after a changed version/payload."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportSuccess"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Role/ownership restriction",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Tenant-hidden or missing record",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "State/version/duplicate/overlap conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Upload, row or request bound exceeded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Unsupported format",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Mapping/measurement validation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limited",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Dependency unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ImportPreview"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/university/ingestion/files/{id}/skip": {
+      "post": {
+        "summary": "Explicitly exclude a file with an audit reason",
+        "tags": [
+          "University ingestion"
+        ],
+        "operationId": "post__api_v2_university_ingestion_files_id_skip",
+        "x-roles": [
+          "ADMIN",
+          "ENTRY"
+        ],
+        "x-idempotent-cache": true,
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            },
+            "description": "Reuse the same key only for the exact same request. Use a new key after a changed version/payload."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportSuccess"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Role/ownership restriction",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Tenant-hidden or missing record",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "State/version/duplicate/overlap conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Upload, row or request bound exceeded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Unsupported format",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Mapping/measurement validation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limited",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Dependency unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ImportReason"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/university/ingestion/batches/{id}/review": {
+      "post": {
+        "summary": "Correct, confirm or skip up to 100 staged rows",
+        "tags": [
+          "University ingestion"
+        ],
+        "operationId": "post__api_v2_university_ingestion_batches_id_review",
+        "x-roles": [
+          "ADMIN",
+          "ENTRY"
+        ],
+        "x-idempotent-cache": true,
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            },
+            "description": "Reuse the same key only for the exact same request. Use a new key after a changed version/payload."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportSuccess"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Role/ownership restriction",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Tenant-hidden or missing record",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "State/version/duplicate/overlap conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Upload, row or request bound exceeded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Unsupported format",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Mapping/measurement validation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limited",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Dependency unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ImportReview"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/university/ingestion/batches/{id}/commit": {
+      "post": {
+        "summary": "Atomically import selected READY rows as reviewable drafts",
+        "tags": [
+          "University ingestion"
+        ],
+        "operationId": "post__api_v2_university_ingestion_batches_id_commit",
+        "x-roles": [
+          "ADMIN",
+          "ENTRY"
+        ],
+        "x-idempotent-cache": true,
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            },
+            "description": "Reuse the same key only for the exact same request. Use a new key after a changed version/payload."
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportSuccess"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Role/ownership restriction",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Tenant-hidden or missing record",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "State/version/duplicate/overlap conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Upload, row or request bound exceeded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Unsupported format",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Mapping/measurement validation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limited",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Dependency unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ImportCommit"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/university/ingestion/batches/{id}/complete": {
+      "post": {
+        "summary": "Complete a batch after every file and row is resolved",
+        "tags": [
+          "University ingestion"
+        ],
+        "operationId": "post__api_v2_university_ingestion_batches_id_complete",
+        "x-roles": [
+          "ADMIN",
+          "ENTRY"
+        ],
+        "x-idempotent-cache": true,
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            },
+            "description": "Reuse the same key only for the exact same request. Use a new key after a changed version/payload."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportSuccess"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Role/ownership restriction",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Tenant-hidden or missing record",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "State/version/duplicate/overlap conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Upload, row or request bound exceeded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Unsupported format",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Mapping/measurement validation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limited",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Dependency unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ImportReason"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/university/ingestion/batches/{id}/cancel": {
+      "post": {
+        "summary": "Cancel an uncommitted batch without deleting evidence",
+        "tags": [
+          "University ingestion"
+        ],
+        "operationId": "post__api_v2_university_ingestion_batches_id_cancel",
+        "x-roles": [
+          "ADMIN",
+          "ENTRY"
+        ],
+        "x-idempotent-cache": true,
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            },
+            "description": "Reuse the same key only for the exact same request. Use a new key after a changed version/payload."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportSuccess"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Role/ownership restriction",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Tenant-hidden or missing record",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "State/version/duplicate/overlap conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Upload, row or request bound exceeded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Unsupported format",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Mapping/measurement validation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limited",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Dependency unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ImportReason"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/university/ingestion/batches/{id}/export": {
+      "get": {
+        "summary": "Export normalized rows and errors as XLSX, CSV or JSON",
+        "tags": [
+          "University ingestion"
+        ],
+        "operationId": "get__api_v2_university_ingestion_batches_id_export",
+        "x-roles": [
+          "ADMIN",
+          "ENTRY",
+          "REVIEWER",
+          "LEADERSHIP"
+        ],
+        "x-idempotent-cache": false,
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "format",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "xlsx",
+                "csv",
+                "json"
+              ]
+            }
+          },
+          {
+            "name": "errorsOnly",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Normalized review export, not a certified emissions report.",
+            "content": {
+              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              },
+              "text/csv": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Role/ownership restriction",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Tenant-hidden or missing record",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "State/version/duplicate/overlap conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Upload, row or request bound exceeded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Unsupported format",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Mapping/measurement validation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limited",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Dependency unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/university/ingestion/templates": {
+      "get": {
+        "summary": "List reusable tenant-scoped mapping templates",
+        "tags": [
+          "University ingestion"
+        ],
+        "operationId": "get__api_v2_university_ingestion_templates",
+        "x-roles": [
+          "ADMIN",
+          "ENTRY",
+          "REVIEWER",
+          "LEADERSHIP"
+        ],
+        "x-idempotent-cache": false,
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportSuccess"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Role/ownership restriction",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Tenant-hidden or missing record",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "State/version/duplicate/overlap conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Upload, row or request bound exceeded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Unsupported format",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Mapping/measurement validation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limited",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Dependency unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/university/ingestion/files/{id}/template": {
+      "post": {
+        "summary": "Save the reviewed sheet/page mapping as a reusable template",
+        "tags": [
+          "University ingestion"
+        ],
+        "operationId": "post__api_v2_university_ingestion_files_id_template",
+        "x-roles": [
+          "ADMIN",
+          "ENTRY"
+        ],
+        "x-idempotent-cache": true,
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            },
+            "description": "Reuse the same key only for the exact same request. Use a new key after a changed version/payload."
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportSuccess"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Role/ownership restriction",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Tenant-hidden or missing record",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "State/version/duplicate/overlap conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Upload, row or request bound exceeded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Unsupported format",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Mapping/measurement validation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limited",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Dependency unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportError"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ImportTemplate"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "Session": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "Opaque session from existing login, not JWT."
+      }
+    },
+    "schemas": {
+      "ImportValues": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "quantity": {
+            "type": "string",
+            "maxLength": 2000,
+            "description": "Exact decimal measurement, never the currency total."
+          },
+          "unit": {
+            "type": "string",
+            "maxLength": 2000
+          },
+          "intervalStart": {
+            "type": "string",
+            "maxLength": 2000
+          },
+          "intervalEnd": {
+            "type": "string",
+            "maxLength": 2000
+          },
+          "activityDate": {
+            "type": "string",
+            "maxLength": 2000
+          },
+          "campusCode": {
+            "type": "string",
+            "maxLength": 2000
+          },
+          "sourceCode": {
+            "type": "string",
+            "maxLength": 2000
+          },
+          "sourceId": {
+            "type": "string",
+            "maxLength": 2000,
+            "description": "Registered source; a conflicting uploaded sourceCode is an error."
+          },
+          "taskId": {
+            "type": "string",
+            "maxLength": 2000
+          },
+          "kpiCode": {
+            "type": "string",
+            "maxLength": 2000
+          },
+          "category": {
+            "type": "string",
+            "maxLength": 2000
+          },
+          "factorId": {
+            "type": "string",
+            "maxLength": 2000
+          },
+          "fallbackFactorId": {
+            "type": "string",
+            "maxLength": 2000
+          },
+          "fallbackReason": {
+            "type": "string",
+            "maxLength": 2000
+          },
+          "dataQuality": {
+            "type": "string",
+            "maxLength": 2000
+          },
+          "assumptions": {
+            "type": "string",
+            "maxLength": 2000
+          },
+          "zeroReason": {
+            "type": "string",
+            "maxLength": 2000
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 2000
+          },
+          "invoiceNumber": {
+            "type": "string",
+            "maxLength": 2000
+          },
+          "vendor": {
+            "type": "string",
+            "maxLength": 2000
+          },
+          "accountNumber": {
+            "type": "string",
+            "maxLength": 2000
+          },
+          "amountInr": {
+            "type": "string",
+            "maxLength": 2000
+          },
+          "lineRef": {
+            "type": "string",
+            "maxLength": 2000
+          },
+          "externalKey": {
+            "type": "string",
+            "maxLength": 2000
+          }
+        },
+        "required": []
+      },
+      "ImportPlan": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "sheet": {
+            "type": "string"
+          },
+          "headerRow": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 2000
+          },
+          "mapping": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "quantity": {
+                "type": "string",
+                "pattern": "^[A-Z]{1,2}$"
+              },
+              "unit": {
+                "type": "string",
+                "pattern": "^[A-Z]{1,2}$"
+              },
+              "intervalStart": {
+                "type": "string",
+                "pattern": "^[A-Z]{1,2}$"
+              },
+              "intervalEnd": {
+                "type": "string",
+                "pattern": "^[A-Z]{1,2}$"
+              },
+              "activityDate": {
+                "type": "string",
+                "pattern": "^[A-Z]{1,2}$"
+              },
+              "campusCode": {
+                "type": "string",
+                "pattern": "^[A-Z]{1,2}$"
+              },
+              "sourceCode": {
+                "type": "string",
+                "pattern": "^[A-Z]{1,2}$"
+              },
+              "sourceId": {
+                "type": "string",
+                "pattern": "^[A-Z]{1,2}$"
+              },
+              "taskId": {
+                "type": "string",
+                "pattern": "^[A-Z]{1,2}$"
+              },
+              "kpiCode": {
+                "type": "string",
+                "pattern": "^[A-Z]{1,2}$"
+              },
+              "category": {
+                "type": "string",
+                "pattern": "^[A-Z]{1,2}$"
+              },
+              "factorId": {
+                "type": "string",
+                "pattern": "^[A-Z]{1,2}$"
+              },
+              "fallbackFactorId": {
+                "type": "string",
+                "pattern": "^[A-Z]{1,2}$"
+              },
+              "fallbackReason": {
+                "type": "string",
+                "pattern": "^[A-Z]{1,2}$"
+              },
+              "dataQuality": {
+                "type": "string",
+                "pattern": "^[A-Z]{1,2}$"
+              },
+              "assumptions": {
+                "type": "string",
+                "pattern": "^[A-Z]{1,2}$"
+              },
+              "zeroReason": {
+                "type": "string",
+                "pattern": "^[A-Z]{1,2}$"
+              },
+              "description": {
+                "type": "string",
+                "pattern": "^[A-Z]{1,2}$"
+              },
+              "invoiceNumber": {
+                "type": "string",
+                "pattern": "^[A-Z]{1,2}$"
+              },
+              "vendor": {
+                "type": "string",
+                "pattern": "^[A-Z]{1,2}$"
+              },
+              "accountNumber": {
+                "type": "string",
+                "pattern": "^[A-Z]{1,2}$"
+              },
+              "amountInr": {
+                "type": "string",
+                "pattern": "^[A-Z]{1,2}$"
+              },
+              "lineRef": {
+                "type": "string",
+                "pattern": "^[A-Z]{1,2}$"
+              },
+              "externalKey": {
+                "type": "string",
+                "pattern": "^[A-Z]{1,2}$"
+              }
+            },
+            "required": []
+          },
+          "defaults": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "quantity": {
+                "type": "string",
+                "maxLength": 2000,
+                "description": "Exact decimal measurement, never the currency total."
+              },
+              "unit": {
+                "type": "string",
+                "maxLength": 2000
+              },
+              "intervalStart": {
+                "type": "string",
+                "maxLength": 2000
+              },
+              "intervalEnd": {
+                "type": "string",
+                "maxLength": 2000
+              },
+              "activityDate": {
+                "type": "string",
+                "maxLength": 2000
+              },
+              "campusCode": {
+                "type": "string",
+                "maxLength": 2000
+              },
+              "sourceCode": {
+                "type": "string",
+                "maxLength": 2000
+              },
+              "sourceId": {
+                "type": "string",
+                "maxLength": 2000,
+                "description": "Registered source; a conflicting uploaded sourceCode is an error."
+              },
+              "taskId": {
+                "type": "string",
+                "maxLength": 2000
+              },
+              "kpiCode": {
+                "type": "string",
+                "maxLength": 2000
+              },
+              "category": {
+                "type": "string",
+                "maxLength": 2000
+              },
+              "factorId": {
+                "type": "string",
+                "maxLength": 2000
+              },
+              "fallbackFactorId": {
+                "type": "string",
+                "maxLength": 2000
+              },
+              "fallbackReason": {
+                "type": "string",
+                "maxLength": 2000
+              },
+              "dataQuality": {
+                "type": "string",
+                "maxLength": 2000
+              },
+              "assumptions": {
+                "type": "string",
+                "maxLength": 2000
+              },
+              "zeroReason": {
+                "type": "string",
+                "maxLength": 2000
+              },
+              "description": {
+                "type": "string",
+                "maxLength": 2000
+              },
+              "invoiceNumber": {
+                "type": "string",
+                "maxLength": 2000
+              },
+              "vendor": {
+                "type": "string",
+                "maxLength": 2000
+              },
+              "accountNumber": {
+                "type": "string",
+                "maxLength": 2000
+              },
+              "amountInr": {
+                "type": "string",
+                "maxLength": 2000
+              },
+              "lineRef": {
+                "type": "string",
+                "maxLength": 2000
+              },
+              "externalKey": {
+                "type": "string",
+                "maxLength": 2000
+              }
+            },
+            "required": []
+          },
+          "dateOrder": {
+            "enum": [
+              "AUTO",
+              "DMY",
+              "MDY"
+            ]
+          },
+          "numberFormat": {
+            "enum": [
+              "IN_EN",
+              "DECIMAL_COMMA"
+            ]
+          },
+          "includeHidden": {
+            "type": "boolean"
+          },
+          "forwardFill": {
+            "type": "array",
+            "items": {
+              "enum": [
+                "campusCode",
+                "sourceCode",
+                "sourceId",
+                "unit",
+                "category",
+                "kpiCode",
+                "description"
+              ]
+            }
+          },
+          "monthColumns": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "column": {
+                  "type": "string"
+                },
+                "intervalStart": {
+                  "type": "string",
+                  "format": "date"
+                },
+                "intervalEnd": {
+                  "type": "string",
+                  "format": "date"
+                }
+              },
+              "required": [
+                "column",
+                "intervalStart",
+                "intervalEnd"
+              ]
+            }
+          },
+          "groups": {
+            "type": "array",
+            "maxItems": 100,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "pageStart": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 30
+                },
+                "pageEnd": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 30
+                },
+                "defaults": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "quantity": {
+                      "type": "string",
+                      "maxLength": 2000,
+                      "description": "Exact decimal measurement, never the currency total."
+                    },
+                    "unit": {
+                      "type": "string",
+                      "maxLength": 2000
+                    },
+                    "intervalStart": {
+                      "type": "string",
+                      "maxLength": 2000
+                    },
+                    "intervalEnd": {
+                      "type": "string",
+                      "maxLength": 2000
+                    },
+                    "activityDate": {
+                      "type": "string",
+                      "maxLength": 2000
+                    },
+                    "campusCode": {
+                      "type": "string",
+                      "maxLength": 2000
+                    },
+                    "sourceCode": {
+                      "type": "string",
+                      "maxLength": 2000
+                    },
+                    "sourceId": {
+                      "type": "string",
+                      "maxLength": 2000,
+                      "description": "Registered source; a conflicting uploaded sourceCode is an error."
+                    },
+                    "taskId": {
+                      "type": "string",
+                      "maxLength": 2000
+                    },
+                    "kpiCode": {
+                      "type": "string",
+                      "maxLength": 2000
+                    },
+                    "category": {
+                      "type": "string",
+                      "maxLength": 2000
+                    },
+                    "factorId": {
+                      "type": "string",
+                      "maxLength": 2000
+                    },
+                    "fallbackFactorId": {
+                      "type": "string",
+                      "maxLength": 2000
+                    },
+                    "fallbackReason": {
+                      "type": "string",
+                      "maxLength": 2000
+                    },
+                    "dataQuality": {
+                      "type": "string",
+                      "maxLength": 2000
+                    },
+                    "assumptions": {
+                      "type": "string",
+                      "maxLength": 2000
+                    },
+                    "zeroReason": {
+                      "type": "string",
+                      "maxLength": 2000
+                    },
+                    "description": {
+                      "type": "string",
+                      "maxLength": 2000
+                    },
+                    "invoiceNumber": {
+                      "type": "string",
+                      "maxLength": 2000
+                    },
+                    "vendor": {
+                      "type": "string",
+                      "maxLength": 2000
+                    },
+                    "accountNumber": {
+                      "type": "string",
+                      "maxLength": 2000
+                    },
+                    "amountInr": {
+                      "type": "string",
+                      "maxLength": 2000
+                    },
+                    "lineRef": {
+                      "type": "string",
+                      "maxLength": 2000
+                    },
+                    "externalKey": {
+                      "type": "string",
+                      "maxLength": 2000
+                    }
+                  },
+                  "required": []
+                }
+              },
+              "required": [
+                "pageStart",
+                "pageEnd"
+              ]
+            }
+          }
+        },
+        "required": []
+      },
+      "ImportCreate": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 180
+          },
+          "kind": {
+            "enum": [
+              "SPREADSHEET",
+              "INVOICE"
+            ]
+          },
+          "target": {
+            "enum": [
+              "CARBON",
+              "KPI",
+              "EMISSION"
+            ]
+          },
+          "periodId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "name",
+          "kind",
+          "target",
+          "periodId"
+        ]
+      },
+      "ImportAttach": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "documentIds": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 20,
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        },
+        "required": [
+          "version",
+          "documentIds"
+        ]
+      },
+      "ImportPreview": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "plans": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 10,
+            "items": {
+              "$ref": "#/components/schemas/ImportPlan"
+            }
+          }
+        },
+        "required": [
+          "version",
+          "plans"
+        ]
+      },
+      "ImportReview": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "quantityMeaningConfirmed": {
+            "const": true
+          },
+          "items": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 100,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "rowId": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "version": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "action": {
+                  "enum": [
+                    "CONFIRM",
+                    "SKIP"
+                  ]
+                },
+                "overrides": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "quantity": {
+                      "type": "string",
+                      "maxLength": 2000,
+                      "description": "Exact decimal measurement, never the currency total."
+                    },
+                    "unit": {
+                      "type": "string",
+                      "maxLength": 2000
+                    },
+                    "intervalStart": {
+                      "type": "string",
+                      "maxLength": 2000
+                    },
+                    "intervalEnd": {
+                      "type": "string",
+                      "maxLength": 2000
+                    },
+                    "activityDate": {
+                      "type": "string",
+                      "maxLength": 2000
+                    },
+                    "campusCode": {
+                      "type": "string",
+                      "maxLength": 2000
+                    },
+                    "sourceCode": {
+                      "type": "string",
+                      "maxLength": 2000
+                    },
+                    "sourceId": {
+                      "type": "string",
+                      "maxLength": 2000,
+                      "description": "Registered source; a conflicting uploaded sourceCode is an error."
+                    },
+                    "taskId": {
+                      "type": "string",
+                      "maxLength": 2000
+                    },
+                    "kpiCode": {
+                      "type": "string",
+                      "maxLength": 2000
+                    },
+                    "category": {
+                      "type": "string",
+                      "maxLength": 2000
+                    },
+                    "factorId": {
+                      "type": "string",
+                      "maxLength": 2000
+                    },
+                    "fallbackFactorId": {
+                      "type": "string",
+                      "maxLength": 2000
+                    },
+                    "fallbackReason": {
+                      "type": "string",
+                      "maxLength": 2000
+                    },
+                    "dataQuality": {
+                      "type": "string",
+                      "maxLength": 2000
+                    },
+                    "assumptions": {
+                      "type": "string",
+                      "maxLength": 2000
+                    },
+                    "zeroReason": {
+                      "type": "string",
+                      "maxLength": 2000
+                    },
+                    "description": {
+                      "type": "string",
+                      "maxLength": 2000
+                    },
+                    "invoiceNumber": {
+                      "type": "string",
+                      "maxLength": 2000
+                    },
+                    "vendor": {
+                      "type": "string",
+                      "maxLength": 2000
+                    },
+                    "accountNumber": {
+                      "type": "string",
+                      "maxLength": 2000
+                    },
+                    "amountInr": {
+                      "type": "string",
+                      "maxLength": 2000
+                    },
+                    "lineRef": {
+                      "type": "string",
+                      "maxLength": 2000
+                    },
+                    "externalKey": {
+                      "type": "string",
+                      "maxLength": 2000
+                    }
+                  },
+                  "required": []
+                },
+                "reason": {
+                  "type": "string",
+                  "minLength": 10,
+                  "maxLength": 2000
+                }
+              },
+              "required": [
+                "rowId",
+                "version",
+                "action",
+                "reason"
+              ]
+            }
+          }
+        },
+        "required": [
+          "quantityMeaningConfirmed",
+          "items"
+        ]
+      },
+      "ImportCommit": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "confirmed": {
+            "const": true
+          },
+          "rowIds": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 100,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        },
+        "required": [
+          "version",
+          "confirmed",
+          "rowIds"
+        ]
+      },
+      "ImportReason": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 10,
+            "maxLength": 2000
+          }
+        },
+        "required": [
+          "version",
+          "reason"
+        ]
+      },
+      "ImportTemplate": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 180
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "ImportSuccess": {
+        "type": "object",
+        "required": [
+          "success",
+          "data",
+          "requestId"
+        ],
+        "properties": {
+          "success": {
+            "const": true
+          },
+          "data": {
+            "description": "Tenant-scoped batch/file/row resource; see HLD and executable examples for exact shapes."
+          },
+          "requestId": {
+            "type": "string"
+          }
+        }
+      },
+      "ImportError": {
+        "type": "object",
+        "required": [
+          "success",
+          "error",
+          "requestId"
+        ],
+        "properties": {
+          "success": {
+            "const": false
+          },
+          "error": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string"
+              },
+              "message": {
+                "type": "string"
+              },
+              "details": {}
+            }
+          },
+          "requestId": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

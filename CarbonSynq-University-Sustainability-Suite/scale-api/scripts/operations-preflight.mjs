@@ -1,0 +1,4 @@
+/** Non-mutating local prerequisite check. It does not certify PostgreSQL/S3/ClamAV integration. */
+import {spawnSync} from 'node:child_process';import {operationsConfig} from '../src/operations/crypto.mjs';import {migrationPlan} from './migrate.mjs';
+const cfg=operationsConfig(),tools={};for(const [tool,args]of [['python3',['--version']],['pdfinfo',['-v']],['pdftoppm',['-v']],['tesseract',['--version']],['pg_dump',['--version']],['docker',['compose','version']]]){const r=spawnSync(tool,args,{encoding:'utf8',timeout:5000});tools[tool]={available:r.status===0,version:r.status===0?(r.stdout||r.stderr).trim().split('\n')[0]:null};}
+console.log(JSON.stringify({node:process.version,mailMode:cfg.mailMode,localCaptureNotEmail:cfg.mailMode==='capture',ocrEnabled:cfg.ocrEnabled,tools,migrations:(await migrationPlan()).map(x=>x.version),externalIntegrationTested:false,next:'Run the real deployment acceptance workflow in docs/operations/PRODUCTION-GATES.md.'},null,2));

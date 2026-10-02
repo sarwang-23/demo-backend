@@ -1,0 +1,49 @@
+{
+  "release": "2.4.0-operations-rc.1",
+  "checkedAtUtc": "2026-10-02T05:10:02.360161+00:00",
+  "inputZip": "CarbonSynq-University-Excel-Invoice-Import-With-HLD(1).zip",
+  "inputZipSha256": "1d0927a180a832eb49ab205672afb2fae5baed065417682ac07e3ea15e977f4a",
+  "archiveFiles": 652,
+  "originalPaths": 554,
+  "unchangedOriginalFiles": 523,
+  "updatedOriginalFilesWithExactBackups": 31,
+  "missingOriginalPaths": 0,
+  "fullCodeManifestFilesVerified": 149,
+  "migrations001Through004Unchanged": true,
+  "freshArchiveExtraction": {
+    "backendTests": {
+      "passed": 531,
+      "failed": 0,
+      "skipped": 0
+    },
+    "legacyTests": {
+      "passed": 43,
+      "failed": 0,
+      "skipped": 0
+    }
+  },
+  "ui": {
+    "checksPassed": 17,
+    "mode": "Chromium DOM with explicit local HTTP bridge; synthetic authentication/database/storage/scanner",
+    "nativeNavigation": "ERR_BLOCKED_BY_ADMINISTRATOR; native browser/CSP acceptance not verified"
+  },
+  "actualOcr": {
+    "fixtures": 1,
+    "language": "English",
+    "engine": "Tesseract 5.5.0",
+    "originalBytesUnchanged": true,
+    "note": "Separate controlled PDF smoke, not repeated in the standard tests; no accuracy guarantee."
+  },
+  "notExecuted": [
+    "PostgreSQL migrations/RLS/concurrent locks/triggers",
+    "S3 and ClamAV",
+    "Docker startup/build",
+    "real email delivery",
+    "real pg_dump/object recovery and restore",
+    "hosted CI",
+    "load and penetration testing",
+    "native Windows launchers"
+  ],
+  "dependencyLock": "Registry DNS failed EAI_AGAIN. No fabricated lockfile.",
+  "note": "Measured tests were rerun from an extracted archive. Package evidence files were then finalized without changes to tested runtime code. ZIP integrity and final source hashes are checked after repacking."
+}

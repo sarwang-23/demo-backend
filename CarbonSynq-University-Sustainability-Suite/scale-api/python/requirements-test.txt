@@ -1,0 +1,3 @@
+# Test fixture generation only; not installed in the runtime image.
+-r requirements.txt
+reportlab==4.4.9

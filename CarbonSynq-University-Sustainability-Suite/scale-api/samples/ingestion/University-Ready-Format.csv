@@ -1,0 +1,3 @@
+campus,source code,period start,period end,quantity,unit
+TEST,MAIN_GRID,2026-04-01,2026-04-30,1250,kWh
+TEST,MAIN_GRID,2026-05-01,2026-05-31,1500,kWh

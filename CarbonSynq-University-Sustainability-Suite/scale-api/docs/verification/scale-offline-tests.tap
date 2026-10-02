@@ -1,0 +1,578 @@
+
+> carbonsynq-scale-api@2.0.0-rc.1 test
+> node --test tests/unit.test.mjs tests/http.test.mjs tests/adapters.test.mjs
+
+TAP version 13
+# Subtest: tenant transaction sets local tenant context and uses one connection
+ok 1 - tenant transaction sets local tenant context and uses one connection
+  ---
+  duration_ms: 6.203429
+  type: 'test'
+  ...
+# Subtest: transaction errors roll back and release the connection
+ok 2 - transaction errors roll back and release the connection
+  ---
+  duration_ms: 1.073651
+  type: 'test'
+  ...
+# Subtest: a broken rollback destroys rather than recycles the connection
+ok 3 - a broken rollback destroys rather than recycles the connection
+  ---
+  duration_ms: 0.952474
+  type: 'test'
+  ...
+# Subtest: an uncertain COMMIT is not automatically replayed
+ok 4 - an uncertain COMMIT is not automatically replayed
+  ---
+  duration_ms: 0.429261
+  type: 'test'
+  ...
+# Subtest: runtime refuses superuser database credentials
+ok 5 - runtime refuses superuser database credentials
+  ---
+  duration_ms: 0.770267
+  type: 'test'
+  ...
+# Subtest: runtime refuses table-owning application role
+ok 6 - runtime refuses table-owning application role
+  ---
+  duration_ms: 0.520049
+  type: 'test'
+  ...
+# Subtest: idempotency returns stored response instead of running a second mutation
+ok 7 - idempotency returns stored response instead of running a second mutation
+  ---
+  duration_ms: 2.500087
+  type: 'test'
+  ...
+# Subtest: enqueue uses a unique dedupe key and delayed durable availability
+ok 8 - enqueue uses a unique dedupe key and delayed durable availability
+  ---
+  duration_ms: 0.313506
+  type: 'test'
+  ...
+# Subtest: claim SQL uses skip-locked row locking, an attempt cap and a fresh lease token
+ok 9 - claim SQL uses skip-locked row locking, an attempt cap and a fresh lease token
+  ---
+  duration_ms: 1.240399
+  type: 'test'
+  ...
+# Subtest: stale worker cannot obtain a finalization fence
+ok 10 - stale worker cannot obtain a finalization fence
+  ---
+  duration_ms: 0.774195
+  type: 'test'
+  ...
+# Subtest: ClamD client sends correct bounded INSTREAM frames
+ok 11 - ClamD client sends correct bounded INSTREAM frames
+  ---
+  duration_ms: 28.80374
+  type: 'test'
+  ...
+# Subtest: ClamD FOUND verdict prevents clean acceptance
+ok 12 - ClamD FOUND verdict prevents clean acceptance
+  ---
+  duration_ms: 11.366482
+  type: 'test'
+  ...
+# Subtest: scanner errors fail closed rather than claiming CLEAN
+ok 13 - scanner errors fail closed rather than claiming CLEAN
+  ---
+  duration_ms: 2.942804
+  type: 'test'
+  ...
+# Subtest: connection refusal fails scanning
+ok 14 - connection refusal fails scanning
+  ---
+  duration_ms: 2.147299
+  type: 'test'
+  ...
+# Subtest: migration structurally includes RLS, composite FKs and immutable ledgers (not a database execution test)
+ok 15 - migration structurally includes RLS, composite FKs and immutable ledgers (not a database execution test)
+  ---
+  duration_ms: 6.563286
+  type: 'test'
+  ...
+# Subtest: liveness endpoint works without a session
+ok 16 - liveness endpoint works without a session
+  ---
+  duration_ms: 49.378737
+  type: 'test'
+  ...
+# Subtest: business routes require authentication
+ok 17 - business routes require authentication
+  ---
+  duration_ms: 13.219369
+  type: 'test'
+  ...
+# Subtest: business response contains request ID and security headers
+ok 18 - business response contains request ID and security headers
+  ---
+  duration_ms: 7.015546
+  type: 'test'
+  ...
+# Subtest: untrusted browser origins rejected
+ok 19 - untrusted browser origins rejected
+  ---
+  duration_ms: 3.084108
+  type: 'test'
+  ...
+# Subtest: allowed origin receives exact CORS header
+ok 20 - allowed origin receives exact CORS header
+  ---
+  duration_ms: 3.063059
+  type: 'test'
+  ...
+# Subtest: preflight supports required idempotency header
+ok 21 - preflight supports required idempotency header
+  ---
+  duration_ms: 2.796241
+  type: 'test'
+  ...
+# Subtest: metrics require a separate credential
+ok 22 - metrics require a separate credential
+  ---
+  duration_ms: 4.865389
+  type: 'test'
+  ...
+# Subtest: JSON content type is enforced
+ok 23 - JSON content type is enforced
+  ---
+  duration_ms: 11.958573
+  type: 'test'
+  ...
+# Subtest: malformed JSON produces 400, not a stack trace
+ok 24 - malformed JSON produces 400, not a stack trace
+  ---
+  duration_ms: 6.491693
+  type: 'test'
+  ...
+# Subtest: JSON array body rejected
+ok 25 - JSON array body rejected
+  ---
+  duration_ms: 4.22856
+  type: 'test'
+  ...
+# Subtest: JSON body has a strict 64 KiB limit
+ok 26 - JSON body has a strict 64 KiB limit
+  ---
+  duration_ms: 3.596646
+  type: 'test'
+  ...
+# Subtest: create routes forward the idempotency key
+ok 27 - create routes forward the idempotency key
+  ---
+  duration_ms: 5.32283
+  type: 'test'
+  ...
+# Subtest: tenant IDs in query cannot redirect authorization
+ok 28 - tenant IDs in query cannot redirect authorization
+  ---
+  duration_ms: 2.756881
+  type: 'test'
+  ...
+# Subtest: raw invoice upload is bounded and URL-decodes the filename
+ok 29 - raw invoice upload is bounded and URL-decodes the filename
+  ---
+  duration_ms: 4.474037
+  type: 'test'
+  ...
+# Subtest: invoice size rejection happens before storage
+ok 30 - invoice size rejection happens before storage
+  ---
+  duration_ms: 2.769015
+  type: 'test'
+  ...
+# Subtest: readiness returns 503 when a dependency is not ready
+ok 31 - readiness returns 503 when a dependency is not ready
+  ---
+  duration_ms: 2.091758
+  type: 'test'
+  ...
+# Subtest: internal service errors are sanitized
+ok 32 - internal service errors are sanitized
+  ---
+  duration_ms: 4.256569
+  type: 'test'
+  ...
+# Subtest: draining rejects new traffic safely
+ok 33 - draining rejects new traffic safely
+  ---
+  duration_ms: 2.529924
+  type: 'test'
+  ...
+# Subtest: production transport advertises HSTS
+ok 34 - production transport advertises HSTS
+  ---
+  duration_ms: 1.809065
+  type: 'test'
+  ...
+# Subtest: canonical request hashing ignores JSON key ordering
+ok 35 - canonical request hashing ignores JSON key ordering
+  ---
+  duration_ms: 1.934812
+  type: 'test'
+  ...
+# Subtest: decimal strings normalize without binary floating point
+ok 36 - decimal strings normalize without binary floating point
+  ---
+  duration_ms: 0.499334
+  type: 'test'
+  ...
+# Subtest: reject invalid consumption 1
+ok 37 - reject invalid consumption 1
+  ---
+  duration_ms: 0.675377
+  type: 'test'
+  ...
+# Subtest: reject invalid consumption "1e3"
+ok 38 - reject invalid consumption "1e3"
+  ---
+  duration_ms: 0.294151
+  type: 'test'
+  ...
+# Subtest: reject invalid consumption "-1"
+ok 39 - reject invalid consumption "-1"
+  ---
+  duration_ms: 0.150755
+  type: 'test'
+  ...
+# Subtest: reject invalid consumption "01"
+ok 40 - reject invalid consumption "01"
+  ---
+  duration_ms: 0.140787
+  type: 'test'
+  ...
+# Subtest: reject invalid consumption "1.0000001"
+ok 41 - reject invalid consumption "1.0000001"
+  ---
+  duration_ms: 0.228794
+  type: 'test'
+  ...
+# Subtest: reject invalid consumption "NaN"
+ok 42 - reject invalid consumption "NaN"
+  ---
+  duration_ms: 0.195852
+  type: 'test'
+  ...
+# Subtest: reject invalid consumption "Infinity"
+ok 43 - reject invalid consumption "Infinity"
+  ---
+  duration_ms: 1.763475
+  type: 'test'
+  ...
+# Subtest: reject invalid consumption "0"
+ok 44 - reject invalid consumption "0"
+  ---
+  duration_ms: 0.535759
+  type: 'test'
+  ...
+# Subtest: reject invalid consumption "1000000000000"
+ok 45 - reject invalid consumption "1000000000000"
+  ---
+  duration_ms: 0.510045
+  type: 'test'
+  ...
+# Subtest: zero money is allowed while zero consumption is not
+ok 46 - zero money is allowed while zero consumption is not
+  ---
+  duration_ms: 0.199581
+  type: 'test'
+  ...
+# Subtest: exact multiplication keeps decimal result
+ok 47 - exact multiplication keeps decimal result
+  ---
+  duration_ms: 0.34658
+  type: 'test'
+  ...
+# Subtest: rounding half-up to six decimal places
+ok 48 - rounding half-up to six decimal places
+  ---
+  duration_ms: 0.20655
+  type: 'test'
+  ...
+# Subtest: large products do not use JS safe-integer arithmetic
+ok 49 - large products do not use JS safe-integer arithmetic
+  ---
+  duration_ms: 0.196995
+  type: 'test'
+  ...
+# Subtest: strict dates reject February overflow
+ok 50 - strict dates reject February overflow
+  ---
+  duration_ms: 0.842741
+  type: 'test'
+  ...
+# Subtest: leap date accepted
+ok 51 - leap date accepted
+  ---
+  duration_ms: 0.185203
+  type: 'test'
+  ...
+# Subtest: activity scope is derived from category
+ok 52 - activity scope is derived from category
+  ---
+  duration_ms: 0.630175
+  type: 'test'
+  ...
+# Subtest: money cannot replace a consumption quantity
+ok 53 - money cannot replace a consumption quantity
+  ---
+  duration_ms: 0.272557
+  type: 'test'
+  ...
+# Subtest: canonical unit mismatch rejected
+ok 54 - canonical unit mismatch rejected
+  ---
+  duration_ms: 0.142034
+  type: 'test'
+  ...
+# Subtest: caller cannot select a tenant in an activity payload
+ok 55 - caller cannot select a tenant in an activity payload
+  ---
+  duration_ms: 0.12361
+  type: 'test'
+  ...
+# Subtest: caller cannot override the accounting scope
+ok 56 - caller cannot override the accounting scope
+  ---
+  duration_ms: 0.110354
+  type: 'test'
+  ...
+# Subtest: semantic duplicate fingerprint is independent of description
+ok 57 - semantic duplicate fingerprint is independent of description
+  ---
+  duration_ms: 0.944529
+  type: 'test'
+  ...
+# Subtest: duplicate override requires a substantive reason
+ok 58 - duplicate override requires a substantive reason
+  ---
+  duration_ms: 0.26246
+  type: 'test'
+  ...
+# Subtest: creator may submit own draft
+ok 59 - creator may submit own draft
+  ---
+  duration_ms: 0.638782
+  type: 'test'
+  ...
+# Subtest: other data-entry user cannot submit
+ok 60 - other data-entry user cannot submit
+  ---
+  duration_ms: 0.211892
+  type: 'test'
+  ...
+# Subtest: leadership cannot approve
+ok 61 - leadership cannot approve
+  ---
+  duration_ms: 0.198634
+  type: 'test'
+  ...
+# Subtest: admin cannot self-approve
+ok 62 - admin cannot self-approve
+  ---
+  duration_ms: 0.142033
+  type: 'test'
+  ...
+# Subtest: separate reviewer can verify
+ok 63 - separate reviewer can verify
+  ---
+  duration_ms: 0.110632
+  type: 'test'
+  ...
+# Subtest: stale writes are rejected before state mutation
+ok 64 - stale writes are rejected before state mutation
+  ---
+  duration_ms: 0.207577
+  type: 'test'
+  ...
+# Subtest: cannot skip review
+ok 65 - cannot skip review
+  ---
+  duration_ms: 0.214346
+  type: 'test'
+  ...
+# Subtest: reject requires reason
+ok 66 - reject requires reason
+  ---
+  duration_ms: 0.148302
+  type: 'test'
+  ...
+# Subtest: keyset cursor round-trip preserves timestamp and UUID
+ok 67 - keyset cursor round-trip preserves timestamp and UUID
+  ---
+  duration_ms: 1.617151
+  type: 'test'
+  ...
+# Subtest: invalid cursors rejected
+ok 68 - invalid cursors rejected
+  ---
+  duration_ms: 0.52518
+  type: 'test'
+  ...
+# Subtest: list requests cannot bypass the page cap
+ok 69 - list requests cannot bypass the page cap
+  ---
+  duration_ms: 0.178357
+  type: 'test'
+  ...
+# Subtest: session tokens use random secrets and tenant-scoped hashes
+ok 70 - session tokens use random secrets and tenant-scoped hashes
+  ---
+  duration_ms: 0.740642
+  type: 'test'
+  ...
+# Subtest: malformed bearer rejected
+ok 71 - malformed bearer rejected
+  ---
+  duration_ms: 0.193039
+  type: 'test'
+  ...
+# Subtest: password hashing uses async scrypt and verifies without plaintext storage
+ok 72 - password hashing uses async scrypt and verifies without plaintext storage
+  ---
+  duration_ms: 423.47989
+  type: 'test'
+  ...
+# Subtest: short passwords rejected
+ok 73 - short passwords rejected
+  ---
+  duration_ms: 1.661995
+  type: 'test'
+  ...
+# Subtest: weak idempotency key rejected
+ok 74 - weak idempotency key rejected
+  ---
+  duration_ms: 0.219558
+  type: 'test'
+  ...
+# Subtest: internal errors never expose database messages
+ok 75 - internal errors never expose database messages
+  ---
+  duration_ms: 0.198951
+  type: 'test'
+  ...
+# Subtest: unique conflict has a safe machine-readable error
+ok 76 - unique conflict has a safe machine-readable error
+  ---
+  duration_ms: 0.067409
+  type: 'test'
+  ...
+# Subtest: default config is bounded and development only
+ok 77 - default config is bounded and development only
+  ---
+  duration_ms: 0.515663
+  type: 'test'
+  ...
+# Subtest: production rejects insecure database transport
+ok 78 - production rejects insecure database transport
+  ---
+  duration_ms: 0.127096
+  type: 'test'
+  ...
+# Subtest: production rejects HTTP browser origins
+ok 79 - production rejects HTTP browser origins
+  ---
+  duration_ms: 0.114895
+  type: 'test'
+  ...
+# Subtest: database URL cannot override TLS verification
+ok 80 - database URL cannot override TLS verification
+  ---
+  duration_ms: 0.181128
+  type: 'test'
+  ...
+# Subtest: pool size has a hard bound
+ok 81 - pool size has a hard bound
+  ---
+  duration_ms: 0.11907
+  type: 'test'
+  ...
+# Subtest: request digest secret is mandatory
+ok 82 - request digest secret is mandatory
+  ---
+  duration_ms: 0.083699
+  type: 'test'
+  ...
+# Subtest: file type uses bytes, not just extension
+ok 83 - file type uses bytes, not just extension
+  ---
+  duration_ms: 1.19402
+  type: 'test'
+  ...
+# Subtest: MIME spoof is rejected
+ok 84 - MIME spoof is rejected
+  ---
+  duration_ms: 0.59232
+  type: 'test'
+  ...
+# Subtest: filename cannot escape a directory
+ok 85 - filename cannot escape a directory
+  ---
+  duration_ms: 0.39558
+  type: 'test'
+  ...
+# Subtest: HTML and executable files are not accepted
+ok 86 - HTML and executable files are not accepted
+  ---
+  duration_ms: 0.131781
+  type: 'test'
+  ...
+# Subtest: empty upload rejected
+ok 87 - empty upload rejected
+  ---
+  duration_ms: 0.07116
+  type: 'test'
+  ...
+# Subtest: upload size cap enforced
+ok 88 - upload size cap enforced
+  ---
+  duration_ms: 0.154808
+  type: 'test'
+  ...
+# Subtest: extraction never converts money into consumption
+ok 89 - extraction never converts money into consumption
+  ---
+  duration_ms: 1.63073
+  type: 'test'
+  ...
+# Subtest: MWh is explicitly normalized to kWh with a warning
+ok 90 - MWh is explicitly normalized to kWh with a warning
+  ---
+  duration_ms: 0.485479
+  type: 'test'
+  ...
+# Subtest: ambiguous invoice consumption lines force manual review
+ok 91 - ambiguous invoice consumption lines force manual review
+  ---
+  duration_ms: 0.085911
+  type: 'test'
+  ...
+# Subtest: bounded extraction executes real text parsing in a worker thread
+ok 92 - bounded extraction executes real text parsing in a worker thread
+  ---
+  duration_ms: 66.06688
+  type: 'test'
+  ...
+# Subtest: real sample PDF parser is retained and works within the bounded worker
+ok 93 - real sample PDF parser is retained and works within the bounded worker
+  ---
+  duration_ms: 55.318104
+  type: 'test'
+  ...
+# Subtest: metrics expose bounded status labels, not personal IDs or paths
+ok 94 - metrics expose bounded status labels, not personal IDs or paths
+  ---
+  duration_ms: 1.007299
+  type: 'test'
+  ...
+1..94
+# tests 94
+# suites 0
+# pass 94
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 678.599774

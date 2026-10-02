@@ -1,0 +1,16 @@
+node_modules
+.env
+.env.*
+backups
+docs/*results*
+
+# Do not send private operator configuration or artifacts to the build context.
+.env*
+.private-mail
+.private-mail/**
+private-backups
+private-backups/**
+.env.prepare.lock
+.env.preparing-*
+*.tap
+*.log

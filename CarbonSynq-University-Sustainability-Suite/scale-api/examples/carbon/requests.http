@@ -1,0 +1,70 @@
+# VS Code REST-client style examples. Replace every REQUIRED value with your own
+# tenant's IDs/token. This is not a fixture and does not create a tenant.
+@base = http://localhost:8080
+@token = REQUIRED_ENTRY_SESSION_TOKEN
+@reviewerToken = REQUIRED_DIFFERENT_REVIEWER_SESSION_TOKEN
+@period = REQUIRED_PERIOD_UUID
+@source = REQUIRED_OWNED_SOURCE_UUID
+@factor = REQUIRED_APPROVED_FACTOR_UUID
+@evidence = REQUIRED_CLEAN_DOCUMENT_UUID
+@record = REQUIRED_CREATED_RECORD_UUID
+@version = REQUIRED_CURRENT_VERSION
+
+### Available shapes and validation controls
+GET {{base}}/api/v2/university/carbon/catalog
+Authorization: Bearer {{token}}
+
+### Non-persistent fuel reconciliation
+POST {{base}}/api/v2/university/carbon/quantity/preview
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{"mode":"FUEL_STOCK","unit":"litre","opening":"100","received":"200","transfersIn":"0","closing":"20","transfersOut":"0"}
+
+### Read source metadata before choosing a unit/factor
+GET {{base}}/api/v2/university/carbon/sources/{{source}}
+Authorization: Bearer {{token}}
+
+### Manual source entry; dates must fit the period, source and factor
+# Replace the idempotency key for a different logical request, never for its retry.
+POST {{base}}/api/v2/university/carbon/records
+Authorization: Bearer {{token}}
+Content-Type: application/json
+Idempotency-Key: replace-with-unique-manual-entry-key
+
+{
+ "periodId":"{{period}}",
+ "sourceId":"{{source}}",
+ "intervalStart":"2026-04-01",
+ "intervalEnd":"2026-04-30",
+ "externalKey":"replace-with-your-source-and-month-reference",
+ "description":"Actual fuel consumed, reconciled against the attached evidence",
+ "quantityInput":{"mode":"DIRECT","quantity":"280","unit":"litre"},
+ "factorId":"{{factor}}",
+ "evidenceIds":["{{evidence}}"],
+ "dataQuality":"MEASURED"
+}
+
+### Submit using the current version in the previous response
+POST {{base}}/api/v2/university/carbon/records/{{record}}/submit
+Authorization: Bearer {{token}}
+Content-Type: application/json
+Idempotency-Key: replace-with-unique-submit-key
+
+{"version":{{version}}}
+
+### Different reviewer verifies and calculates; update version after submission
+POST {{base}}/api/v2/university/carbon/records/{{record}}/approve
+Authorization: Bearer {{reviewerToken}}
+Content-Type: application/json
+Idempotency-Key: replace-with-unique-approval-key
+
+{"version":{{version}}}
+
+### Role restricted: use reviewer/admin/leadership token
+GET {{base}}/api/v2/university/carbon/readiness?periodId={{period}}
+Authorization: Bearer {{reviewerToken}}
+
+### Current live ledger, not a frozen approved report
+GET {{base}}/api/v2/university/carbon/export?periodId={{period}}
+Authorization: Bearer {{reviewerToken}}

@@ -1,0 +1,34 @@
+{
+  "date": "2026-10-02",
+  "platform": "Linux",
+  "node": "v22.16.0",
+  "syntaxChecksPassed": 14,
+  "originalFilesByteCompared": 242,
+  "originalFilesChanged": 0,
+  "openapiInternalRefsResolved": 55,
+  "shellLauncherHttpSmoke": "PASS",
+  "httpSmokeResponses": {
+    "/": {
+      "status": 200,
+      "bytes": 526
+    },
+    "/api-docs": {
+      "status": 200,
+      "bytes": 10767
+    },
+    "/openapi.json": {
+      "status": 200,
+      "bytes": 71023
+    }
+  },
+  "normalStartupSeed": {
+    "activities": 38,
+    "calculatedActivities": 36,
+    "totalKgCO2e": 289339.8
+  },
+  "gracefulShutdown": "PASS",
+  "productionCliGuard": "PASS",
+  "windowsLauncherExecuted": false,
+  "nativeBrowserSessionRetested": false,
+  "originalNeonBuildExecuted": false
+}

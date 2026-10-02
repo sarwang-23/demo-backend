@@ -1,0 +1,30 @@
+{
+  "result": "PASS",
+  "archiveRoot": "CarbonSynq-University-Demo-Ready",
+  "codeTested": "Extracted copy of delivered university-demo; metadata report added after code verification.",
+  "node": "v22.16.0",
+  "platform": "Linux",
+  "tests": 43,
+  "passed": 43,
+  "failed": 0,
+  "skipped": 0,
+  "sourcePreservation": {
+    "originalSourceAndMigrationFilesCompared": 205,
+    "changedOriginalFiles": [
+      ".gitignore",
+      "README.md",
+      "package.json"
+    ],
+    "missingOriginalFiles": [],
+    "originalSrcPreserved": true
+  },
+  "browserUiHarness": true,
+  "noNpmInstallRequired": true,
+  "noPersistedDemoDatabaseBundled": true,
+  "notValidated": [
+    "Original Express/TypeScript/Neon build and tests",
+    "Native browser-to-localhost connection in this restricted execution environment",
+    "Windows/macOS launch execution",
+    "Production deployment or security certification"
+  ]
+}

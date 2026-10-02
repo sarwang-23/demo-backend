@@ -1,0 +1,13 @@
+{
+  "archive": "CarbonSynq-Complete-Backend-With-HLD.zip",
+  "archiveExtractedAndRetested": true,
+  "node": "v22.16.0",
+  "tests": 43,
+  "passed": 43,
+  "failed": 0,
+  "fullApiWorkflow": "PASS",
+  "sourceFilesChangedAfterPackagedTest": 0,
+  "finalChangesAfterRetest": "Only verification output files and packaging report were added; source and configuration unchanged.",
+  "originalFilesPreserved": 242,
+  "codeBookEmbeddedFiles": 235
+}

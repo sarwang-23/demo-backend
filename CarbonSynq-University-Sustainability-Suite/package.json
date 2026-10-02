@@ -1,0 +1,18 @@
+{
+  "name": "carbonsynq-complete-backend",
+  "version": "1.0.1",
+  "private": true,
+  "type": "module",
+  "description": "Complete source delivery: isolated university demo backend, HLD and preserved original Neon project",
+  "engines": {
+    "node": "^22.16.0 || >=24.0.0"
+  },
+  "scripts": {
+    "start": "node server.mjs",
+    "dev": "node --watch server.mjs",
+    "test": "node --test tests/unit.test.mjs tests/integration.test.mjs tests/operations.test.mjs",
+    "demo:flow": "node examples/full-workflow.mjs",
+    "backup": "node tools.mjs backup",
+    "reset": "node tools.mjs reset"
+  }
+}

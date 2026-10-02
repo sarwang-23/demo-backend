@@ -1,0 +1,790 @@
+TAP version 13
+# Subtest: tenant transaction sets local tenant context and uses one connection
+ok 1 - tenant transaction sets local tenant context and uses one connection
+  ---
+  duration_ms: 2.791494
+  type: 'test'
+  ...
+# Subtest: transaction errors roll back and release the connection
+ok 2 - transaction errors roll back and release the connection
+  ---
+  duration_ms: 0.688848
+  type: 'test'
+  ...
+# Subtest: a broken rollback destroys rather than recycles the connection
+ok 3 - a broken rollback destroys rather than recycles the connection
+  ---
+  duration_ms: 0.451924
+  type: 'test'
+  ...
+# Subtest: an uncertain COMMIT is not automatically replayed
+ok 4 - an uncertain COMMIT is not automatically replayed
+  ---
+  duration_ms: 0.409913
+  type: 'test'
+  ...
+# Subtest: runtime refuses superuser database credentials
+ok 5 - runtime refuses superuser database credentials
+  ---
+  duration_ms: 0.649451
+  type: 'test'
+  ...
+# Subtest: runtime refuses table-owning application role
+ok 6 - runtime refuses table-owning application role
+  ---
+  duration_ms: 0.278454
+  type: 'test'
+  ...
+# Subtest: idempotency returns stored response instead of running a second mutation
+ok 7 - idempotency returns stored response instead of running a second mutation
+  ---
+  duration_ms: 1.646219
+  type: 'test'
+  ...
+# Subtest: enqueue uses a unique dedupe key and delayed durable availability
+ok 8 - enqueue uses a unique dedupe key and delayed durable availability
+  ---
+  duration_ms: 0.3237
+  type: 'test'
+  ...
+# Subtest: claim SQL uses skip-locked row locking, an attempt cap and a fresh lease token
+ok 9 - claim SQL uses skip-locked row locking, an attempt cap and a fresh lease token
+  ---
+  duration_ms: 1.279801
+  type: 'test'
+  ...
+# Subtest: stale worker cannot obtain a finalization fence
+ok 10 - stale worker cannot obtain a finalization fence
+  ---
+  duration_ms: 0.697601
+  type: 'test'
+  ...
+# Subtest: ClamD client sends correct bounded INSTREAM frames
+ok 11 - ClamD client sends correct bounded INSTREAM frames
+  ---
+  duration_ms: 27.902211
+  type: 'test'
+  ...
+# Subtest: ClamD FOUND verdict prevents clean acceptance
+ok 12 - ClamD FOUND verdict prevents clean acceptance
+  ---
+  duration_ms: 3.732135
+  type: 'test'
+  ...
+# Subtest: scanner errors fail closed rather than claiming CLEAN
+ok 13 - scanner errors fail closed rather than claiming CLEAN
+  ---
+  duration_ms: 2.519039
+  type: 'test'
+  ...
+# Subtest: connection refusal fails scanning
+ok 14 - connection refusal fails scanning
+  ---
+  duration_ms: 2.070678
+  type: 'test'
+  ...
+# Subtest: migration structurally includes RLS, composite FKs and immutable ledgers (not a database execution test)
+ok 15 - migration structurally includes RLS, composite FKs and immutable ledgers (not a database execution test)
+  ---
+  duration_ms: 4.37291
+  type: 'test'
+  ...
+# Subtest: template has correct port/origins but fails readiness without rotated credentials
+ok 16 - template has correct port/origins but fails readiness without rotated credentials
+  ---
+  duration_ms: 3.507521
+  type: 'test'
+  ...
+# Subtest: prepares three distinct direct URL identities and verified TLS
+ok 17 - prepares three distinct direct URL identities and verified TLS
+  ---
+  duration_ms: 2.567627
+  type: 'test'
+  ...
+# Subtest: generates fresh unpredictable values locally and does not mutate input
+ok 18 - generates fresh unpredictable values locally and does not mutate input
+  ---
+  duration_ms: 2.048499
+  type: 'test'
+  ...
+# Subtest: reruns preserve every valid previously prepared secret
+ok 19 - reruns preserve every valid previously prepared secret
+  ---
+  duration_ms: 2.382038
+  type: 'test'
+  ...
+# Subtest: a copied pooled Neon URL becomes direct and its TLS options become explicit config
+ok 20 - a copied pooled Neon URL becomes direct and its TLS options become explicit config
+  ---
+  duration_ms: 1.168392
+  type: 'test'
+  ...
+# Subtest: percent-encoded special password characters survive URL normalization
+ok 21 - percent-encoded special password characters survive URL normalization
+  ---
+  duration_ms: 3.303334
+  type: 'test'
+  ...
+# Subtest: rejects insecure SSL query options
+ok 22 - rejects insecure SSL query options
+  ---
+  duration_ms: 0.602403
+  type: 'test'
+  ...
+# Subtest: rejects hidden arbitrary connection options
+ok 23 - rejects hidden arbitrary connection options
+  ---
+  duration_ms: 0.498344
+  type: 'test'
+  ...
+# Subtest: rejects invalid URLs without including their value in errors
+ok 24 - rejects invalid URLs without including their value in errors
+  ---
+  duration_ms: 0.739534
+  type: 'test'
+  ...
+# Subtest: rejects owner URL in another database service
+ok 25 - rejects owner URL in another database service
+  ---
+  duration_ms: 0.964785
+  type: 'test'
+  ...
+# Subtest: rejects fragments so unencoded password characters cannot silently truncate URL
+ok 26 - rejects fragments so unencoded password characters cannot silently truncate URL
+  ---
+  duration_ms: 0.700214
+  type: 'test'
+  ...
+# Subtest: runtime role cannot act as migration owner
+ok 27 - runtime role cannot act as migration owner
+  ---
+  duration_ms: 0.510865
+  type: 'test'
+  ...
+# Subtest: rejects nonlocal/production profile instead of overwriting it
+ok 28 - rejects nonlocal/production profile instead of overwriting it
+  ---
+  duration_ms: 0.354506
+  type: 'test'
+  ...
+# Subtest: cannot turn off Neon TLS
+ok 29 - cannot turn off Neon TLS
+  ---
+  duration_ms: 0.301535
+  type: 'test'
+  ...
+# Subtest: explicit binding flag is enabled for API and worker config
+ok 30 - explicit binding flag is enabled for API and worker config
+  ---
+  duration_ms: 0.64837
+  type: 'test'
+  ...
+# Subtest: binding config rejects invalid values and plaintext transport
+ok 31 - binding config rejects invalid values and plaintext transport
+  ---
+  duration_ms: 1.006383
+  type: 'test'
+  ...
+# Subtest: existing runtime credentials are kept, not rotated implicitly
+ok 32 - existing runtime credentials are kept, not rotated implicitly
+  ---
+  duration_ms: 0.831193
+  type: 'test'
+  ...
+# Subtest: runtime URL and separate password mismatch is rejected
+ok 33 - runtime URL and separate password mismatch is rejected
+  ---
+  duration_ms: 0.712876
+  type: 'test'
+  ...
+# Subtest: runtime URL cannot point to another endpoint
+ok 34 - runtime URL cannot point to another endpoint
+  ---
+  duration_ms: 0.813179
+  type: 'test'
+  ...
+# Subtest: runtime URL cannot use owner permissions
+ok 35 - runtime URL cannot use owner permissions
+  ---
+  duration_ms: 0.855151
+  type: 'test'
+  ...
+# Subtest: API and worker password reuse is rejected
+ok 36 - API and worker password reuse is rejected
+  ---
+  duration_ms: 0.474801
+  type: 'test'
+  ...
+# Subtest: duplicate .env variable names are rejected
+ok 37 - duplicate .env variable names are rejected
+  ---
+  duration_ms: 0.231912
+  type: 'test'
+  ...
+# Subtest: old API/JWT keys are not silently retained in the new file
+ok 38 - old API/JWT keys are not silently retained in the new file
+  ---
+  duration_ms: 0.305029
+  type: 'test'
+  ...
+# Subtest: multiline and oversized .env input are rejected
+ok 39 - multiline and oversized .env input are rejected
+  ---
+  duration_ms: 0.332118
+  type: 'test'
+  ...
+# Subtest: comments and all configured values survive rendering and read-back
+ok 40 - comments and all configured values survive rendering and read-back
+  ---
+  duration_ms: 1.052841
+  type: 'test'
+  ...
+# Subtest: readiness returns only redacted status and makes no external verification claim
+ok 41 - readiness returns only redacted status and makes no external verification claim
+  ---
+  duration_ms: 0.878402
+  type: 'test'
+  ...
+# Subtest: readiness rejects stale public port and missing own UI origin
+ok 42 - readiness rejects stale public port and missing own UI origin
+  ---
+  duration_ms: 1.021681
+  type: 'test'
+  ...
+# Subtest: local compose profile does not claim to configure a custom CA or external storage
+ok 43 - local compose profile does not claim to configure a custom CA or external storage
+  ---
+  duration_ms: 1.06354
+  type: 'test'
+  ...
+# Subtest: readiness requires prepared direct URLs not raw pooler strings
+ok 44 - readiness requires prepared direct URLs not raw pooler strings
+  ---
+  duration_ms: 0.695063
+  type: 'test'
+  ...
+# Subtest: CLI writes private .env, preserves it on rerun and never prints secrets
+ok 45 - CLI writes private .env, preserves it on rerun and never prints secrets
+  ---
+  duration_ms: 186.931144
+  type: 'test'
+  ...
+# Subtest: CLI failure leaves invalid input unchanged and returns useful no-secret error
+ok 46 - CLI failure leaves invalid input unchanged and returns useful no-secret error
+  ---
+  duration_ms: 51.471674
+  type: 'test'
+  ...
+# Subtest: first-run CLI copies a safe template when .env is absent and then stops for owner input
+ok 47 - first-run CLI copies a safe template when .env is absent and then stops for owner input
+  ---
+  duration_ms: 53.288159
+  type: 'test'
+  ...
+# Subtest: env checker rejects conflicting shell config without printing conflicting values
+ok 48 - env checker rejects conflicting shell config without printing conflicting values
+  ---
+  duration_ms: 147.872448
+  type: 'test'
+  ...
+# Subtest: a concurrent setup lock is not removed by the losing CLI
+ok 49 - a concurrent setup lock is not removed by the losing CLI
+  ---
+  duration_ms: 49.028652
+  type: 'test'
+  ...
+# Subtest: migration rejects transaction-pooler endpoints before importing database driver
+ok 50 - migration rejects transaction-pooler endpoints before importing database driver
+  ---
+  duration_ms: 0.818555
+  type: 'test'
+  ...
+# Subtest: API and worker compose environments exclude the migration-owner URL
+ok 51 - API and worker compose environments exclude the migration-owner URL
+  ---
+  duration_ms: 0.376277
+  type: 'test'
+  ...
+# Subtest: liveness endpoint works without a session
+ok 52 - liveness endpoint works without a session
+  ---
+  duration_ms: 31.141368
+  type: 'test'
+  ...
+# Subtest: business routes require authentication
+ok 53 - business routes require authentication
+  ---
+  duration_ms: 8.417559
+  type: 'test'
+  ...
+# Subtest: business response contains request ID and security headers
+ok 54 - business response contains request ID and security headers
+  ---
+  duration_ms: 8.173527
+  type: 'test'
+  ...
+# Subtest: untrusted browser origins rejected
+ok 55 - untrusted browser origins rejected
+  ---
+  duration_ms: 4.719243
+  type: 'test'
+  ...
+# Subtest: allowed origin receives exact CORS header
+ok 56 - allowed origin receives exact CORS header
+  ---
+  duration_ms: 4.489008
+  type: 'test'
+  ...
+# Subtest: preflight supports required idempotency header
+ok 57 - preflight supports required idempotency header
+  ---
+  duration_ms: 3.667726
+  type: 'test'
+  ...
+# Subtest: metrics require a separate credential
+ok 58 - metrics require a separate credential
+  ---
+  duration_ms: 8.041472
+  type: 'test'
+  ...
+# Subtest: JSON content type is enforced
+ok 59 - JSON content type is enforced
+  ---
+  duration_ms: 15.492899
+  type: 'test'
+  ...
+# Subtest: malformed JSON produces 400, not a stack trace
+ok 60 - malformed JSON produces 400, not a stack trace
+  ---
+  duration_ms: 10.653681
+  type: 'test'
+  ...
+# Subtest: JSON array body rejected
+ok 61 - JSON array body rejected
+  ---
+  duration_ms: 6.297765
+  type: 'test'
+  ...
+# Subtest: JSON body has a strict 64 KiB limit
+ok 62 - JSON body has a strict 64 KiB limit
+  ---
+  duration_ms: 4.712271
+  type: 'test'
+  ...
+# Subtest: create routes forward the idempotency key
+ok 63 - create routes forward the idempotency key
+  ---
+  duration_ms: 6.339754
+  type: 'test'
+  ...
+# Subtest: tenant IDs in query cannot redirect authorization
+ok 64 - tenant IDs in query cannot redirect authorization
+  ---
+  duration_ms: 3.200628
+  type: 'test'
+  ...
+# Subtest: raw invoice upload is bounded and URL-decodes the filename
+ok 65 - raw invoice upload is bounded and URL-decodes the filename
+  ---
+  duration_ms: 5.030466
+  type: 'test'
+  ...
+# Subtest: invoice size rejection happens before storage
+ok 66 - invoice size rejection happens before storage
+  ---
+  duration_ms: 3.79875
+  type: 'test'
+  ...
+# Subtest: readiness returns 503 when a dependency is not ready
+ok 67 - readiness returns 503 when a dependency is not ready
+  ---
+  duration_ms: 3.205275
+  type: 'test'
+  ...
+# Subtest: internal service errors are sanitized
+ok 68 - internal service errors are sanitized
+  ---
+  duration_ms: 5.009819
+  type: 'test'
+  ...
+# Subtest: draining rejects new traffic safely
+ok 69 - draining rejects new traffic safely
+  ---
+  duration_ms: 2.519072
+  type: 'test'
+  ...
+# Subtest: production transport advertises HSTS
+ok 70 - production transport advertises HSTS
+  ---
+  duration_ms: 2.609103
+  type: 'test'
+  ...
+# Subtest: canonical request hashing ignores JSON key ordering
+ok 71 - canonical request hashing ignores JSON key ordering
+  ---
+  duration_ms: 1.258547
+  type: 'test'
+  ...
+# Subtest: decimal strings normalize without binary floating point
+ok 72 - decimal strings normalize without binary floating point
+  ---
+  duration_ms: 0.299012
+  type: 'test'
+  ...
+# Subtest: reject invalid consumption 1
+ok 73 - reject invalid consumption 1
+  ---
+  duration_ms: 0.526866
+  type: 'test'
+  ...
+# Subtest: reject invalid consumption "1e3"
+ok 74 - reject invalid consumption "1e3"
+  ---
+  duration_ms: 0.151368
+  type: 'test'
+  ...
+# Subtest: reject invalid consumption "-1"
+ok 75 - reject invalid consumption "-1"
+  ---
+  duration_ms: 0.154795
+  type: 'test'
+  ...
+# Subtest: reject invalid consumption "01"
+ok 76 - reject invalid consumption "01"
+  ---
+  duration_ms: 0.086697
+  type: 'test'
+  ...
+# Subtest: reject invalid consumption "1.0000001"
+ok 77 - reject invalid consumption "1.0000001"
+  ---
+  duration_ms: 0.131909
+  type: 'test'
+  ...
+# Subtest: reject invalid consumption "NaN"
+ok 78 - reject invalid consumption "NaN"
+  ---
+  duration_ms: 0.070932
+  type: 'test'
+  ...
+# Subtest: reject invalid consumption "Infinity"
+ok 79 - reject invalid consumption "Infinity"
+  ---
+  duration_ms: 1.499504
+  type: 'test'
+  ...
+# Subtest: reject invalid consumption "0"
+ok 80 - reject invalid consumption "0"
+  ---
+  duration_ms: 0.428046
+  type: 'test'
+  ...
+# Subtest: reject invalid consumption "1000000000000"
+ok 81 - reject invalid consumption "1000000000000"
+  ---
+  duration_ms: 0.194431
+  type: 'test'
+  ...
+# Subtest: zero money is allowed while zero consumption is not
+ok 82 - zero money is allowed while zero consumption is not
+  ---
+  duration_ms: 0.134845
+  type: 'test'
+  ...
+# Subtest: exact multiplication keeps decimal result
+ok 83 - exact multiplication keeps decimal result
+  ---
+  duration_ms: 0.492131
+  type: 'test'
+  ...
+# Subtest: rounding half-up to six decimal places
+ok 84 - rounding half-up to six decimal places
+  ---
+  duration_ms: 0.139
+  type: 'test'
+  ...
+# Subtest: large products do not use JS safe-integer arithmetic
+ok 85 - large products do not use JS safe-integer arithmetic
+  ---
+  duration_ms: 0.080545
+  type: 'test'
+  ...
+# Subtest: strict dates reject February overflow
+ok 86 - strict dates reject February overflow
+  ---
+  duration_ms: 0.495705
+  type: 'test'
+  ...
+# Subtest: leap date accepted
+ok 87 - leap date accepted
+  ---
+  duration_ms: 0.115884
+  type: 'test'
+  ...
+# Subtest: activity scope is derived from category
+ok 88 - activity scope is derived from category
+  ---
+  duration_ms: 0.466599
+  type: 'test'
+  ...
+# Subtest: money cannot replace a consumption quantity
+ok 89 - money cannot replace a consumption quantity
+  ---
+  duration_ms: 0.177116
+  type: 'test'
+  ...
+# Subtest: canonical unit mismatch rejected
+ok 90 - canonical unit mismatch rejected
+  ---
+  duration_ms: 0.079412
+  type: 'test'
+  ...
+# Subtest: caller cannot select a tenant in an activity payload
+ok 91 - caller cannot select a tenant in an activity payload
+  ---
+  duration_ms: 0.061594
+  type: 'test'
+  ...
+# Subtest: caller cannot override the accounting scope
+ok 92 - caller cannot override the accounting scope
+  ---
+  duration_ms: 0.057466
+  type: 'test'
+  ...
+# Subtest: semantic duplicate fingerprint is independent of description
+ok 93 - semantic duplicate fingerprint is independent of description
+  ---
+  duration_ms: 1.037788
+  type: 'test'
+  ...
+# Subtest: duplicate override requires a substantive reason
+ok 94 - duplicate override requires a substantive reason
+  ---
+  duration_ms: 0.134415
+  type: 'test'
+  ...
+# Subtest: creator may submit own draft
+ok 95 - creator may submit own draft
+  ---
+  duration_ms: 0.164188
+  type: 'test'
+  ...
+# Subtest: other data-entry user cannot submit
+ok 96 - other data-entry user cannot submit
+  ---
+  duration_ms: 0.08004
+  type: 'test'
+  ...
+# Subtest: leadership cannot approve
+ok 97 - leadership cannot approve
+  ---
+  duration_ms: 0.062048
+  type: 'test'
+  ...
+# Subtest: admin cannot self-approve
+ok 98 - admin cannot self-approve
+  ---
+  duration_ms: 0.10376
+  type: 'test'
+  ...
+# Subtest: separate reviewer can verify
+ok 99 - separate reviewer can verify
+  ---
+  duration_ms: 0.164237
+  type: 'test'
+  ...
+# Subtest: stale writes are rejected before state mutation
+ok 100 - stale writes are rejected before state mutation
+  ---
+  duration_ms: 0.146116
+  type: 'test'
+  ...
+# Subtest: cannot skip review
+ok 101 - cannot skip review
+  ---
+  duration_ms: 0.074501
+  type: 'test'
+  ...
+# Subtest: reject requires reason
+ok 102 - reject requires reason
+  ---
+  duration_ms: 0.298741
+  type: 'test'
+  ...
+# Subtest: keyset cursor round-trip preserves timestamp and UUID
+ok 103 - keyset cursor round-trip preserves timestamp and UUID
+  ---
+  duration_ms: 1.379077
+  type: 'test'
+  ...
+# Subtest: invalid cursors rejected
+ok 104 - invalid cursors rejected
+  ---
+  duration_ms: 0.157365
+  type: 'test'
+  ...
+# Subtest: list requests cannot bypass the page cap
+ok 105 - list requests cannot bypass the page cap
+  ---
+  duration_ms: 0.07365
+  type: 'test'
+  ...
+# Subtest: session tokens use random secrets and tenant-scoped hashes
+ok 106 - session tokens use random secrets and tenant-scoped hashes
+  ---
+  duration_ms: 0.705206
+  type: 'test'
+  ...
+# Subtest: malformed bearer rejected
+ok 107 - malformed bearer rejected
+  ---
+  duration_ms: 0.129736
+  type: 'test'
+  ...
+# Subtest: password hashing uses async scrypt and verifies without plaintext storage
+ok 108 - password hashing uses async scrypt and verifies without plaintext storage
+  ---
+  duration_ms: 311.710604
+  type: 'test'
+  ...
+# Subtest: short passwords rejected
+ok 109 - short passwords rejected
+  ---
+  duration_ms: 0.376858
+  type: 'test'
+  ...
+# Subtest: weak idempotency key rejected
+ok 110 - weak idempotency key rejected
+  ---
+  duration_ms: 0.135339
+  type: 'test'
+  ...
+# Subtest: internal errors never expose database messages
+ok 111 - internal errors never expose database messages
+  ---
+  duration_ms: 0.177807
+  type: 'test'
+  ...
+# Subtest: unique conflict has a safe machine-readable error
+ok 112 - unique conflict has a safe machine-readable error
+  ---
+  duration_ms: 0.064175
+  type: 'test'
+  ...
+# Subtest: default config is bounded and development only
+ok 113 - default config is bounded and development only
+  ---
+  duration_ms: 0.444992
+  type: 'test'
+  ...
+# Subtest: production rejects insecure database transport
+ok 114 - production rejects insecure database transport
+  ---
+  duration_ms: 0.112976
+  type: 'test'
+  ...
+# Subtest: production rejects HTTP browser origins
+ok 115 - production rejects HTTP browser origins
+  ---
+  duration_ms: 0.103885
+  type: 'test'
+  ...
+# Subtest: database URL cannot override TLS verification
+ok 116 - database URL cannot override TLS verification
+  ---
+  duration_ms: 0.169958
+  type: 'test'
+  ...
+# Subtest: pool size has a hard bound
+ok 117 - pool size has a hard bound
+  ---
+  duration_ms: 0.116903
+  type: 'test'
+  ...
+# Subtest: request digest secret is mandatory
+ok 118 - request digest secret is mandatory
+  ---
+  duration_ms: 0.097652
+  type: 'test'
+  ...
+# Subtest: file type uses bytes, not just extension
+ok 119 - file type uses bytes, not just extension
+  ---
+  duration_ms: 0.244191
+  type: 'test'
+  ...
+# Subtest: MIME spoof is rejected
+ok 120 - MIME spoof is rejected
+  ---
+  duration_ms: 0.413763
+  type: 'test'
+  ...
+# Subtest: filename cannot escape a directory
+ok 121 - filename cannot escape a directory
+  ---
+  duration_ms: 0.282949
+  type: 'test'
+  ...
+# Subtest: HTML and executable files are not accepted
+ok 122 - HTML and executable files are not accepted
+  ---
+  duration_ms: 0.118339
+  type: 'test'
+  ...
+# Subtest: empty upload rejected
+ok 123 - empty upload rejected
+  ---
+  duration_ms: 0.07122
+  type: 'test'
+  ...
+# Subtest: upload size cap enforced
+ok 124 - upload size cap enforced
+  ---
+  duration_ms: 0.062842
+  type: 'test'
+  ...
+# Subtest: extraction never converts money into consumption
+ok 125 - extraction never converts money into consumption
+  ---
+  duration_ms: 1.537652
+  type: 'test'
+  ...
+# Subtest: MWh is explicitly normalized to kWh with a warning
+ok 126 - MWh is explicitly normalized to kWh with a warning
+  ---
+  duration_ms: 0.94035
+  type: 'test'
+  ...
+# Subtest: ambiguous invoice consumption lines force manual review
+ok 127 - ambiguous invoice consumption lines force manual review
+  ---
+  duration_ms: 0.143425
+  type: 'test'
+  ...
+# Subtest: bounded extraction executes real text parsing in a worker thread
+ok 128 - bounded extraction executes real text parsing in a worker thread
+  ---
+  duration_ms: 50.442708
+  type: 'test'
+  ...
+# Subtest: real sample PDF parser is retained and works within the bounded worker
+ok 129 - real sample PDF parser is retained and works within the bounded worker
+  ---
+  duration_ms: 52.144814
+  type: 'test'
+  ...
+# Subtest: metrics expose bounded status labels, not personal IDs or paths
+ok 130 - metrics expose bounded status labels, not personal IDs or paths
+  ---
+  duration_ms: 0.44516
+  type: 'test'
+  ...
+1..130
+# tests 130
+# suites 0
+# pass 130
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 676.789255

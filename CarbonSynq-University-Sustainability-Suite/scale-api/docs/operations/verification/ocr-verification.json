@@ -1,0 +1,13 @@
+{
+  "test": "Actual English OCR of one synthetic image-only PDF",
+  "passed": true,
+  "elapsedMs": 1100,
+  "engine": "tesseract 5.5.0",
+  "pages": 1,
+  "ocrPages": 1,
+  "wordCount": 30,
+  "originalSha256": "bf0be36c11c612f8f86ded61e641b9ccbb34eea01ec8c6ade4ae16824df6daf1",
+  "originalUnchanged": true,
+  "needsHumanReview": true,
+  "limits": "This is one controlled fixture, not a field-accuracy benchmark or real antivirus/storage acceptance."
+}

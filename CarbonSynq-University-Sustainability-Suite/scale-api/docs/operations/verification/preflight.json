@@ -1,0 +1,41 @@
+{
+  "node": "v22.16.0",
+  "mailMode": "disabled",
+  "localCaptureNotEmail": false,
+  "ocrEnabled": false,
+  "tools": {
+    "python3": {
+      "available": true,
+      "version": "Python 3.13.5"
+    },
+    "pdfinfo": {
+      "available": true,
+      "version": "pdfinfo version 25.06.0"
+    },
+    "pdftoppm": {
+      "available": true,
+      "version": "pdftoppm version 25.06.0"
+    },
+    "tesseract": {
+      "available": true,
+      "version": "tesseract 5.5.0"
+    },
+    "pg_dump": {
+      "available": false,
+      "version": null
+    },
+    "docker": {
+      "available": false,
+      "version": null
+    }
+  },
+  "migrations": [
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  "externalIntegrationTested": false,
+  "next": "Run the real deployment acceptance workflow in docs/operations/PRODUCTION-GATES.md."
+}

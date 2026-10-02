@@ -1,0 +1,2059 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "CarbonSynq University Operations",
+    "version": "2.4.0-operations-rc.1",
+    "description": "Additive operations API. Authentication, tenant identity and role enforcement reuse the existing backend. New staff features require configured delivery; capture is development only. No production acceptance or independent accounting assurance is implied."
+  },
+  "servers": [
+    {
+      "url": "/"
+    }
+  ],
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "paths": {
+    "/api/v2/operations/capabilities": {
+      "get": {
+        "summary": "Read actual operations configuration and explicit limits",
+        "operationId": "ops_get_capabilities",
+        "x-roles": [
+          "ADMIN",
+          "ENTRY",
+          "REVIEWER",
+          "LEADERSHIP"
+        ],
+        "x-idempotent-cache": false,
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Success"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "400 malformed; 401 authentication; 403 role; 404 hidden or absent; 409 stale/state; 422 validation; 429 rate/queue; 503 provider configuration",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/operations/staff/invite": {
+      "post": {
+        "summary": "Queue a single-use staff invitation after administrator password confirmation",
+        "operationId": "ops_post_staff_invite",
+        "x-roles": [
+          "ADMIN"
+        ],
+        "x-idempotent-cache": false,
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Success"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "400 malformed; 401 authentication; 403 role; 404 hidden or absent; 409 stale/state; 422 validation; 429 rate/queue; 503 provider configuration",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": ""
+                  },
+                  "email": {
+                    "type": "string",
+                    "description": "",
+                    "format": "email"
+                  },
+                  "role": {
+                    "type": "string",
+                    "enum": [
+                      "ADMIN",
+                      "ENTRY",
+                      "REVIEWER",
+                      "LEADERSHIP"
+                    ]
+                  },
+                  "currentPassword": {
+                    "type": "string",
+                    "description": "Administrator reauthentication",
+                    "format": "password"
+                  }
+                },
+                "required": [
+                  "name",
+                  "email",
+                  "role",
+                  "currentPassword"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/operations/staff/invitations": {
+      "get": {
+        "summary": "List staff invitations without exposing token hashes or tokens",
+        "operationId": "ops_get_staff_invitations",
+        "x-roles": [
+          "ADMIN"
+        ],
+        "x-idempotent-cache": false,
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "description": ""
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Success"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "400 malformed; 401 authentication; 403 role; 404 hidden or absent; 409 stale/state; 422 validation; 429 rate/queue; 503 provider configuration",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/operations/staff/invitations/{id}/revoke": {
+      "post": {
+        "summary": "Revoke an unconsumed staff invitation",
+        "operationId": "ops_post_staff_invitations__id_revoke",
+        "x-roles": [
+          "ADMIN"
+        ],
+        "x-idempotent-cache": true,
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "Registered UUID",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "Reuse for exact retry only",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Success"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "400 malformed; 401 authentication; 403 role; 404 hidden or absent; 409 stale/state; 422 validation; 429 rate/queue; 503 provider configuration",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/operations/memberships": {
+      "get": {
+        "summary": "Page active and revoked campus/department memberships",
+        "operationId": "ops_get_memberships",
+        "x-roles": [
+          "ADMIN"
+        ],
+        "x-idempotent-cache": false,
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "description": "Registered UUID",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "description": ""
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Success"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "400 malformed; 401 authentication; 403 role; 404 hidden or absent; 409 stale/state; 422 validation; 429 rate/queue; 503 provider configuration",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create or revoke an explicit evidence-scope membership",
+        "operationId": "ops_post_memberships",
+        "x-roles": [
+          "ADMIN"
+        ],
+        "x-idempotent-cache": true,
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "Reuse for exact retry only",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Success"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "400 malformed; 401 authentication; 403 role; 404 hidden or absent; 409 stale/state; 422 validation; 429 rate/queue; 503 provider configuration",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "description": "Registered UUID",
+                    "format": "uuid"
+                  },
+                  "version": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "userId": {
+                    "type": "string",
+                    "description": "Registered UUID",
+                    "format": "uuid"
+                  },
+                  "campusId": {
+                    "type": "string",
+                    "description": "Registered UUID",
+                    "format": "uuid"
+                  },
+                  "departmentId": {
+                    "type": "string",
+                    "description": "Registered UUID",
+                    "format": "uuid"
+                  },
+                  "active": {
+                    "type": "boolean"
+                  },
+                  "reason": {
+                    "type": "string",
+                    "description": "Auditable explanation; at least ten characters",
+                    "minLength": 10,
+                    "maxLength": 2000
+                  }
+                },
+                "required": [
+                  "userId",
+                  "campusId",
+                  "active",
+                  "reason"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/operations/documents/{id}/access": {
+      "get": {
+        "summary": "Read the explicit evidence scope, holds and grants",
+        "operationId": "ops_get_documents__id_access",
+        "x-roles": [
+          "ADMIN"
+        ],
+        "x-idempotent-cache": false,
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "Registered UUID",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Success"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "400 malformed; 401 authentication; 403 role; 404 hidden or absent; 409 stale/state; 422 validation; 429 rate/queue; 503 provider configuration",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/operations/documents/{id}/scope": {
+      "post": {
+        "summary": "Change document sharing scope with an audit reason",
+        "operationId": "ops_post_documents__id_scope",
+        "x-roles": [
+          "ADMIN"
+        ],
+        "x-idempotent-cache": true,
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "Registered UUID",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "Reuse for exact retry only",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Success"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "400 malformed; 401 authentication; 403 role; 404 hidden or absent; 409 stale/state; 422 validation; 429 rate/queue; 503 provider configuration",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "version": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "visibility": {
+                    "type": "string",
+                    "enum": [
+                      "PRIVATE",
+                      "CAMPUS",
+                      "DEPARTMENT"
+                    ]
+                  },
+                  "campusId": {
+                    "type": "string",
+                    "description": "Registered UUID",
+                    "format": "uuid"
+                  },
+                  "departmentId": {
+                    "type": "string",
+                    "description": "Registered UUID",
+                    "format": "uuid"
+                  },
+                  "reason": {
+                    "type": "string",
+                    "description": "Auditable explanation; at least ten characters",
+                    "minLength": 10,
+                    "maxLength": 2000
+                  }
+                },
+                "required": [
+                  "version",
+                  "visibility",
+                  "reason"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/operations/documents/{id}/grant": {
+      "post": {
+        "summary": "Grant or revoke one named user evidence access",
+        "operationId": "ops_post_documents__id_grant",
+        "x-roles": [
+          "ADMIN"
+        ],
+        "x-idempotent-cache": true,
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "Registered UUID",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "Reuse for exact retry only",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Success"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "400 malformed; 401 authentication; 403 role; 404 hidden or absent; 409 stale/state; 422 validation; 429 rate/queue; 503 provider configuration",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "version": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "userId": {
+                    "type": "string",
+                    "description": "Registered UUID",
+                    "format": "uuid"
+                  },
+                  "active": {
+                    "type": "boolean"
+                  },
+                  "reason": {
+                    "type": "string",
+                    "description": "Auditable explanation; at least ten characters",
+                    "minLength": 10,
+                    "maxLength": 2000
+                  }
+                },
+                "required": [
+                  "version",
+                  "userId",
+                  "active",
+                  "reason"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/operations/documents/{id}/hold": {
+      "post": {
+        "summary": "Set or release an evidence retention hold without deleting bytes",
+        "operationId": "ops_post_documents__id_hold",
+        "x-roles": [
+          "ADMIN"
+        ],
+        "x-idempotent-cache": true,
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "Registered UUID",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "Reuse for exact retry only",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Success"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "400 malformed; 401 authentication; 403 role; 404 hidden or absent; 409 stale/state; 422 validation; 429 rate/queue; 503 provider configuration",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "version": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "hold": {
+                    "type": "boolean"
+                  },
+                  "until": {
+                    "type": "string",
+                    "description": "Optional future ISO timestamp",
+                    "format": "date-time"
+                  },
+                  "reason": {
+                    "type": "string",
+                    "description": "Auditable explanation; at least ten characters",
+                    "minLength": 10,
+                    "maxLength": 2000
+                  }
+                },
+                "required": [
+                  "version",
+                  "hold",
+                  "reason"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/operations/documents/{id}/dependencies": {
+      "get": {
+        "summary": "Review evidence dependencies before any manual retention decision",
+        "operationId": "ops_get_documents__id_dependencies",
+        "x-roles": [
+          "ADMIN"
+        ],
+        "x-idempotent-cache": false,
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "Registered UUID",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Success"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "400 malformed; 401 authentication; 403 role; 404 hidden or absent; 409 stale/state; 422 validation; 429 rate/queue; 503 provider configuration",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/operations/tasks/{id}/reassign": {
+      "post": {
+        "summary": "Transfer an open task without changing historical authorship",
+        "operationId": "ops_post_tasks__id_reassign",
+        "x-roles": [
+          "ADMIN"
+        ],
+        "x-idempotent-cache": true,
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "Registered UUID",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "Reuse for exact retry only",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Success"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "400 malformed; 401 authentication; 403 role; 404 hidden or absent; 409 stale/state; 422 validation; 429 rate/queue; 503 provider configuration",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "version": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "assigneeId": {
+                    "type": "string",
+                    "description": "Registered UUID",
+                    "format": "uuid"
+                  },
+                  "reviewerId": {
+                    "type": "string",
+                    "description": "Registered UUID",
+                    "format": "uuid"
+                  },
+                  "returnPending": {
+                    "type": "boolean"
+                  },
+                  "reason": {
+                    "type": "string",
+                    "description": "Auditable explanation; at least ten characters",
+                    "minLength": 10,
+                    "maxLength": 2000
+                  }
+                },
+                "required": [
+                  "version",
+                  "assigneeId",
+                  "reviewerId",
+                  "reason"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/operations/sources/{id}/reassign": {
+      "post": {
+        "summary": "Transfer only source ownership; accounting identity stays immutable",
+        "operationId": "ops_post_sources__id_reassign",
+        "x-roles": [
+          "ADMIN"
+        ],
+        "x-idempotent-cache": true,
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "Registered UUID",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "Reuse for exact retry only",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Success"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "400 malformed; 401 authentication; 403 role; 404 hidden or absent; 409 stale/state; 422 validation; 429 rate/queue; 503 provider configuration",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "ownershipVersion": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "ownerId": {
+                    "type": "string",
+                    "description": "Registered UUID",
+                    "format": "uuid"
+                  },
+                  "returnPending": {
+                    "type": "boolean"
+                  },
+                  "reason": {
+                    "type": "string",
+                    "description": "Auditable explanation; at least ten characters",
+                    "minLength": 10,
+                    "maxLength": 2000
+                  }
+                },
+                "required": [
+                  "ownershipVersion",
+                  "ownerId",
+                  "reason"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/operations/actions/{id}/reassign": {
+      "post": {
+        "summary": "Transfer responsibility for an open corrective action",
+        "operationId": "ops_post_actions__id_reassign",
+        "x-roles": [
+          "ADMIN"
+        ],
+        "x-idempotent-cache": true,
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "Registered UUID",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "Reuse for exact retry only",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Success"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "400 malformed; 401 authentication; 403 role; 404 hidden or absent; 409 stale/state; 422 validation; 429 rate/queue; 503 provider configuration",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "version": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "ownerId": {
+                    "type": "string",
+                    "description": "Registered UUID",
+                    "format": "uuid"
+                  },
+                  "reason": {
+                    "type": "string",
+                    "description": "Auditable explanation; at least ten characters",
+                    "minLength": 10,
+                    "maxLength": 2000
+                  }
+                },
+                "required": [
+                  "version",
+                  "ownerId",
+                  "reason"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/operations/reassignments": {
+      "get": {
+        "summary": "Page immutable operational transfer history",
+        "operationId": "ops_get_reassignments",
+        "x-roles": [
+          "ADMIN"
+        ],
+        "x-idempotent-cache": false,
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "description": ""
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Success"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "400 malformed; 401 authentication; 403 role; 404 hidden or absent; 409 stale/state; 422 validation; 429 rate/queue; 503 provider configuration",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/operations/notifications": {
+      "get": {
+        "summary": "Read your own in-app notification inbox",
+        "operationId": "ops_get_notifications",
+        "x-roles": [
+          "ADMIN",
+          "ENTRY",
+          "REVIEWER",
+          "LEADERSHIP"
+        ],
+        "x-idempotent-cache": false,
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "description": ""
+            }
+          },
+          {
+            "name": "unreadOnly",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "description": ""
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Success"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "400 malformed; 401 authentication; 403 role; 404 hidden or absent; 409 stale/state; 422 validation; 429 rate/queue; 503 provider configuration",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/operations/notifications/{id}/read": {
+      "post": {
+        "summary": "Mark your own notification read",
+        "operationId": "ops_post_notifications__id_read",
+        "x-roles": [
+          "ADMIN",
+          "ENTRY",
+          "REVIEWER",
+          "LEADERSHIP"
+        ],
+        "x-idempotent-cache": true,
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "Registered UUID",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "Reuse for exact retry only",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Success"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "400 malformed; 401 authentication; 403 role; 404 hidden or absent; 409 stale/state; 422 validation; 429 rate/queue; 503 provider configuration",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/operations/preferences": {
+      "get": {
+        "summary": "Read your own notification preferences",
+        "operationId": "ops_get_preferences",
+        "x-roles": [
+          "ADMIN",
+          "ENTRY",
+          "REVIEWER",
+          "LEADERSHIP"
+        ],
+        "x-idempotent-cache": false,
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Success"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "400 malformed; 401 authentication; 403 role; 404 hidden or absent; 409 stale/state; 422 validation; 429 rate/queue; 503 provider configuration",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Update your own reminder/email preferences",
+        "operationId": "ops_post_preferences",
+        "x-roles": [
+          "ADMIN",
+          "ENTRY",
+          "REVIEWER",
+          "LEADERSHIP"
+        ],
+        "x-idempotent-cache": true,
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "Reuse for exact retry only",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Success"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "400 malformed; 401 authentication; 403 role; 404 hidden or absent; 409 stale/state; 422 validation; 429 rate/queue; 503 provider configuration",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "version": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "emailEnabled": {
+                    "type": "boolean"
+                  },
+                  "remindersEnabled": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "version",
+                  "emailEnabled",
+                  "remindersEnabled"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/operations/outbox": {
+      "get": {
+        "summary": "Page delivery statuses without exposing bodies or credential links",
+        "operationId": "ops_get_outbox",
+        "x-roles": [
+          "ADMIN"
+        ],
+        "x-idempotent-cache": false,
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "description": ""
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Success"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "400 malformed; 401 authentication; 403 role; 404 hidden or absent; 409 stale/state; 422 validation; 429 rate/queue; 503 provider configuration",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/operations/exports": {
+      "post": {
+        "summary": "Schedule a locked-period inventory export for independent approval",
+        "operationId": "ops_post_exports",
+        "x-roles": [
+          "ADMIN"
+        ],
+        "x-idempotent-cache": true,
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "Reuse for exact retry only",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Success"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "400 malformed; 401 authentication; 403 role; 404 hidden or absent; 409 stale/state; 422 validation; 429 rate/queue; 503 provider configuration",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "periodId": {
+                    "type": "string",
+                    "description": "Registered UUID",
+                    "format": "uuid"
+                  },
+                  "title": {
+                    "type": "string",
+                    "description": "",
+                    "maxLength": 180
+                  },
+                  "format": {
+                    "type": "string",
+                    "enum": [
+                      "csv",
+                      "jsonl"
+                    ]
+                  }
+                },
+                "required": [
+                  "periodId",
+                  "title",
+                  "format"
+                ]
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "Page background inventory export status",
+        "operationId": "ops_get_exports",
+        "x-roles": [
+          "ADMIN",
+          "REVIEWER",
+          "LEADERSHIP"
+        ],
+        "x-idempotent-cache": false,
+        "parameters": [
+          {
+            "name": "periodId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "description": "Registered UUID",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "description": ""
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Success"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "400 malformed; 401 authentication; 403 role; 404 hidden or absent; 409 stale/state; 422 validation; 429 rate/queue; 503 provider configuration",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/operations/exports/{id}": {
+      "get": {
+        "summary": "Read an export manifest and current period version",
+        "operationId": "ops_get_exports__id",
+        "x-roles": [
+          "ADMIN",
+          "REVIEWER",
+          "LEADERSHIP"
+        ],
+        "x-idempotent-cache": false,
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "Registered UUID",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Success"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "400 malformed; 401 authentication; 403 role; 404 hidden or absent; 409 stale/state; 422 validation; 429 rate/queue; 503 provider configuration",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/operations/exports/{id}/review": {
+      "post": {
+        "summary": "Independently approve or reject a completed inventory export",
+        "operationId": "ops_post_exports__id_review",
+        "x-roles": [
+          "ADMIN",
+          "REVIEWER"
+        ],
+        "x-idempotent-cache": true,
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "Registered UUID",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "Reuse for exact retry only",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Success"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "400 malformed; 401 authentication; 403 role; 404 hidden or absent; 409 stale/state; 422 validation; 429 rate/queue; 503 provider configuration",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "version": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "decision": {
+                    "type": "string",
+                    "enum": [
+                      "APPROVE",
+                      "REJECT"
+                    ]
+                  },
+                  "reason": {
+                    "type": "string",
+                    "description": "Auditable explanation; at least ten characters",
+                    "minLength": 10,
+                    "maxLength": 2000
+                  }
+                },
+                "required": [
+                  "version",
+                  "decision",
+                  "reason"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/operations/exports/{id}/preview": {
+      "get": {
+        "summary": "Download exact bytes for review before publication",
+        "operationId": "ops_get_exports__id_preview",
+        "x-roles": [
+          "ADMIN",
+          "REVIEWER"
+        ],
+        "x-idempotent-cache": false,
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "Registered UUID",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Authorized attachment, not JSON envelope",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "400 malformed; 401 authentication; 403 role; 404 hidden or absent; 409 stale/state; 422 validation; 429 rate/queue; 503 provider configuration",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/operations/exports/{id}/download": {
+      "get": {
+        "summary": "Download a hash-verified internally approved inventory export",
+        "operationId": "ops_get_exports__id_download",
+        "x-roles": [
+          "ADMIN",
+          "REVIEWER",
+          "LEADERSHIP"
+        ],
+        "x-idempotent-cache": false,
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "Registered UUID",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Authorized attachment, not JSON envelope",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "400 malformed; 401 authentication; 403 role; 404 hidden or absent; 409 stale/state; 422 validation; 429 rate/queue; 503 provider configuration",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/operations/documents/{id}/ocr": {
+      "post": {
+        "summary": "Request bounded local English OCR on a clean unimported document",
+        "operationId": "ops_post_documents__id_ocr",
+        "x-roles": [
+          "ADMIN",
+          "ENTRY"
+        ],
+        "x-idempotent-cache": true,
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "Registered UUID",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "Reuse for exact retry only",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Success"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "400 malformed; 401 authentication; 403 role; 404 hidden or absent; 409 stale/state; 422 validation; 429 rate/queue; 503 provider configuration",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "version": {
+                    "type": "integer",
+                    "minimum": 0
+                  }
+                },
+                "required": [
+                  "version"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/operations/ocr": {
+      "get": {
+        "summary": "Page OCR runs visible to the uploader or university reviewer",
+        "operationId": "ops_get_ocr",
+        "x-roles": [
+          "ADMIN",
+          "ENTRY",
+          "REVIEWER",
+          "LEADERSHIP"
+        ],
+        "x-idempotent-cache": false,
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "description": ""
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Success"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "400 malformed; 401 authentication; 403 role; 404 hidden or absent; 409 stale/state; 422 validation; 429 rate/queue; 503 provider configuration",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/account/recover": {
+      "post": {
+        "security": [],
+        "summary": "Generic recovery response; account existence is not disclosed. Link delivery is conditional on an active matching account and configured transport.",
+        "x-rate-limited": true,
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "tenantId": {
+                    "type": "string",
+                    "description": "Registered UUID",
+                    "format": "uuid"
+                  },
+                  "email": {
+                    "type": "string",
+                    "description": "",
+                    "format": "email"
+                  }
+                },
+                "required": [
+                  "tenantId",
+                  "email"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Success"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Generic invalid/expired link, validation, or rate-limit error"
+          }
+        }
+      }
+    },
+    "/api/v2/account/complete": {
+      "post": {
+        "security": [],
+        "summary": "Accept invitation or reset password; revoke reset sessions and require fresh sign-in.",
+        "x-rate-limited": true,
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "token": {
+                    "type": "string",
+                    "description": "One-use credential from URL fragment; never log it"
+                  },
+                  "newPassword": {
+                    "type": "string",
+                    "description": "",
+                    "format": "password",
+                    "minLength": 12,
+                    "maxLength": 128
+                  },
+                  "confirmPassword": {
+                    "type": "string",
+                    "description": "",
+                    "format": "password",
+                    "minLength": 12,
+                    "maxLength": 128
+                  }
+                },
+                "required": [
+                  "token",
+                  "newPassword",
+                  "confirmPassword"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Success"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Generic invalid/expired link, validation, or rate-limit error"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    },
+    "schemas": {
+      "Error": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "enum": [
+              false
+            ]
+          },
+          "error": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "description": ""
+              },
+              "message": {
+                "type": "string",
+                "description": ""
+              }
+            }
+          },
+          "requestId": {
+            "type": "string",
+            "description": ""
+          }
+        }
+      },
+      "Success": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "enum": [
+              true
+            ]
+          },
+          "data": {},
+          "requestId": {
+            "type": "string",
+            "description": ""
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "originalSourceAndMigrationFilesCompared": 205,
+  "changedOriginalFiles": [
+    ".gitignore",
+    "README.md",
+    "package.json"
+  ],
+  "missingOriginalFiles": [],
+  "originalSrcPreserved": true
+}

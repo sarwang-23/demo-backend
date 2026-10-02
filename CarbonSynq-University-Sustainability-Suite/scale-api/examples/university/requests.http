@@ -1,0 +1,141 @@
+# REST-client template. Replace every placeholder with YOUR tenant references.
+# Never commit credentials or invitation tokens. Examples are not auto-executed.
+@base = http://localhost:8080
+@tenantId = REPLACE_TENANT_UUID
+@email = REPLACE_ADMIN_EMAIL
+@password = REPLACE_PASSWORD
+@token = REPLACE_ADMIN_SESSION
+@reviewerToken = REPLACE_OTHER_PERSON_SESSION
+@periodId = REPLACE_PERIOD_UUID
+@campusId = REPLACE_CAMPUS_UUID
+@assigneeId = REPLACE_ENTRY_USER_UUID
+@reviewerId = REPLACE_REVIEWER_UUID
+@kpiId = REPLACE_KPI_UUID
+@documentId = REPLACE_CLEAN_DOCUMENT_UUID
+@taskId = REPLACE_TASK_UUID
+@submissionId = REPLACE_SUBMISSION_UUID
+@factorId = REPLACE_APPROVED_FACTOR_UUID
+@emissionId = REPLACE_EMISSION_UUID
+@reportId = REPLACE_REPORT_UUID
+
+### Login: copy data.token into a private variable; reviewer logs in separately.
+POST {{base}}/api/v2/auth/login
+Content-Type: application/json
+
+{"tenantId":"{{tenantId}}","email":"{{email}}","password":"{{password}}"}
+
+### Metadata and capabilities
+GET {{base}}/api/v2/university/meta
+Authorization: Bearer {{token}}
+
+### Definitions only; no factor or measurement seeding
+POST {{base}}/api/v2/university/catalog/install
+Authorization: Bearer {{token}}
+Idempotency-Key: catalog-install-example-001
+Content-Type: application/json
+
+{}
+
+### Task assignment: dates must be inside your actual reporting period.
+POST {{base}}/api/v2/university/tasks
+Authorization: Bearer {{token}}
+Idempotency-Key: collection-task-example-001
+Content-Type: application/json
+
+{"periodId":"{{periodId}}","campusId":"{{campusId}}","kpiId":"{{kpiId}}","assigneeId":"{{assigneeId}}","reviewerId":"{{reviewerId}}","bucket":"METER_A","intervalStart":"2026-04-01","intervalEnd":"2026-04-30","dueDate":"2026-05-10"}
+
+### Submission: login as the assigned contributor and use their token.
+# This illustrative 500 m3 value is NOT a real university measurement.
+POST {{base}}/api/v2/university/tasks/{{taskId}}/submissions
+Authorization: Bearer {{token}}
+Idempotency-Key: collection-submission-example-001
+Content-Type: application/json
+
+{"taskVersion":1,"value":"500","unit":"m3","notes":"REPLACE with actual source notes; use synthetic values only in an isolated rehearsal tenant.","evidenceIds":["{{documentId}}"]}
+
+### Submit with the version returned by the latest read/write, not a guessed version.
+POST {{base}}/api/v2/university/submissions/{{submissionId}}/submit
+Authorization: Bearer {{token}}
+Idempotency-Key: collection-submit-example-001
+Content-Type: application/json
+
+{"version":1}
+
+### Independent review; version 2 is illustrative, use the actual current version.
+POST {{base}}/api/v2/university/submissions/{{submissionId}}/approve
+Authorization: Bearer {{reviewerToken}}
+Idempotency-Key: collection-approve-example-001
+Content-Type: application/json
+
+{"version":2}
+
+### Scope 3 boundary decision (admin)
+POST {{base}}/api/v2/university/scope3-screenings
+Authorization: Bearer {{token}}
+Idempotency-Key: category-one-example-001
+Content-Type: application/json
+
+{"periodId":"{{periodId}}","categoryNumber":1,"decision":"INCLUDED","rationale":"Purchased dining goods within the declared university operational boundary."}
+
+### Food activity with an already applicable, independently approved factor.
+# Replace quantity/date/evidence/description with the actual source record.
+POST {{base}}/api/v2/university/emissions
+Authorization: Bearer {{token}}
+Idempotency-Key: food-source-example-001
+Content-Type: application/json
+
+{"periodId":"{{periodId}}","campusId":"{{campusId}}","category":"FOOD_PURCHASES","quantity":"100","unit":"kg","activityDate":"2026-04-15","externalKey":"REPLACE/source-document/line-1","description":"REPLACE with source-specific description","factorId":"{{factorId}}","dataQuality":"MEASURED","evidenceIds":["{{documentId}}"]}
+
+### Submit a carbon draft
+POST {{base}}/api/v2/university/emissions/{{emissionId}}/submit
+Authorization: Bearer {{token}}
+Idempotency-Key: emission-submit-example-001
+Content-Type: application/json
+
+{"version":1}
+
+### Independent approval and atomic calculation
+POST {{base}}/api/v2/university/emissions/{{emissionId}}/approve
+Authorization: Bearer {{reviewerToken}}
+Idempotency-Key: emission-approve-example-001
+Content-Type: application/json
+
+{"version":2}
+
+### Combined university overview
+GET {{base}}/api/v2/university/overview?periodId={{periodId}}
+Authorization: Bearer {{token}}
+
+### Traceable facts, NOT an LLM/OCR call
+POST {{base}}/api/v2/university/insights/query
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{"periodId":"{{periodId}}","questionId":"SCOPE3_COVERAGE"}
+
+### Lock only after resolving pending work. Use the current period version.
+POST {{base}}/api/v2/periods/{{periodId}}/lock
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{"version":1,"reason":"Collection and carbon entries have completed the internal review workflow."}
+
+### Frozen report, not a compliance certificate
+POST {{base}}/api/v2/university/reports
+Authorization: Bearer {{token}}
+Idempotency-Key: report-example-001
+Content-Type: application/json
+
+{"periodId":"{{periodId}}","title":"University sustainability inventory","purpose":"UNIVERSITY_SUSTAINABILITY","boundaryStatement":"REPLACE with the actual organizational and operational accounting boundary, campuses, activities and exclusions."}
+
+### Review using another person's session
+POST {{base}}/api/v2/university/reports/{{reportId}}/approve
+Authorization: Bearer {{reviewerToken}}
+Idempotency-Key: report-approval-example-001
+Content-Type: application/json
+
+{"version":1}
+
+### Approved export
+GET {{base}}/api/v2/university/reports/{{reportId}}/export?format=json
+Authorization: Bearer {{token}}

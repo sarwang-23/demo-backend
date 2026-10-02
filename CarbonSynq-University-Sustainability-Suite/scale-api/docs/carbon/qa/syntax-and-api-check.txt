@@ -1,0 +1,5 @@
+
+> carbonsynq-scale-api@2.2.0-scope12-rc.1 check:university
+> node scripts/check-university.mjs
+
+{"syntaxFilesChecked":65,"universityOperations":134,"migrations":[{"version":1,"checksum":"4c3dadcb5d996d5ffc19605a38e05a5b8e5d2b116f03f746fab0c5996dacc058"},{"version":2,"checksum":"6b13b0b4934dd13dc662cae0f00c34bcb25f90c65a800b55e16ad498273e821e"},{"version":3,"checksum":"291d58383fcfacf082555668fbb7ec152927be3ed0c62c556e85269c70ef7960"}],"openApiCovered":true}

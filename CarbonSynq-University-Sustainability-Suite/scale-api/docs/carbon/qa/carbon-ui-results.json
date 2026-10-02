@@ -1,0 +1,24 @@
+{
+  "passed": 11,
+  "checks": [
+    "authenticated Scope1/2 section loads through the real HTTP middleware and memory domain fixture",
+    "location and market methods remain separate with correct primary total",
+    "all seven source accounting resource tabs load",
+    "guided consumption entry exposes source picker and quantity-method JSON",
+    "fuel stock preview submits to HTTP and returns exact 280 litres without writes",
+    "record details expose factor and evidence provenance",
+    "boundary form contains campus source-screening checklist",
+    "instrument criteria require actual assessment rather than default verified claims",
+    "leadership console has no mutation controls",
+    "mobile Scope1/2 section has no document-level horizontal overflow",
+    "no uncaught JavaScript errors in tested workflow"
+  ],
+  "browser": "Chromium via Playwright",
+  "data": "SYNTHETIC_LOOPBACK_FIXTURE",
+  "mode": "DOM_WITH_LOCAL_HTTP_BRIDGE",
+  "browserNavigationTested": false,
+  "productionCSPTested": false,
+  "postgresqlTested": false,
+  "objectStorageTested": false,
+  "antivirusTested": false
+}

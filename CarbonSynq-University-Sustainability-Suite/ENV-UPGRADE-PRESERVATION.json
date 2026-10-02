@@ -1,0 +1,26 @@
+{
+  "source_archive_sha256": "d84bb6921096f80e72bf25691ffd2eae2cb520d14cacb17a689b0b41ae8ff345",
+  "original_paths": 652,
+  "unchanged": 640,
+  "modified_with_exact_backup": 12,
+  "missing": [],
+  "modified_files": [
+    ".gitignore",
+    "scale-api/.dockerignore",
+    "scale-api/.env.example",
+    "scale-api/.gitignore",
+    "scale-api/docs/operations/CODE-MANIFEST.json",
+    "scale-api/docs/operations/HLD-AND-FULL-CODE.md",
+    "scale-api/package.json",
+    "scale-api/scripts/build-operations-codebook.mjs",
+    "scale-api/scripts/migrate.mjs",
+    "scale-api/scripts/provision.mjs",
+    "scale-api/src/config.mjs",
+    "scale-api/src/db.mjs"
+  ],
+  "backup_root": "upgrade-backup/operations-v2.4-env/",
+  "full_code_manifest_verified_files": 156,
+  "pasted_credentials_copied": false,
+  "database_contacted": false,
+  "migrations_unchanged": true
+}

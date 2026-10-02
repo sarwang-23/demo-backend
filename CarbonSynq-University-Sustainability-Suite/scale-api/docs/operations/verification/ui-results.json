@@ -1,0 +1,83 @@
+{
+  "passed": 17,
+  "failed": 0,
+  "checks": [
+    {
+      "name": "Actual operations DOM and scripts loaded with explicit local HTTP fixture bridge",
+      "passed": true
+    },
+    {
+      "name": "Administrator sign-in and actual capability display",
+      "passed": true
+    },
+    {
+      "name": "Recipient inbox and read marker",
+      "passed": true
+    },
+    {
+      "name": "Own notification preferences",
+      "passed": true
+    },
+    {
+      "name": "Password-confirmed staff invitation queues without exposing a credential",
+      "passed": true
+    },
+    {
+      "name": "Campus-wide membership accepts intentionally blank department",
+      "passed": true
+    },
+    {
+      "name": "Audited outstanding-task transfer form",
+      "passed": true
+    },
+    {
+      "name": "Source responsibility transfer preserves source identity",
+      "passed": true
+    },
+    {
+      "name": "Audited retention hold without deleting original evidence",
+      "passed": true
+    },
+    {
+      "name": "Explicit OCR queue request; UI does not invent completion",
+      "passed": true
+    },
+    {
+      "name": "Locked-period inventory export is queued, not automatically approved",
+      "passed": true
+    },
+    {
+      "name": "Redacted delivery log with honest pending status",
+      "passed": true
+    },
+    {
+      "name": "Desktop visual capture, synthetic label visible",
+      "passed": true
+    },
+    {
+      "name": "Operations script does not use browser-persistent credential storage",
+      "passed": true
+    },
+    {
+      "name": "390px mobile layout has no document-wide horizontal overflow",
+      "passed": true
+    },
+    {
+      "name": "Public account recovery returns generic response",
+      "passed": true
+    },
+    {
+      "name": "No application JavaScript errors in DOM harness",
+      "passed": true
+    }
+  ],
+  "pageErrors": [],
+  "consoleErrors": [],
+  "nativeNavigation": false,
+  "nativeNavigationFailure": "ERR_BLOCKED_BY_ADMINISTRATOR",
+  "CSPExecutionTested": false,
+  "realPostgreSQL": false,
+  "realStorageOrAntivirus": false,
+  "auth": "fixture",
+  "notes": "Actual app DOM/scripts, explicit local HTTP bridge and domain handlers. Synthetic memory/auth/provider services. Native browser navigation blocked; CSP/TLS/navigation not validated."
+}

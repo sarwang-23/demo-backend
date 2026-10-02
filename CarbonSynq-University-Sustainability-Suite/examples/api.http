@@ -1,0 +1,83 @@
+# Plain HTTP request examples. Run the root backend with npm start first.
+# Paste login tokens and actual IDs/versions returned by the API below.
+# Full request/response schemas: docs/openapi.json.
+@base = http://localhost:5050
+@entryToken = PASTE_ENTRY_TOKEN
+@reviewerToken = PASTE_REVIEWER_TOKEN
+@periodId = PASTE_PERIOD_ID_FROM_META
+@campusId = PASTE_CAMPUS_ID_FROM_META
+@activityId = PASTE_ACTIVITY_ID
+
+### Health
+GET {{base}}/health
+
+### Data-entry login
+POST {{base}}/api/v1/auth/login
+Content-Type: application/json
+
+{"email":"entry@carbonsynq.demo","password":"Demo@12345"}
+
+### Metadata - obtain real IDs before creating a record
+GET {{base}}/api/v1/meta
+Authorization: Bearer {{entryToken}}
+
+### Create manual activity - choose a new idempotency key for a NEW request
+POST {{base}}/api/v1/activity-data
+Authorization: Bearer {{entryToken}}
+Content-Type: application/json
+Idempotency-Key: manual-example-001
+
+{
+  "reportingPeriodId": "{{periodId}}",
+  "campusId": "{{campusId}}",
+  "category": "PURCHASED_ELECTRICITY",
+  "quantity": 1250,
+  "unit": "kWh",
+  "activityDate": "2026-10-02",
+  "description": "Manual electricity entry - demo"
+}
+
+### Submit the draft. Replace version with the current response value.
+POST {{base}}/api/v1/activity-data/{{activityId}}/submit
+Authorization: Bearer {{entryToken}}
+Content-Type: application/json
+
+{"version":1}
+
+### Separate reviewer login
+POST {{base}}/api/v1/auth/login
+Content-Type: application/json
+
+{"email":"reviewer@carbonsynq.demo","password":"Demo@12345"}
+
+### Start review - response contains the next version
+POST {{base}}/api/v1/activity-data/{{activityId}}/start-review
+Authorization: Bearer {{reviewerToken}}
+Content-Type: application/json
+
+{"version":2}
+
+### Verify - cannot be the creating account
+POST {{base}}/api/v1/activity-data/{{activityId}}/verify
+Authorization: Bearer {{reviewerToken}}
+Content-Type: application/json
+
+{"version":3}
+
+### Calculate - only after verification
+POST {{base}}/api/v1/activity-data/{{activityId}}/calculate
+Authorization: Bearer {{reviewerToken}}
+Content-Type: application/json
+
+{"version":4}
+
+### Dashboard
+GET {{base}}/api/v1/dashboard
+Authorization: Bearer {{reviewerToken}}
+
+### CSV report
+GET {{base}}/api/v1/reports/export?format=csv
+Authorization: Bearer {{reviewerToken}}
+
+# For a complete executable multipart invoice upload and human-review fixture,
+# run npm run demo:flow or read examples/full-workflow.mjs.

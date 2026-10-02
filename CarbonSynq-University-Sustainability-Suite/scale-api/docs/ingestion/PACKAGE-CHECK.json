@@ -1,0 +1,31 @@
+{
+  "artifact": "CarbonSynq-University-Excel-Invoice-Import-With-HLD.zip",
+  "release": "2.3.0-ingestion-rc.1",
+  "extractedSourceTreeTested": true,
+  "backendTests": {
+    "pass": 413,
+    "fail": 0,
+    "skip": 0
+  },
+  "legacyTests": {
+    "pass": 43,
+    "fail": 0
+  },
+  "uiTests": {
+    "pass": 13,
+    "mode": "DOM_WITH_LOCAL_HTTP_BRIDGE",
+    "nativeNavigationTested": false
+  },
+  "syntaxFilesChecked": 80,
+  "staffOperations": 151,
+  "newIngestionOperations": 17,
+  "externalPortalOperations": 2,
+  "originalFiles": 483,
+  "originalUnchanged": 465,
+  "originalUpdatedWithExactBackup": 18,
+  "missingOriginalPaths": 0,
+  "fullSourceFilesHashedAndCodebookChecked": 110,
+  "postgresqlS3ClamavDockerTested": false,
+  "productionApproved": false,
+  "note": "Executable files in the final ZIP match those tested after extraction. Final verification metadata is added after the test run; no tested code changed."
+}

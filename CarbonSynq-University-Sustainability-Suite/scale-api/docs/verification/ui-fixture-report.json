@@ -1,0 +1,21 @@
+{
+  "checksPassed": 11,
+  "checks": [
+    "dashboard renders synthetic fixture quantities without runtime error",
+    "source check: no auth token written to web storage",
+    "manual DTO uses decimal string, canonical unit, key; no caller tenant",
+    "manual dialog saves and ledger renders new row",
+    "invoice DTO separates money and consumption; explicit human confirmation",
+    "invoice review displays extraction warning before confirmation",
+    "raw invoice upload includes MIME, filename and retry key",
+    "queue page renders job state",
+    "workspace setup form submits name/code without property collision",
+    "390px mobile overview has no page-level horizontal overflow",
+    "mobile logout clears the workspace"
+  ],
+  "pageErrors": [],
+  "apiRequests": 21,
+  "browser": "local Chromium / Playwright",
+  "backend": "Native Chromium renders local HTML/CSS/JS injected by test harness; fetch mocked. Browser loopback HTTP navigation was blocked by environment. Not a network/CSP/PostgreSQL/S3/ClamAV end-to-end test",
+  "screenshots": "Synthetic workspace fixtures, not customer data or production totals"
+}

@@ -1,0 +1,28 @@
+
+> carbonsynq-complete-backend@1.0.1 demo:flow
+> node examples/full-workflow.mjs
+
+(node:946) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+{
+  "result": "PASS",
+  "mode": "Isolated in-memory database and real loopback HTTP requests",
+  "manualActivity": {
+    "quantityKWh": 1250,
+    "kgCO2e": 887.5,
+    "status": "CALCULATED"
+  },
+  "invoiceActivity": {
+    "quantityKWh": 12500,
+    "amountInr": 112500,
+    "kgCO2e": 8875,
+    "status": "CALCULATED"
+  },
+  "dashboardDeltaKgCO2e": 9762.5,
+  "calculatedActivitiesAdded": 2,
+  "originalInvoiceBytesPreserved": true,
+  "reportReconciles": true,
+  "illustrativeFactorsOnly": true,
+  "ocrConnected": false,
+  "persistentDemoDatabaseChanged": false
+}

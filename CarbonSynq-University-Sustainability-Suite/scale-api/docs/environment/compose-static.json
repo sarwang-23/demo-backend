@@ -1,0 +1,7 @@
+{
+  "parsed": true,
+  "rolesSeparated": true,
+  "loopbackPort5000": true,
+  "noLocalPostgres": true,
+  "dockerExecuted": false
+}

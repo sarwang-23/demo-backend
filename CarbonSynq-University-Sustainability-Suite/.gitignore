@@ -1,0 +1,16 @@
+node_modules/
+.local-data/
+.backups/
+.local-data-before-reset-*/
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+.env
+.env.*
+!.env.example
+*.log
+
+# Safe example only; prepared .env and local setup lock remain private.
+!.env.neon.example
+.env.prepare.lock/
+.env.preparing-*

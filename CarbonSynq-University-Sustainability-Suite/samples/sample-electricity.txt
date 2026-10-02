@@ -1,0 +1,11 @@
+SYNTHETIC DEMO INVOICE - NOT PAYABLE
+Vendor: Greenfield Utilities (Demo)
+Invoice number: DEMO-ELEC-2026-0930
+Invoice date: 2026-09-30
+Billed to: Greenfield University
+Campus: North Campus
+Building: Academic Block
+Category: Purchased electricity
+Consumption: 12,500 kWh
+Total amount: INR 112,500.00
+This is invented sample data, not a real bill.

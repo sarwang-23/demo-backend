@@ -1,0 +1,54 @@
+@base = http://localhost:8080
+@token = REPLACE_WITH_SESSION
+@period = REPLACE_WITH_PERIOD_UUID
+@batch = REPLACE_WITH_BATCH_UUID
+@file = REPLACE_WITH_IMPORT_FILE_UUID
+@document = REPLACE_WITH_UPLOADED_DOCUMENT_UUID
+@source = REPLACE_WITH_APPROVED_SOURCE_UUID
+@factor = REPLACE_WITH_APPROVED_FACTOR_UUID
+@fallback = REPLACE_WITH_APPROVED_FALLBACK_UUID
+
+### Existing file upload uses binary bytes and filename/MIME headers; use the workbench for an actual file.
+### Read the merged OpenAPI for its exact existing transport. Do not base64-encode file contents into this batch request.
+
+POST {{base}}/api/v2/university/ingestion/batches
+Authorization: Bearer {{token}}
+Content-Type: application/json
+Idempotency-Key: create-import-batch-001
+
+{"name":"University monthly intake","kind":"SPREADSHEET","target":"CARBON","periodId":"{{period}}"}
+
+### Attach an existing uploaded original; use the latest version from the create/read response.
+POST {{base}}/api/v2/university/ingestion/batches/{{batch}}/files
+Authorization: Bearer {{token}}
+Content-Type: application/json
+Idempotency-Key: attach-import-file-001
+
+{"version":1,"documentIds":["{{document}}"]}
+
+### File preview exposes extraction and suggestions after CLEAN scanning.
+GET {{base}}/api/v2/university/ingestion/files/{{file}}
+Authorization: Bearer {{token}}
+
+### Normalize the selected sheet; this stages data, not emissions.
+POST {{base}}/api/v2/university/ingestion/files/{{file}}/preview
+Authorization: Bearer {{token}}
+Content-Type: application/json
+Idempotency-Key: map-import-file-001
+
+{"version":1,"plans":[{"sheet":"Messy electricity","headerRow":5,"dateOrder":"DMY","numberFormat":"IN_EN","mapping":{"campusCode":"A","sourceCode":"B","intervalStart":"C","intervalEnd":"D","quantity":"E","unit":"F","amountInr":"G","description":"H"},"defaults":{"sourceId":"{{source}}","factorId":"{{factor}}","fallbackFactorId":"{{fallback}}","fallbackReason":"Reviewed applicable fallback for unmatched purchased energy."}}]}
+
+### All active rows across uploaded files; only current mappings, not superseded history.
+GET {{base}}/api/v2/university/ingestion/batches/{{batch}}/rows
+Authorization: Bearer {{token}}
+
+### Export structured review data.
+GET {{base}}/api/v2/university/ingestion/batches/{{batch}}/export?format=xlsx
+Authorization: Bearer {{token}}
+
+### Review and commit request shapes (replace row IDs/versions; use fresh Idempotency-Key):
+# POST /batches/{id}/review
+# {"quantityMeaningConfirmed":true,"items":[{"rowId":"UUID","version":1,"action":"CONFIRM","reason":"Checked original consumption and reporting interval."}]}
+# POST /batches/{id}/commit
+# {"version":CURRENT_BATCH_VERSION,"confirmed":true,"rowIds":["UUID"]}
+# Existing separate submit/reviewer endpoints are still required after draft import.

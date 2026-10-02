@@ -1,0 +1,15 @@
+{
+  "zipCRC": "passed",
+  "allFilesExtractedExactly": true,
+  "extractedConfigurationAndCoreTests": {
+    "passed": 130,
+    "failed": 0,
+    "skipped": 0
+  },
+  "privateSecretsInShippedEnv": false,
+  "shippedTemplateRequiresRotatedOwnerInput": true,
+  "fullCodeHashesVerified": 156,
+  "realDatabaseContacted": false,
+  "dockerExecuted": false,
+  "windowsLauncherExecuted": false
+}

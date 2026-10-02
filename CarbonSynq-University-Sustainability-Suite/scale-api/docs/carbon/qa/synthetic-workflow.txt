@@ -1,0 +1,43 @@
+
+> carbonsynq-scale-api@2.2.0-scope12-rc.1 carbon:demo
+> node examples/carbon/synthetic-workflow.mjs
+
+{
+  "warning": "SYNTHETIC_IN_MEMORY_ONLY_NOT_POSTGRESQL_OR_OFFICIAL_FACTORS",
+  "summary": {
+    "scope1": {
+      "kgCo2e": "2680.000000",
+      "biogenicCo2Kg": "0.000000",
+      "byGas": [
+        {
+          "gas": "CO2E",
+          "massKg": "2680.000000",
+          "kgCo2e": "2680.000000"
+        }
+      ],
+      "aggregatedFactorRecords": 1
+    },
+    "scope2": {
+      "locationKgCo2e": "70000.000000",
+      "marketKgCo2e": "54000.000000",
+      "marketResultComplete": true,
+      "method": "DUAL"
+    },
+    "scope12LocationKgCo2e": "72680.000000",
+    "scope12MarketKgCo2e": "56680.000000",
+    "recordCount": 2,
+    "estimatedRecords": 0,
+    "campuses": [
+      {
+        "campusId": "ada83ecf-5e0d-4402-aa2b-f9ecb417c4af",
+        "scope1Kg": "2680.000000",
+        "scope2LocationKg": "70000.000000",
+        "scope2MarketKg": "54000.000000"
+      }
+    ],
+    "arithmetic": "Scope 1 + location-based Scope 2 is the primary inventory. Market-based Scope 2 is an alternative, not an extra emission. Biogenic CO2 is separate.",
+    "completeInventoryClaim": false
+  },
+  "ready": true,
+  "savedUniversityRecordsChanged": false
+}

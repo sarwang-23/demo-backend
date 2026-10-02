@@ -1,0 +1,124 @@
+# LOCAL INTEGRATION STACK ONLY. For public deployments use docs/OPERATIONS.md.
+# No cloud resources are created by this file.
+x-app: &app
+  build: .
+  init: true
+  read_only: true
+  tmpfs: ['/tmp:size=96m,mode=1777']
+  cap_drop: [ALL]
+  security_opt: [no-new-privileges:true]
+  stop_grace_period: 100s
+x-runtime-env: &runtime-env
+  NODE_ENV: development
+  HOST: 0.0.0.0
+  PORT: 8080
+  DB_SSL: 'false'
+  DB_POOL_MAX: '10'
+  S3_BUCKET: ${S3_BUCKET}
+  S3_ENDPOINT: http://object-store:9000
+  S3_FORCE_PATH_STYLE: 'true'
+  AWS_REGION: us-east-1
+  AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+  AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+  CLAMAV_HOST: scanner
+  CLAMAV_PORT: '3310'
+  TRUST_PROXY: 'false'
+  PUBLIC_BASE_URL: ${PUBLIC_BASE_URL:-http://localhost:8080}
+  MAIL_MODE: ${MAIL_MODE:-disabled}
+  MAIL_ENCRYPTION_KEY: ${MAIL_ENCRYPTION_KEY:-}
+  MAIL_WEBHOOK_URL: ${MAIL_WEBHOOK_URL:-}
+  MAIL_WEBHOOK_SECRET: ${MAIL_WEBHOOK_SECRET:-}
+  MAIL_CAPTURE_DIR: /private-mail
+  OCR_ENABLED: ${OCR_ENABLED:-false}
+services:
+  database:
+    image: postgres:17-bookworm
+    environment:
+      POSTGRES_USER: cs_owner
+      POSTGRES_PASSWORD: ${DB_OWNER_PASSWORD}
+      POSTGRES_DB: carbonsynq
+    ports: ['127.0.0.1:5433:5432']
+    volumes: [postgres-data:/var/lib/postgresql/data]
+    healthcheck:
+      test: ['CMD-SHELL','pg_isready -U cs_owner -d carbonsynq']
+      interval: 5s
+      timeout: 3s
+      retries: 30
+  object-store:
+    build:
+      context: .
+      dockerfile: deploy/Dockerfile.object-store
+    command: server /data --console-address ':9001'
+    environment:
+      MINIO_ROOT_USER: ${AWS_ACCESS_KEY_ID}
+      MINIO_ROOT_PASSWORD: ${AWS_SECRET_ACCESS_KEY}
+    ports: ['127.0.0.1:9000:9000','127.0.0.1:9001:9001']
+    volumes: [object-data:/data]
+  storage-init:
+    <<: *app
+    depends_on: [object-store]
+    environment:
+      S3_BUCKET: ${S3_BUCKET}
+      S3_ENDPOINT: http://object-store:9000
+      S3_FORCE_PATH_STYLE: 'true'
+      AWS_REGION: us-east-1
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+    command: ['node','scripts/storage-init.mjs']
+  scanner:
+    image: clamav/clamav:stable
+    volumes:
+      - clam-db:/var/lib/clamav
+      - ./deploy/clamd.conf:/etc/clamav/clamd.conf:ro
+    ports: ['127.0.0.1:3310:3310']
+    healthcheck:
+      test: ['CMD-SHELL',"printf 'PING\n' | nc -w 3 127.0.0.1 3310 | grep -q PONG"]
+      interval: 15s
+      timeout: 5s
+      retries: 60
+    # Signature database download can delay first startup. No scan bypass is provided.
+  migrate:
+    <<: *app
+    environment:
+      NODE_ENV: development
+      DB_SSL: 'false'
+      DATABASE_OWNER_URL: postgres://cs_owner:${DB_OWNER_PASSWORD}@database:5432/carbonsynq
+      DB_API_PASSWORD: ${DB_API_PASSWORD}
+      DB_WORKER_PASSWORD: ${DB_WORKER_PASSWORD}
+    command: ['node','scripts/migrate.mjs']
+    depends_on:
+      database: {condition: service_healthy}
+  worker:
+    <<: *app
+    tmpfs: ['/tmp:size=96m,mode=1777', '/private-mail:size=16m,mode=700,uid=1000,gid=1000']
+    environment:
+      <<: *runtime-env
+      WORKER_DATABASE_URL: postgres://cs_worker:${DB_WORKER_PASSWORD}@database:5432/carbonsynq
+    command: ['node','src/worker-main.mjs']
+    restart: unless-stopped
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+      storage-init: {condition: service_completed_successfully}
+      scanner: {condition: service_healthy}
+  api:
+    <<: *app
+    environment:
+      <<: *runtime-env
+      DATABASE_URL: postgres://cs_api:${DB_API_PASSWORD}@database:5432/carbonsynq
+      ALLOWED_ORIGINS: http://localhost:8080,http://127.0.0.1:8080
+      METRICS_TOKEN: ${METRICS_TOKEN}
+      REQUEST_HASH_SECRET: ${REQUEST_HASH_SECRET}
+    ports: ['127.0.0.1:8080:8080']
+    restart: unless-stopped
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+      storage-init: {condition: service_completed_successfully}
+    healthcheck:
+      test: ['CMD','node','-e',"fetch('http://127.0.0.1:8080/readyz').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 15s
+      timeout: 12s
+      retries: 10
+volumes:
+  postgres-data:
+  object-data:
+  clam-db:

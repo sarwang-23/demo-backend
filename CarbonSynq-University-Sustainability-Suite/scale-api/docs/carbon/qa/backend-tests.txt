@@ -1,0 +1,1772 @@
+
+> carbonsynq-scale-api@2.2.0-scope12-rc.1 test
+> node --test tests/unit.test.mjs tests/http.test.mjs tests/adapters.test.mjs tests/university/core.test.mjs tests/university/domain.test.mjs tests/university/http.test.mjs tests/university/store.test.mjs tests/carbon/core.test.mjs tests/carbon/domain.test.mjs tests/carbon/contract.test.mjs
+
+TAP version 13
+# Subtest: tenant transaction sets local tenant context and uses one connection
+ok 1 - tenant transaction sets local tenant context and uses one connection
+  ---
+  duration_ms: 3.092441
+  type: 'test'
+  ...
+# Subtest: transaction errors roll back and release the connection
+ok 2 - transaction errors roll back and release the connection
+  ---
+  duration_ms: 0.483692
+  type: 'test'
+  ...
+# Subtest: a broken rollback destroys rather than recycles the connection
+ok 3 - a broken rollback destroys rather than recycles the connection
+  ---
+  duration_ms: 0.420458
+  type: 'test'
+  ...
+# Subtest: an uncertain COMMIT is not automatically replayed
+ok 4 - an uncertain COMMIT is not automatically replayed
+  ---
+  duration_ms: 0.37405
+  type: 'test'
+  ...
+# Subtest: runtime refuses superuser database credentials
+ok 5 - runtime refuses superuser database credentials
+  ---
+  duration_ms: 0.486406
+  type: 'test'
+  ...
+# Subtest: runtime refuses table-owning application role
+ok 6 - runtime refuses table-owning application role
+  ---
+  duration_ms: 0.229979
+  type: 'test'
+  ...
+# Subtest: idempotency returns stored response instead of running a second mutation
+ok 7 - idempotency returns stored response instead of running a second mutation
+  ---
+  duration_ms: 1.245813
+  type: 'test'
+  ...
+# Subtest: enqueue uses a unique dedupe key and delayed durable availability
+ok 8 - enqueue uses a unique dedupe key and delayed durable availability
+  ---
+  duration_ms: 0.286241
+  type: 'test'
+  ...
+# Subtest: claim SQL uses skip-locked row locking, an attempt cap and a fresh lease token
+ok 9 - claim SQL uses skip-locked row locking, an attempt cap and a fresh lease token
+  ---
+  duration_ms: 0.835831
+  type: 'test'
+  ...
+# Subtest: stale worker cannot obtain a finalization fence
+ok 10 - stale worker cannot obtain a finalization fence
+  ---
+  duration_ms: 0.585872
+  type: 'test'
+  ...
+# Subtest: ClamD client sends correct bounded INSTREAM frames
+ok 11 - ClamD client sends correct bounded INSTREAM frames
+  ---
+  duration_ms: 20.3094
+  type: 'test'
+  ...
+# Subtest: ClamD FOUND verdict prevents clean acceptance
+ok 12 - ClamD FOUND verdict prevents clean acceptance
+  ---
+  duration_ms: 2.894911
+  type: 'test'
+  ...
+# Subtest: scanner errors fail closed rather than claiming CLEAN
+ok 13 - scanner errors fail closed rather than claiming CLEAN
+  ---
+  duration_ms: 2.04524
+  type: 'test'
+  ...
+# Subtest: connection refusal fails scanning
+ok 14 - connection refusal fails scanning
+  ---
+  duration_ms: 1.608588
+  type: 'test'
+  ...
+# Subtest: migration structurally includes RLS, composite FKs and immutable ledgers (not a database execution test)
+ok 15 - migration structurally includes RLS, composite FKs and immutable ledgers (not a database execution test)
+  ---
+  duration_ms: 2.573527
+  type: 'test'
+  ...
+# Subtest: 49 real operations have schema and matching permission metadata
+ok 16 - 49 real operations have schema and matching permission metadata
+  ---
+  duration_ms: 10.58615
+  type: 'test'
+  ...
+# Subtest: carbon contract has 10 unique tenant tables, not dynamically accepted SQL
+ok 17 - carbon contract has 10 unique tenant tables, not dynamically accepted SQL
+  ---
+  duration_ms: 0.997458
+  type: 'test'
+  ...
+# Subtest: all mutation routes exclude leadership and previews have no idempotent write cache
+ok 18 - all mutation routes exclude leadership and previews have no idempotent write cache
+  ---
+  duration_ms: 0.253853
+  type: 'test'
+  ...
+# Subtest: query tenant switching fails before any database access
+ok 19 - query tenant switching fails before any database access
+  ---
+  duration_ms: 1.230772
+  type: 'test'
+  ...
+# Subtest: migrations remain contiguous and add version 3
+ok 20 - migrations remain contiguous and add version 3
+  ---
+  duration_ms: 3.169084
+  type: 'test'
+  ...
+# Subtest: allocation-used SQL filters tenant, calculated records and approved voids
+ok 21 - allocation-used SQL filters tenant, calculated records and approved voids
+  ---
+  duration_ms: 0.360821
+  type: 'test'
+  ...
+# Subtest: full HTTP middleware to domain: create, submit, approve, inventory and unauthorized checks
+ok 22 - full HTTP middleware to domain: create, submit, approve, inventory and unauthorized checks
+  ---
+  duration_ms: 52.200845
+  type: 'test'
+  ...
+# Subtest: fuel stock consumes 280 litres, not total purchases
+ok 23 - fuel stock consumes 280 litres, not total purchases
+  ---
+  duration_ms: 2.047253
+  type: 'test'
+  ...
+# Subtest: negative stock is rejected rather than clamped
+ok 24 - negative stock is rejected rather than clamped
+  ---
+  duration_ms: 0.439757
+  type: 'test'
+  ...
+# Subtest: fuel balance refuses currency
+ok 25 - fuel balance refuses currency
+  ---
+  duration_ms: 0.139165
+  type: 'test'
+  ...
+# Subtest: meter uses multiplier
+ok 26 - meter uses multiplier
+  ---
+  duration_ms: 0.227825
+  type: 'test'
+  ...
+# Subtest: single documented rollover uses exclusive maximum
+ok 27 - single documented rollover uses exclusive maximum
+  ---
+  duration_ms: 0.214556
+  type: 'test'
+  ...
+# Subtest: negative meter without rollover refuses reset
+ok 28 - negative meter without rollover refuses reset
+  ---
+  duration_ms: 0.177972
+  type: 'test'
+  ...
+# Subtest: rollover cannot be fabricated on positive movement
+ok 29 - rollover cannot be fabricated on positive movement
+  ---
+  duration_ms: 0.178893
+  type: 'test'
+  ...
+# Subtest: refrigerant balance excludes recovered closing stock and transferred gas
+ok 30 - refrigerant balance excludes recovered closing stock and transferred gas
+  ---
+  duration_ms: 0.107608
+  type: 'test'
+  ...
+# Subtest: refrigerant purchases do not qualify as leak-only topup
+ok 31 - refrigerant purchases do not qualify as leak-only topup
+  ---
+  duration_ms: 0.335344
+  type: 'test'
+  ...
+# Subtest: documented topup permits loss replacement
+ok 32 - documented topup permits loss replacement
+  ---
+  duration_ms: 0.387831
+  type: 'test'
+  ...
+# Subtest: exact delivered-energy conversion MWh 1.2
+ok 33 - exact delivered-energy conversion MWh 1.2
+  ---
+  duration_ms: 0.151593
+  type: 'test'
+  ...
+# Subtest: exact delivered-energy conversion GJ 3.6
+ok 34 - exact delivered-energy conversion GJ 3.6
+  ---
+  duration_ms: 0.061981
+  type: 'test'
+  ...
+# Subtest: exact delivered-energy conversion GJ 1
+ok 35 - exact delivered-energy conversion GJ 1
+  ---
+  duration_ms: 0.075771
+  type: 'test'
+  ...
+# Subtest: exact delivered-energy conversion kWh 12
+ok 36 - exact delivered-energy conversion kWh 12
+  ---
+  duration_ms: 0.050815
+  type: 'test'
+  ...
+# Subtest: electricity exports do not subtract gross imports
+ok 37 - electricity exports do not subtract gross imports
+  ---
+  duration_ms: 0.09483
+  type: 'test'
+  ...
+# Subtest: negative campus balance must be reconciled
+ok 38 - negative campus balance must be reconciled
+  ---
+  duration_ms: 0.104073
+  type: 'test'
+  ...
+# Subtest: factor gas breakdown computes CO2 CH4 N2O exactly
+ok 39 - factor gas breakdown computes CO2 CH4 N2O exactly
+  ---
+  duration_ms: 1.403385
+  type: 'test'
+  ...
+# Subtest: biogenic CO2 separate but CH4 and N2O remain in inventory
+ok 40 - biogenic CO2 separate but CH4 and N2O remain in inventory
+  ---
+  duration_ms: 0.164883
+  type: 'test'
+  ...
+# Subtest: aggregate CO2e cannot have extra gases added
+ok 41 - aggregate CO2e cannot have extra gases added
+  ---
+  duration_ms: 0.166686
+  type: 'test'
+  ...
+# Subtest: combustion CO2 alone is not presented as all gases
+ok 42 - combustion CO2 alone is not presented as all gases
+  ---
+  duration_ms: 0.10868
+  type: 'test'
+  ...
+# Subtest: named refrigerant GWP is supplied explicitly
+ok 43 - named refrigerant GWP is supplied explicitly
+  ---
+  duration_ms: 0.153336
+  type: 'test'
+  ...
+# Subtest: refrigerant factor must match gas name and unit mass
+ok 44 - refrigerant factor must match gas name and unit mass
+  ---
+  duration_ms: 0.248226
+  type: 'test'
+  ...
+# Subtest: Scope2 CO2-only factor must instead be documented CO2e
+ok 45 - Scope2 CO2-only factor must instead be documented CO2e
+  ---
+  duration_ms: 0.134588
+  type: 'test'
+  ...
+# Subtest: zero factor requires explanation
+ok 46 - zero factor requires explanation
+  ---
+  duration_ms: 0.137903
+  type: 'test'
+  ...
+# Subtest: precision survives quantities beyond float safe integer
+ok 47 - precision survives quantities beyond float safe integer
+  ---
+  duration_ms: 0.212372
+  type: 'test'
+  ...
+# Subtest: market allocation computes remaining consumption with residual
+ok 48 - market allocation computes remaining consumption with residual
+  ---
+  duration_ms: 0.383945
+  type: 'test'
+  ...
+# Subtest: unmatched market quantity cannot be silently zero
+ok 49 - unmatched market quantity cannot be silently zero
+  ---
+  duration_ms: 0.088991
+  type: 'test'
+  ...
+# Subtest: market over-allocation rejected
+ok 50 - market over-allocation rejected
+  ---
+  duration_ms: 0.135219
+  type: 'test'
+  ...
+# Subtest: location commodity cannot be arbitrary
+ok 51 - location commodity cannot be arbitrary
+  ---
+  duration_ms: 0.398727
+  type: 'test'
+  ...
+# Subtest: all source kinds declare scope and unit
+ok 52 - all source kinds declare scope and unit
+  ---
+  duration_ms: 0.170771
+  type: 'test'
+  ...
+# Subtest: ten supplementary definitions are distinct and non-emissions records
+ok 53 - ten supplementary definitions are distinct and non-emissions records
+  ---
+  duration_ms: 0.086527
+  type: 'test'
+  ...
+# Subtest: instrument requires quality checks rather than checkbox-only claim
+ok 54 - instrument requires quality checks rather than checkbox-only claim
+  ---
+  duration_ms: 0.436032
+  type: 'test'
+  ...
+# Subtest: instrument cannot claim a future retirement
+ok 55 - instrument cannot claim a future retirement
+  ---
+  duration_ms: 0.249457
+  type: 'test'
+  ...
+# Subtest: same serial normalized independent of whitespace and case
+ok 56 - same serial normalized independent of whitespace and case
+  ---
+  duration_ms: 0.442701
+  type: 'test'
+  ...
+# Subtest: coverage reports leading and trailing missing days
+ok 57 - coverage reports leading and trailing missing days
+  ---
+  duration_ms: 0.599032
+  type: 'test'
+  ...
+# Subtest: adjacent periods give no missing dates
+ok 58 - adjacent periods give no missing dates
+  ---
+  duration_ms: 6.486987
+  type: 'test'
+  ...
+# Subtest: source and factor are tenant scoped and restricted by role
+ok 59 - source and factor are tenant scoped and restricted by role
+  ---
+  duration_ms: 4.366867
+  type: 'test'
+  ...
+# Subtest: factor maker cannot approve their own version
+ok 60 - factor maker cannot approve their own version
+  ---
+  duration_ms: 1.151474
+  type: 'test'
+  ...
+# Subtest: approved factors cannot be edited
+ok 61 - approved factors cannot be edited
+  ---
+  duration_ms: 0.983167
+  type: 'test'
+  ...
+# Subtest: boundary needs every campus included or explained
+ok 62 - boundary needs every campus included or explained
+  ---
+  duration_ms: 1.199345
+  type: 'test'
+  ...
+# Subtest: boundary requires source applicability checklist
+ok 63 - boundary requires source applicability checklist
+  ---
+  duration_ms: 0.485915
+  type: 'test'
+  ...
+# Subtest: boundary approval requires clean stored evidence
+ok 64 - boundary approval requires clean stored evidence
+  ---
+  duration_ms: 1.212034
+  type: 'test'
+  ...
+# Subtest: legacy rows block new enhanced ledger activation
+ok 65 - legacy rows block new enhanced ledger activation
+  ---
+  duration_ms: 1.056796
+  type: 'test'
+  ...
+# Subtest: new record cannot be created before boundary approved
+ok 66 - new record cannot be created before boundary approved
+  ---
+  duration_ms: 1.143613
+  type: 'test'
+  ...
+# Subtest: Scope1 draft submit approve produces traceable 268kg exact snapshot
+ok 67 - Scope1 draft submit approve produces traceable 268kg exact snapshot
+  ---
+  duration_ms: 6.197031
+  type: 'test'
+  ...
+# Subtest: drafts and submitted records excluded from inventory
+ok 68 - drafts and submitted records excluded from inventory
+  ---
+  duration_ms: 2.625323
+  type: 'test'
+  ...
+# Subtest: same physical source cannot have overlapping active intervals
+ok 69 - same physical source cannot have overlapping active intervals
+  ---
+  duration_ms: 2.354725
+  type: 'test'
+  ...
+# Subtest: ENTRY cannot write a different source owner or see their entries
+ok 70 - ENTRY cannot write a different source owner or see their entries
+  ---
+  duration_ms: 2.481432
+  type: 'test'
+  ...
+# Subtest: source factors require full interval and correct geography
+ok 71 - source factors require full interval and correct geography
+  ---
+  duration_ms: 1.982768
+  type: 'test'
+  ...
+# Subtest: preview creates no record and reserves no certificate
+ok 72 - preview creates no record and reserves no certificate
+  ---
+  duration_ms: 2.086571
+  type: 'test'
+  ...
+# Subtest: zero consumption must be explicitly justified
+ok 73 - zero consumption must be explicitly justified
+  ---
+  duration_ms: 3.926518
+  type: 'test'
+  ...
+# Subtest: estimated record requires assumptions
+ok 74 - estimated record requires assumptions
+  ---
+  duration_ms: 1.286803
+  type: 'test'
+  ...
+# Subtest: stale version cannot submit and maker cannot approve even admin
+ok 75 - stale version cannot submit and maker cannot approve even admin
+  ---
+  duration_ms: 2.118277
+  type: 'test'
+  ...
+# Subtest: period lock blocks writes without deleting historical calculations
+ok 76 - period lock blocks writes without deleting historical calculations
+  ---
+  duration_ms: 2.799701
+  type: 'test'
+  ...
+# Subtest: partial date coverage blocks final readiness
+ok 77 - partial date coverage blocks final readiness
+  ---
+  duration_ms: 3.623333
+  type: 'test'
+  ...
+# Subtest: reviewed no-activity declaration is distinct from missing data
+ok 78 - reviewed no-activity declaration is distinct from missing data
+  ---
+  duration_ms: 1.265903
+  type: 'test'
+  ...
+# Subtest: Scope2 location and market alternatives are not summed
+ok 79 - Scope2 location and market alternatives are not summed
+  ---
+  duration_ms: 6.205783
+  type: 'test'
+  ...
+# Subtest: market without unmatched-energy factor rejected, not assigned zero
+ok 80 - market without unmatched-energy factor rejected, not assigned zero
+  ---
+  duration_ms: 1.586545
+  type: 'test'
+  ...
+# Subtest: instrument beneficiary must match university
+ok 81 - instrument beneficiary must match university
+  ---
+  duration_ms: 2.636711
+  type: 'test'
+  ...
+# Subtest: instrument capacity checked again at approval after competing draft
+ok 82 - instrument capacity checked again at approval after competing draft
+  ---
+  duration_ms: 4.811311
+  type: 'test'
+  ...
+# Subtest: approved void releases instrument allocation without deleting history
+ok 83 - approved void releases instrument allocation without deleting history
+  ---
+  duration_ms: 6.887416
+  type: 'test'
+  ...
+# Subtest: boundary cannot reinterpret active calculations
+ok 84 - boundary cannot reinterpret active calculations
+  ---
+  duration_ms: 2.536553
+  type: 'test'
+  ...
+# Subtest: high-severity university finding gates report readiness
+ok 85 - high-severity university finding gates report readiness
+  ---
+  duration_ms: 3.760534
+  type: 'test'
+  ...
+# Subtest: late registered sources flagged as unassessed
+ok 86 - late registered sources flagged as unassessed
+  ---
+  duration_ms: 2.917584
+  type: 'test'
+  ...
+# Subtest: extra KPI install idempotent and seeds no activity values
+ok 87 - extra KPI install idempotent and seeds no activity values
+  ---
+  duration_ms: 0.860266
+  type: 'test'
+  ...
+# Subtest: full report snapshot includes both methods with shared primary inventory
+ok 88 - full report snapshot includes both methods with shared primary inventory
+  ---
+  duration_ms: 3.91377
+  type: 'test'
+  ...
+# Subtest: location-only report never silently claims market zero
+ok 89 - location-only report never silently claims market zero
+  ---
+  duration_ms: 3.14558
+  type: 'test'
+  ...
+# Subtest: CSV preview no writes; invalid batch atomically rejected
+ok 90 - CSV preview no writes; invalid batch atomically rejected
+  ---
+  duration_ms: 4.049049
+  type: 'test'
+  ...
+# Subtest: live export labels both method columns without an added total
+ok 91 - live export labels both method columns without an added total
+  ---
+  duration_ms: 2.663389
+  type: 'test'
+  ...
+# Subtest: source pathway with review and exact calculation: MOBILE_COMBUSTION
+ok 92 - source pathway with review and exact calculation: MOBILE_COMBUSTION
+  ---
+  duration_ms: 2.083807
+  type: 'test'
+  ...
+# Subtest: source pathway with review and exact calculation: REFRIGERANT
+ok 93 - source pathway with review and exact calculation: REFRIGERANT
+  ---
+  duration_ms: 2.150746
+  type: 'test'
+  ...
+# Subtest: source pathway with review and exact calculation: DIRECT_GAS
+ok 94 - source pathway with review and exact calculation: DIRECT_GAS
+  ---
+  duration_ms: 2.106961
+  type: 'test'
+  ...
+# Subtest: source pathway with review and exact calculation: ONSITE_PROCESS
+ok 95 - source pathway with review and exact calculation: ONSITE_PROCESS
+  ---
+  duration_ms: 2.127962
+  type: 'test'
+  ...
+# Subtest: source pathway with review and exact calculation: PURCHASED_STEAM
+ok 96 - source pathway with review and exact calculation: PURCHASED_STEAM
+  ---
+  duration_ms: 1.887038
+  type: 'test'
+  ...
+# Subtest: source pathway with review and exact calculation: PURCHASED_HEAT
+ok 97 - source pathway with review and exact calculation: PURCHASED_HEAT
+  ---
+  duration_ms: 1.945723
+  type: 'test'
+  ...
+# Subtest: source pathway with review and exact calculation: PURCHASED_COOLING
+ok 98 - source pathway with review and exact calculation: PURCHASED_COOLING
+  ---
+  duration_ms: 1.696207
+  type: 'test'
+  ...
+# Subtest: grid fallback cannot override a registered matching residual mix
+ok 99 - grid fallback cannot override a registered matching residual mix
+  ---
+  duration_ms: 2.325272
+  type: 'test'
+  ...
+# Subtest: market snapshot retains full unmatched factor provenance
+ok 100 - market snapshot retains full unmatched factor provenance
+  ---
+  duration_ms: 2.916072
+  type: 'test'
+  ...
+# Subtest: final university report cannot be captured with unresolved Scope12 gaps
+ok 101 - final university report cannot be captured with unresolved Scope12 gaps
+  ---
+  duration_ms: 1.603319
+  type: 'test'
+  ...
+# Subtest: frozen report CSV includes separate enhanced alternatives without changing primary quantity
+ok 102 - frozen report CSV includes separate enhanced alternatives without changing primary quantity
+  ---
+  duration_ms: 17.834207
+  type: 'test'
+  ...
+# Subtest: traceable insight links point at enhanced source records rather than legacy endpoints
+ok 103 - traceable insight links point at enhanced source records rather than legacy endpoints
+  ---
+  duration_ms: 2.600097
+  type: 'test'
+  ...
+# Subtest: liveness endpoint works without a session
+ok 104 - liveness endpoint works without a session
+  ---
+  duration_ms: 33.438752
+  type: 'test'
+  ...
+# Subtest: business routes require authentication
+ok 105 - business routes require authentication
+  ---
+  duration_ms: 8.486189
+  type: 'test'
+  ...
+# Subtest: business response contains request ID and security headers
+ok 106 - business response contains request ID and security headers
+  ---
+  duration_ms: 8.050458
+  type: 'test'
+  ...
+# Subtest: untrusted browser origins rejected
+ok 107 - untrusted browser origins rejected
+  ---
+  duration_ms: 3.831529
+  type: 'test'
+  ...
+# Subtest: allowed origin receives exact CORS header
+ok 108 - allowed origin receives exact CORS header
+  ---
+  duration_ms: 3.7167
+  type: 'test'
+  ...
+# Subtest: preflight supports required idempotency header
+ok 109 - preflight supports required idempotency header
+  ---
+  duration_ms: 4.671214
+  type: 'test'
+  ...
+# Subtest: metrics require a separate credential
+ok 110 - metrics require a separate credential
+  ---
+  duration_ms: 5.859264
+  type: 'test'
+  ...
+# Subtest: JSON content type is enforced
+ok 111 - JSON content type is enforced
+  ---
+  duration_ms: 10.559291
+  type: 'test'
+  ...
+# Subtest: malformed JSON produces 400, not a stack trace
+ok 112 - malformed JSON produces 400, not a stack trace
+  ---
+  duration_ms: 6.288956
+  type: 'test'
+  ...
+# Subtest: JSON array body rejected
+ok 113 - JSON array body rejected
+  ---
+  duration_ms: 4.288371
+  type: 'test'
+  ...
+# Subtest: JSON body has a strict 64 KiB limit
+ok 114 - JSON body has a strict 64 KiB limit
+  ---
+  duration_ms: 3.26802
+  type: 'test'
+  ...
+# Subtest: create routes forward the idempotency key
+ok 115 - create routes forward the idempotency key
+  ---
+  duration_ms: 4.613389
+  type: 'test'
+  ...
+# Subtest: tenant IDs in query cannot redirect authorization
+ok 116 - tenant IDs in query cannot redirect authorization
+  ---
+  duration_ms: 2.407273
+  type: 'test'
+  ...
+# Subtest: raw invoice upload is bounded and URL-decodes the filename
+ok 117 - raw invoice upload is bounded and URL-decodes the filename
+  ---
+  duration_ms: 3.568231
+  type: 'test'
+  ...
+# Subtest: invoice size rejection happens before storage
+ok 118 - invoice size rejection happens before storage
+  ---
+  duration_ms: 2.655528
+  type: 'test'
+  ...
+# Subtest: readiness returns 503 when a dependency is not ready
+ok 119 - readiness returns 503 when a dependency is not ready
+  ---
+  duration_ms: 2.041315
+  type: 'test'
+  ...
+# Subtest: internal service errors are sanitized
+ok 120 - internal service errors are sanitized
+  ---
+  duration_ms: 3.872489
+  type: 'test'
+  ...
+# Subtest: draining rejects new traffic safely
+ok 121 - draining rejects new traffic safely
+  ---
+  duration_ms: 1.988357
+  type: 'test'
+  ...
+# Subtest: production transport advertises HSTS
+ok 122 - production transport advertises HSTS
+  ---
+  duration_ms: 1.836863
+  type: 'test'
+  ...
+# Subtest: canonical request hashing ignores JSON key ordering
+ok 123 - canonical request hashing ignores JSON key ordering
+  ---
+  duration_ms: 1.123634
+  type: 'test'
+  ...
+# Subtest: decimal strings normalize without binary floating point
+ok 124 - decimal strings normalize without binary floating point
+  ---
+  duration_ms: 0.340942
+  type: 'test'
+  ...
+# Subtest: reject invalid consumption 1
+ok 125 - reject invalid consumption 1
+  ---
+  duration_ms: 0.516069
+  type: 'test'
+  ...
+# Subtest: reject invalid consumption "1e3"
+ok 126 - reject invalid consumption "1e3"
+  ---
+  duration_ms: 0.146426
+  type: 'test'
+  ...
+# Subtest: reject invalid consumption "-1"
+ok 127 - reject invalid consumption "-1"
+  ---
+  duration_ms: 0.210209
+  type: 'test'
+  ...
+# Subtest: reject invalid consumption "01"
+ok 128 - reject invalid consumption "01"
+  ---
+  duration_ms: 0.092046
+  type: 'test'
+  ...
+# Subtest: reject invalid consumption "1.0000001"
+ok 129 - reject invalid consumption "1.0000001"
+  ---
+  duration_ms: 0.123031
+  type: 'test'
+  ...
+# Subtest: reject invalid consumption "NaN"
+ok 130 - reject invalid consumption "NaN"
+  ---
+  duration_ms: 1.404187
+  type: 'test'
+  ...
+# Subtest: reject invalid consumption "Infinity"
+ok 131 - reject invalid consumption "Infinity"
+  ---
+  duration_ms: 0.225853
+  type: 'test'
+  ...
+# Subtest: reject invalid consumption "0"
+ok 132 - reject invalid consumption "0"
+  ---
+  duration_ms: 0.673211
+  type: 'test'
+  ...
+# Subtest: reject invalid consumption "1000000000000"
+ok 133 - reject invalid consumption "1000000000000"
+  ---
+  duration_ms: 0.205242
+  type: 'test'
+  ...
+# Subtest: zero money is allowed while zero consumption is not
+ok 134 - zero money is allowed while zero consumption is not
+  ---
+  duration_ms: 0.126276
+  type: 'test'
+  ...
+# Subtest: exact multiplication keeps decimal result
+ok 135 - exact multiplication keeps decimal result
+  ---
+  duration_ms: 0.13598
+  type: 'test'
+  ...
+# Subtest: rounding half-up to six decimal places
+ok 136 - rounding half-up to six decimal places
+  ---
+  duration_ms: 0.107719
+  type: 'test'
+  ...
+# Subtest: large products do not use JS safe-integer arithmetic
+ok 137 - large products do not use JS safe-integer arithmetic
+  ---
+  duration_ms: 0.119085
+  type: 'test'
+  ...
+# Subtest: strict dates reject February overflow
+ok 138 - strict dates reject February overflow
+  ---
+  duration_ms: 0.65232
+  type: 'test'
+  ...
+# Subtest: leap date accepted
+ok 139 - leap date accepted
+  ---
+  duration_ms: 0.100939
+  type: 'test'
+  ...
+# Subtest: activity scope is derived from category
+ok 140 - activity scope is derived from category
+  ---
+  duration_ms: 0.676185
+  type: 'test'
+  ...
+# Subtest: money cannot replace a consumption quantity
+ok 141 - money cannot replace a consumption quantity
+  ---
+  duration_ms: 0.226854
+  type: 'test'
+  ...
+# Subtest: canonical unit mismatch rejected
+ok 142 - canonical unit mismatch rejected
+  ---
+  duration_ms: 0.096131
+  type: 'test'
+  ...
+# Subtest: caller cannot select a tenant in an activity payload
+ok 143 - caller cannot select a tenant in an activity payload
+  ---
+  duration_ms: 0.075381
+  type: 'test'
+  ...
+# Subtest: caller cannot override the accounting scope
+ok 144 - caller cannot override the accounting scope
+  ---
+  duration_ms: 0.120467
+  type: 'test'
+  ...
+# Subtest: semantic duplicate fingerprint is independent of description
+ok 145 - semantic duplicate fingerprint is independent of description
+  ---
+  duration_ms: 0.756123
+  type: 'test'
+  ...
+# Subtest: duplicate override requires a substantive reason
+ok 146 - duplicate override requires a substantive reason
+  ---
+  duration_ms: 0.177001
+  type: 'test'
+  ...
+# Subtest: creator may submit own draft
+ok 147 - creator may submit own draft
+  ---
+  duration_ms: 0.174377
+  type: 'test'
+  ...
+# Subtest: other data-entry user cannot submit
+ok 148 - other data-entry user cannot submit
+  ---
+  duration_ms: 0.125875
+  type: 'test'
+  ...
+# Subtest: leadership cannot approve
+ok 149 - leadership cannot approve
+  ---
+  duration_ms: 0.088139
+  type: 'test'
+  ...
+# Subtest: admin cannot self-approve
+ok 150 - admin cannot self-approve
+  ---
+  duration_ms: 0.079296
+  type: 'test'
+  ...
+# Subtest: separate reviewer can verify
+ok 151 - separate reviewer can verify
+  ---
+  duration_ms: 0.06081
+  type: 'test'
+  ...
+# Subtest: stale writes are rejected before state mutation
+ok 152 - stale writes are rejected before state mutation
+  ---
+  duration_ms: 0.124523
+  type: 'test'
+  ...
+# Subtest: cannot skip review
+ok 153 - cannot skip review
+  ---
+  duration_ms: 0.126026
+  type: 'test'
+  ...
+# Subtest: reject requires reason
+ok 154 - reject requires reason
+  ---
+  duration_ms: 0.102932
+  type: 'test'
+  ...
+# Subtest: keyset cursor round-trip preserves timestamp and UUID
+ok 155 - keyset cursor round-trip preserves timestamp and UUID
+  ---
+  duration_ms: 0.975466
+  type: 'test'
+  ...
+# Subtest: invalid cursors rejected
+ok 156 - invalid cursors rejected
+  ---
+  duration_ms: 0.632551
+  type: 'test'
+  ...
+# Subtest: list requests cannot bypass the page cap
+ok 157 - list requests cannot bypass the page cap
+  ---
+  duration_ms: 0.125685
+  type: 'test'
+  ...
+# Subtest: session tokens use random secrets and tenant-scoped hashes
+ok 158 - session tokens use random secrets and tenant-scoped hashes
+  ---
+  duration_ms: 0.37394
+  type: 'test'
+  ...
+# Subtest: malformed bearer rejected
+ok 159 - malformed bearer rejected
+  ---
+  duration_ms: 0.116852
+  type: 'test'
+  ...
+# Subtest: password hashing uses async scrypt and verifies without plaintext storage
+ok 160 - password hashing uses async scrypt and verifies without plaintext storage
+  ---
+  duration_ms: 292.806709
+  type: 'test'
+  ...
+# Subtest: short passwords rejected
+ok 161 - short passwords rejected
+  ---
+  duration_ms: 0.397425
+  type: 'test'
+  ...
+# Subtest: weak idempotency key rejected
+ok 162 - weak idempotency key rejected
+  ---
+  duration_ms: 0.200766
+  type: 'test'
+  ...
+# Subtest: internal errors never expose database messages
+ok 163 - internal errors never expose database messages
+  ---
+  duration_ms: 0.17627
+  type: 'test'
+  ...
+# Subtest: unique conflict has a safe machine-readable error
+ok 164 - unique conflict has a safe machine-readable error
+  ---
+  duration_ms: 0.073699
+  type: 'test'
+  ...
+# Subtest: default config is bounded and development only
+ok 165 - default config is bounded and development only
+  ---
+  duration_ms: 0.34705
+  type: 'test'
+  ...
+# Subtest: production rejects insecure database transport
+ok 166 - production rejects insecure database transport
+  ---
+  duration_ms: 0.106056
+  type: 'test'
+  ...
+# Subtest: production rejects HTTP browser origins
+ok 167 - production rejects HTTP browser origins
+  ---
+  duration_ms: 0.144522
+  type: 'test'
+  ...
+# Subtest: database URL cannot override TLS verification
+ok 168 - database URL cannot override TLS verification
+  ---
+  duration_ms: 0.173816
+  type: 'test'
+  ...
+# Subtest: pool size has a hard bound
+ok 169 - pool size has a hard bound
+  ---
+  duration_ms: 0.120858
+  type: 'test'
+  ...
+# Subtest: request digest secret is mandatory
+ok 170 - request digest secret is mandatory
+  ---
+  duration_ms: 0.098835
+  type: 'test'
+  ...
+# Subtest: file type uses bytes, not just extension
+ok 171 - file type uses bytes, not just extension
+  ---
+  duration_ms: 0.209418
+  type: 'test'
+  ...
+# Subtest: MIME spoof is rejected
+ok 172 - MIME spoof is rejected
+  ---
+  duration_ms: 0.142349
+  type: 'test'
+  ...
+# Subtest: filename cannot escape a directory
+ok 173 - filename cannot escape a directory
+  ---
+  duration_ms: 0.193985
+  type: 'test'
+  ...
+# Subtest: HTML and executable files are not accepted
+ok 174 - HTML and executable files are not accepted
+  ---
+  duration_ms: 0.091685
+  type: 'test'
+  ...
+# Subtest: empty upload rejected
+ok 175 - empty upload rejected
+  ---
+  duration_ms: 0.06763
+  type: 'test'
+  ...
+# Subtest: upload size cap enforced
+ok 176 - upload size cap enforced
+  ---
+  duration_ms: 0.058647
+  type: 'test'
+  ...
+# Subtest: extraction never converts money into consumption
+ok 177 - extraction never converts money into consumption
+  ---
+  duration_ms: 0.798836
+  type: 'test'
+  ...
+# Subtest: MWh is explicitly normalized to kWh with a warning
+ok 178 - MWh is explicitly normalized to kWh with a warning
+  ---
+  duration_ms: 0.389684
+  type: 'test'
+  ...
+# Subtest: ambiguous invoice consumption lines force manual review
+ok 179 - ambiguous invoice consumption lines force manual review
+  ---
+  duration_ms: 0.0676
+  type: 'test'
+  ...
+# Subtest: bounded extraction executes real text parsing in a worker thread
+ok 180 - bounded extraction executes real text parsing in a worker thread
+  ---
+  duration_ms: 32.715638
+  type: 'test'
+  ...
+# Subtest: real sample PDF parser is retained and works within the bounded worker
+ok 181 - real sample PDF parser is retained and works within the bounded worker
+  ---
+  duration_ms: 33.085813
+  type: 'test'
+  ...
+# Subtest: metrics expose bounded status labels, not personal IDs or paths
+ok 182 - metrics expose bounded status labels, not personal IDs or paths
+  ---
+  duration_ms: 0.873285
+  type: 'test'
+  ...
+# Subtest: university catalog includes 15 explicit Scope 3 screening categories
+ok 183 - university catalog includes 15 explicit Scope 3 screening categories
+  ---
+  duration_ms: 1.543682
+  type: 'test'
+  ...
+# Subtest: student commuting is supplemental, not silently employee category 7
+ok 184 - student commuting is supplemental, not silently employee category 7
+  ---
+  duration_ms: 0.099426
+  type: 'test'
+  ...
+# Subtest: university templates include water, lab waste, dining, academic and normalization metrics
+ok 185 - university templates include water, lab waste, dining, academic and normalization metrics
+  ---
+  duration_ms: 0.229898
+  type: 'test'
+  ...
+# Subtest: physical factor normalizes exact decimals without assigning official provenance
+ok 186 - physical factor normalizes exact decimals without assigning official provenance
+  ---
+  duration_ms: 0.844533
+  type: 'test'
+  ...
+# Subtest: spend-based factor requires currency and base price year
+ok 187 - spend-based factor requires currency and base price year
+  ---
+  duration_ms: 0.466377
+  type: 'test'
+  ...
+# Subtest: physical factors reject money-method mismatch
+ok 188 - physical factors reject money-method mismatch
+  ---
+  duration_ms: 0.116982
+  type: 'test'
+  ...
+# Subtest: factor sources must be HTTPS without embedded credentials
+ok 189 - factor sources must be HTTPS without embedded credentials
+  ---
+  duration_ms: 0.280774
+  type: 'test'
+  ...
+# Subtest: factors reject backward validity dates
+ok 190 - factors reject backward validity dates
+  ---
+  duration_ms: 0.11563
+  type: 'test'
+  ...
+# Subtest: factor zero is not fabricated as a clean-energy default
+ok 191 - factor zero is not fabricated as a clean-energy default
+  ---
+  duration_ms: 0.291479
+  type: 'test'
+  ...
+# Subtest: emission input uses exact quantity and server-derived scope
+ok 192 - emission input uses exact quantity and server-derived scope
+  ---
+  duration_ms: 1.077967
+  type: 'test'
+  ...
+# Subtest: reject invalid input quantity 100
+ok 193 - reject invalid input quantity 100
+  ---
+  duration_ms: 0.238271
+  type: 'test'
+  ...
+# Subtest: reject invalid input quantity -1
+ok 194 - reject invalid input quantity -1
+  ---
+  duration_ms: 0.254744
+  type: 'test'
+  ...
+# Subtest: reject invalid input quantity 1e3
+ok 195 - reject invalid input quantity 1e3
+  ---
+  duration_ms: 0.19017
+  type: 'test'
+  ...
+# Subtest: reject invalid input quantity NaN
+ok 196 - reject invalid input quantity NaN
+  ---
+  duration_ms: 0.125184
+  type: 'test'
+  ...
+# Subtest: reject invalid input quantity 1.0000001
+ok 197 - reject invalid input quantity 1.0000001
+  ---
+  duration_ms: 0.093948
+  type: 'test'
+  ...
+# Subtest: reject invalid input quantity 0
+ok 198 - reject invalid input quantity 0
+  ---
+  duration_ms: 0.083863
+  type: 'test'
+  ...
+# Subtest: reject invalid input quantity 1000000000000
+ok 199 - reject invalid input quantity 1000000000000
+  ---
+  duration_ms: 0.073098
+  type: 'test'
+  ...
+# Subtest: tenant, scope, approval and computed values cannot be supplied by caller
+ok 200 - tenant, scope, approval and computed values cannot be supplied by caller
+  ---
+  duration_ms: 0.896259
+  type: 'test'
+  ...
+# Subtest: unapproved factor or unit mismatch blocks calculation
+ok 201 - unapproved factor or unit mismatch blocks calculation
+  ---
+  duration_ms: 0.255807
+  type: 'test'
+  ...
+# Subtest: spend quantity and factor must have exactly the same price basis
+ok 202 - spend quantity and factor must have exactly the same price basis
+  ---
+  duration_ms: 0.408371
+  type: 'test'
+  ...
+# Subtest: estimates require a substantive assumptions note
+ok 203 - estimates require a substantive assumptions note
+  ---
+  duration_ms: 0.138393
+  type: 'test'
+  ...
+# Subtest: PCF-only factor categories cannot enter university inventory
+ok 204 - PCF-only factor categories cannot enter university inventory
+  ---
+  duration_ms: 0.106637
+  type: 'test'
+  ...
+# Subtest: decimal multiplication is exact and half-up at micro-kg precision
+ok 205 - decimal multiplication is exact and half-up at micro-kg precision
+  ---
+  duration_ms: 0.279322
+  type: 'test'
+  ...
+# Subtest: large sums are not limited by JavaScript Number precision
+ok 206 - large sums are not limited by JavaScript Number precision
+  ---
+  duration_ms: 0.102181
+  type: 'test'
+  ...
+# Subtest: zero denominator returns null rather than misleading zero intensity
+ok 207 - zero denominator returns null rather than misleading zero intensity
+  ---
+  duration_ms: 0.103683
+  type: 'test'
+  ...
+# Subtest: signed observed changes preserve negative reduction percentages
+ok 208 - signed observed changes preserve negative reduction percentages
+  ---
+  duration_ms: 0.084455
+  type: 'test'
+  ...
+# Subtest: commuting distance includes explicit round-trip days and sampled participants
+ok 209 - commuting distance includes explicit round-trip days and sampled participants
+  ---
+  duration_ms: 0.222487
+  type: 'test'
+  ...
+# Subtest: commuting extrapolation is an explicit estimated operation
+ok 210 - commuting extrapolation is an explicit estimated operation
+  ---
+  duration_ms: 0.232653
+  type: 'test'
+  ...
+# Subtest: vehicle-km divides by occupancy, passenger-km must not do so
+ok 211 - vehicle-km divides by occupancy, passenger-km must not do so
+  ---
+  duration_ms: 0.173005
+  type: 'test'
+  ...
+# Subtest: commuting sampling and occupants are validated
+ok 212 - commuting sampling and occupants are validated
+  ---
+  duration_ms: 0.119296
+  type: 'test'
+  ...
+# Subtest: CSV parser handles quoted comma, doubled quote and newline
+ok 213 - CSV parser handles quoted comma, doubled quote and newline
+  ---
+  duration_ms: 0.668253
+  type: 'test'
+  ...
+# Subtest: reject malformed CSV "a,a\\n1,2"
+ok 214 - reject malformed CSV "a,a\\n1,2"
+  ---
+  duration_ms: 0.211181
+  type: 'test'
+  ...
+# Subtest: reject malformed CSV "a,b\\n1"
+ok 215 - reject malformed CSV "a,b\\n1"
+  ---
+  duration_ms: 0.071645
+  type: 'test'
+  ...
+# Subtest: reject malformed CSV "a\\n\\"unclosed"
+ok 216 - reject malformed CSV "a\\n\\"unclosed"
+  ---
+  duration_ms: 0.049132
+  type: 'test'
+  ...
+# Subtest: reject malformed CSV "a\\n\\"x\\"y"
+ok 217 - reject malformed CSV "a\\n\\"x\\"y"
+  ---
+  duration_ms: 0.048001
+  type: 'test'
+  ...
+# Subtest: reject malformed CSV "a\\nx\\"y"
+ok 218 - reject malformed CSV "a\\nx\\"y"
+  ---
+  duration_ms: 0.047039
+  type: 'test'
+  ...
+# Subtest: CSV row and byte limits are explicit
+ok 219 - CSV row and byte limits are explicit
+  ---
+  duration_ms: 0.117363
+  type: 'test'
+  ...
+# Subtest: CSV export neutralizes formula prefixes, including leading whitespace
+ok 220 - CSV export neutralizes formula prefixes, including leading whitespace
+  ---
+  duration_ms: 0.173485
+  type: 'test'
+  ...
+# Subtest: HTML exports escape active markup
+ok 221 - HTML exports escape active markup
+  ---
+  duration_ms: 0.126807
+  type: 'test'
+  ...
+# Subtest: supplier questionnaires validate answer types and missing fields
+ok 222 - supplier questionnaires validate answer types and missing fields
+  ---
+  duration_ms: 0.385046
+  type: 'test'
+  ...
+# Subtest: supplier questionnaires reject repeated keys and unknown answer fields
+ok 223 - supplier questionnaires reject repeated keys and unknown answer fields
+  ---
+  duration_ms: 0.124543
+  type: 'test'
+  ...
+# Subtest: materiality responses below privacy threshold are suppressed
+ok 224 - materiality responses below privacy threshold are suppressed
+  ---
+  duration_ms: 0.131143
+  type: 'test'
+  ...
+# Subtest: materiality flags both axes while suppressing small stakeholder groups
+ok 225 - materiality flags both axes while suppressing small stakeholder groups
+  ---
+  duration_ms: 0.238681
+  type: 'test'
+  ...
+# Subtest: materiality must score each topic once with bounded whole-number ratings
+ok 226 - materiality must score each topic once with bounded whole-number ratings
+  ---
+  duration_ms: 0.160987
+  type: 'test'
+  ...
+# Subtest: primary inventory excludes supplemental student emissions
+ok 227 - primary inventory excludes supplemental student emissions
+  ---
+  duration_ms: 0.260794
+  type: 'test'
+  ...
+# Subtest: latest approved KPI revision replaces prior value without double counting
+ok 228 - latest approved KPI revision replaces prior value without double counting
+  ---
+  duration_ms: 0.256477
+  type: 'test'
+  ...
+# Subtest: point-in-time headcounts are not added across collection intervals
+ok 229 - point-in-time headcounts are not added across collection intervals
+  ---
+  duration_ms: 0.571952
+  type: 'test'
+  ...
+# Subtest: percent observations have no mathematically invalid summed total
+ok 230 - percent observations have no mathematically invalid summed total
+  ---
+  duration_ms: 0.11557
+  type: 'test'
+  ...
+# Subtest: missing campus denominator blocks apparently precise intensity
+ok 231 - missing campus denominator blocks apparently precise intensity
+  ---
+  duration_ms: 0.322925
+  type: 'test'
+  ...
+# Subtest: Scope 3 coverage keeps unassessed categories visible
+ok 232 - Scope 3 coverage keeps unassessed categories visible
+  ---
+  duration_ms: 0.187065
+  type: 'test'
+  ...
+# Subtest: PCF allocation and functional-unit normalization are explicit and inventory-excluded
+ok 233 - PCF allocation and functional-unit normalization are explicit and inventory-excluded
+  ---
+  duration_ms: 0.510842
+  type: 'test'
+  ...
+# Subtest: PCF refuses spend proxies, missing factors and over-allocation
+ok 234 - PCF refuses spend proxies, missing factors and over-allocation
+  ---
+  duration_ms: 0.213534
+  type: 'test'
+  ...
+# Subtest: installing university catalog is repeatable and never seeds measurements or factors
+ok 235 - installing university catalog is repeatable and never seeds measurements or factors
+  ---
+  duration_ms: 4.145961
+  type: 'test'
+  ...
+# Subtest: department cannot reference another university campus
+ok 236 - department cannot reference another university campus
+  ---
+  duration_ms: 0.873526
+  type: 'test'
+  ...
+# Subtest: collection rejects overlapping intervals for the same KPI source
+ok 237 - collection rejects overlapping intervals for the same KPI source
+  ---
+  duration_ms: 2.097557
+  type: 'test'
+  ...
+# Subtest: normalization task must use one whole-period campus-wide bucket
+ok 238 - normalization task must use one whole-period campus-wide bucket
+  ---
+  duration_ms: 1.400462
+  type: 'test'
+  ...
+# Subtest: data-entry users cannot read or write another assignee task
+ok 239 - data-entry users cannot read or write another assignee task
+  ---
+  duration_ms: 1.545855
+  type: 'test'
+  ...
+# Subtest: KPI approval creates a snapshot and completes the task
+ok 240 - KPI approval creates a snapshot and completes the task
+  ---
+  duration_ms: 3.670932
+  type: 'test'
+  ...
+# Subtest: KPI cannot be submitted without required clean evidence
+ok 241 - KPI cannot be submitted without required clean evidence
+  ---
+  duration_ms: 1.422564
+  type: 'test'
+  ...
+# Subtest: quarantined document cannot be used as evidence
+ok 242 - quarantined document cannot be used as evidence
+  ---
+  duration_ms: 1.193687
+  type: 'test'
+  ...
+# Subtest: another administrator may not edit an author draft and then approve it
+ok 243 - another administrator may not edit an author draft and then approve it
+  ---
+  duration_ms: 1.988156
+  type: 'test'
+  ...
+# Subtest: maker-checker prevents self-approval even after elevation to administrator
+ok 244 - maker-checker prevents self-approval even after elevation to administrator
+  ---
+  duration_ms: 2.447241
+  type: 'test'
+  ...
+# Subtest: KPI correction preserves old snapshot and counts only the latest approved revision
+ok 245 - KPI correction preserves old snapshot and counts only the latest approved revision
+  ---
+  duration_ms: 3.339164
+  type: 'test'
+  ...
+# Subtest: KPI waiver records a reason and cannot hide already approved data
+ok 246 - KPI waiver records a reason and cannot hide already approved data
+  ---
+  duration_ms: 1.438667
+  type: 'test'
+  ...
+# Subtest: factor author cannot approve their own factor
+ok 247 - factor author cannot approve their own factor
+  ---
+  duration_ms: 0.678618
+  type: 'test'
+  ...
+# Subtest: Scope 3 approval requires declared included category and evidence
+ok 248 - Scope 3 approval requires declared included category and evidence
+  ---
+  duration_ms: 1.643149
+  type: 'test'
+  ...
+# Subtest: calculated emission retains exact factor provenance and evidence hash
+ok 249 - calculated emission retains exact factor provenance and evidence hash
+  ---
+  duration_ms: 1.194648
+  type: 'test'
+  ...
+# Subtest: repeat approval cannot create a second calculation
+ok 250 - repeat approval cannot create a second calculation
+  ---
+  duration_ms: 0.831884
+  type: 'test'
+  ...
+# Subtest: a category with calculated emissions cannot be excluded
+ok 251 - a category with calculated emissions cannot be excluded
+  ---
+  duration_ms: 0.805516
+  type: 'test'
+  ...
+# Subtest: data-entry emission read is author-scoped
+ok 252 - data-entry emission read is author-scoped
+  ---
+  duration_ms: 0.852455
+  type: 'test'
+  ...
+# Subtest: locked periods reject new university activity records
+ok 253 - locked periods reject new university activity records
+  ---
+  duration_ms: 0.502289
+  type: 'test'
+  ...
+# Subtest: approved void excludes a calculation without deleting the historical ledger
+ok 254 - approved void excludes a calculation without deleting the historical ledger
+  ---
+  duration_ms: 2.072681
+  type: 'test'
+  ...
+# Subtest: replacement activity requires an approved void
+ok 255 - replacement activity requires an approved void
+  ---
+  duration_ms: 1.303138
+  type: 'test'
+  ...
+# Subtest: CSV preview validates fields and references without adding records
+ok 256 - CSV preview validates fields and references without adding records
+  ---
+  duration_ms: 1.208659
+  type: 'test'
+  ...
+# Subtest: CSV commit inserts drafts atomically and rejects malformed batches before writing
+ok 257 - CSV commit inserts drafts atomically and rejects malformed batches before writing
+  ---
+  duration_ms: 0.676746
+  type: 'test'
+  ...
+# Subtest: overview combines original core ledger and new carbon records, but not student supplemental emissions
+ok 258 - overview combines original core ledger and new carbon records, but not student supplemental emissions
+  ---
+  duration_ms: 1.982127
+  type: 'test'
+  ...
+# Subtest: report snapshots require locked periods and an independent approver
+ok 259 - report snapshots require locked periods and an independent approver
+  ---
+  duration_ms: 2.736037
+  type: 'test'
+  ...
+# Subtest: period reopening invalidates approval of a stale report snapshot
+ok 260 - period reopening invalidates approval of a stale report snapshot
+  ---
+  duration_ms: 1.552745
+  type: 'test'
+  ...
+# Subtest: approved reports export frozen JSON, CSV and escaped print-ready HTML
+ok 261 - approved reports export frozen JSON, CSV and escaped print-ready HTML
+  ---
+  duration_ms: 4.143798
+  type: 'test'
+  ...
+# Subtest: snapshot corruption is detected before exporting
+ok 262 - snapshot corruption is detected before exporting
+  ---
+  duration_ms: 1.957731
+  type: 'test'
+  ...
+# Subtest: facts endpoint carries real record IDs and does not pretend to be AI
+ok 263 - facts endpoint carries real record IDs and does not pretend to be AI
+  ---
+  duration_ms: 0.855499
+  type: 'test'
+  ...
+# Subtest: supplier capability is stored hashed, returned once and can access only its questionnaire
+ok 264 - supplier capability is stored hashed, returned once and can access only its questionnaire
+  ---
+  duration_ms: 2.265874
+  type: 'test'
+  ...
+# Subtest: supplier response is single-use, needs evidence and separate internal approval, and does not post emissions
+ok 265 - supplier response is single-use, needs evidence and separate internal approval, and does not post emissions
+  ---
+  duration_ms: 1.339502
+  type: 'test'
+  ...
+# Subtest: revoked or expired capability cannot be used
+ok 266 - revoked or expired capability cannot be used
+  ---
+  duration_ms: 0.641514
+  type: 'test'
+  ...
+# Subtest: full materiality flow gathers consented anonymous responses and publishes only aggregates
+ok 267 - full materiality flow gathers consented anonymous responses and publishes only aggregates
+  ---
+  duration_ms: 2.335306
+  type: 'test'
+  ...
+# Subtest: materiality publication refuses inadequate response numbers
+ok 268 - materiality publication refuses inadequate response numbers
+  ---
+  duration_ms: 0.372148
+  type: 'test'
+  ...
+# Subtest: targets use a frozen approved baseline and planned initiatives never deduct emissions
+ok 269 - targets use a frozen approved baseline and planned initiatives never deduct emissions
+  ---
+  duration_ms: 2.43919
+  type: 'test'
+  ...
+# Subtest: PCF preview and approval remain outside the emissions ledger
+ok 270 - PCF preview and approval remain outside the emissions ledger
+  ---
+  duration_ms: 1.10045
+  type: 'test'
+  ...
+# Subtest: all university operation method/path pairs are unique
+ok 271 - all university operation method/path pairs are unique
+  ---
+  duration_ms: 1.401943
+  type: 'test'
+  ...
+# Subtest: leadership cannot create, approve or mutate university records
+ok 272 - leadership cannot create, approve or mutate university records
+  ---
+  duration_ms: 1.174519
+  type: 'test'
+  ...
+# Subtest: unknown routes and query tenant switching are rejected
+ok 273 - unknown routes and query tenant switching are rejected
+  ---
+  duration_ms: 2.369608
+  type: 'test'
+  ...
+# Subtest: university routes pass through existing authentication and rate limit middleware
+ok 274 - university routes pass through existing authentication and rate limit middleware
+  ---
+  duration_ms: 24.946303
+  type: 'test'
+  ...
+# Subtest: unauthenticated university access never reaches the domain router
+ok 275 - unauthenticated university access never reaches the domain router
+  ---
+  duration_ms: 5.38834
+  type: 'test'
+  ...
+# Subtest: university mutation passes decoded JSON, idempotency key and authenticated actor
+ok 276 - university mutation passes decoded JSON, idempotency key and authenticated actor
+  ---
+  duration_ms: 8.002818
+  type: 'test'
+  ...
+# Subtest: JSON content type, malformed JSON and size limits are enforced before university dispatch
+ok 277 - JSON content type, malformed JSON and size limits are enforced before university dispatch
+  ---
+  duration_ms: 6.788201
+  type: 'test'
+  ...
+# Subtest: tenant ID query field is blocked even before the university handler
+ok 278 - tenant ID query field is blocked even before the university handler
+  ---
+  duration_ms: 2.281968
+  type: 'test'
+  ...
+# Subtest: report export returns downloadable bytes rather than a JSON envelope
+ok 279 - report export returns downloadable bytes rather than a JSON envelope
+  ---
+  duration_ms: 3.360325
+  type: 'test'
+  ...
+# Subtest: capability portal is separate from employee login and refuses URL tokens
+ok 280 - capability portal is separate from employee login and refuses URL tokens
+  ---
+  duration_ms: 5.791143
+  type: 'test'
+  ...
+# Subtest: capability parsing requires exact format and verifies expiration, hash and revocation
+ok 281 - capability parsing requires exact format and verifies expiration, hash and revocation
+  ---
+  duration_ms: 1.113328
+  type: 'test'
+  ...
+# Subtest: repository includes explicit tenant predicate and uses parameters for record IDs
+ok 282 - repository includes explicit tenant predicate and uses parameters for record IDs
+  ---
+  duration_ms: 4.868014
+  type: 'test'
+  ...
+# Subtest: repository rejects unknown table identifiers rather than interpolating them
+ok 283 - repository rejects unknown table identifiers rather than interpolating them
+  ---
+  duration_ms: 0.729945
+  type: 'test'
+  ...
+# Subtest: repository rejects untrusted column identifiers
+ok 284 - repository rejects untrusted column identifiers
+  ---
+  duration_ms: 0.261485
+  type: 'test'
+  ...
+# Subtest: SQL values such as descriptions are parameterized
+ok 285 - SQL values such as descriptions are parameterized
+  ---
+  duration_ms: 0.231701
+  type: 'test'
+  ...
+# Subtest: repository write serializes evidence IDs as JSON, not a PostgreSQL text array
+ok 286 - repository write serializes evidence IDs as JSON, not a PostgreSQL text array
+  ---
+  duration_ms: 0.23774
+  type: 'test'
+  ...
+# Subtest: repository forbids overriding tenant on insert and identity on update
+ok 287 - repository forbids overriding tenant on insert and identity on update
+  ---
+  duration_ms: 0.325559
+  type: 'test'
+  ...
+# Subtest: repository user reference queries never select password hashes
+ok 288 - repository user reference queries never select password hashes
+  ---
+  duration_ms: 0.249937
+  type: 'test'
+  ...
+# Subtest: lexical search escapes wildcard characters and never interpolates user text
+ok 289 - lexical search escapes wildcard characters and never interpolates user text
+  ---
+  duration_ms: 0.300202
+  type: 'test'
+  ...
+# Subtest: transaction snapshot sets isolation before its first query and keeps tenant local
+ok 290 - transaction snapshot sets isolation before its first query and keeps tenant local
+  ---
+  duration_ms: 0.474929
+  type: 'test'
+  ...
+# Subtest: transaction failure rolls back and releases the connection
+ok 291 - transaction failure rolls back and releases the connection
+  ---
+  duration_ms: 0.492866
+  type: 'test'
+  ...
+# Subtest: migration plan includes unchanged core plus additive university migration
+ok 292 - migration plan includes unchanged core plus additive university migration
+  ---
+  duration_ms: 9.705954
+  type: 'test'
+  ...
+# Subtest: university migration declares forced RLS, tenant composite references and immutable snapshots
+ok 293 - university migration declares forced RLS, tenant composite references and immutable snapshots
+  ---
+  duration_ms: 0.585241
+  type: 'test'
+  ...
+1..293
+# tests 293
+# suites 0
+# pass 293
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 641.285928

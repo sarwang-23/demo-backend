@@ -1,0 +1,23 @@
+{
+  "checks": [
+    "Admin sign-in, overview render and 289.34 tCO2e rounded baseline",
+    "Manual form preview, draft creation and submission",
+    "Separate reviewer Review -> Verify -> Calculate controls",
+    "Multipart PDF upload with real suggestions: 12500 kWh distinct from INR 112500",
+    "Invoice review confirmation and linked activity approval/calculation",
+    "Read-only CEO controls, total reconciliation, CSV export response and audit screen",
+    "390px mobile overview without document-level horizontal overflow",
+    "Offline API reference render and actual served OpenAPI contract",
+    "No uncaught JavaScript errors in the DOM-harness workflow"
+  ],
+  "browser": "System Chromium through Playwright, Linux",
+  "mode": "Offline DOM harness, real HTTP API via Python bridge. Managed browser policy blocks direct localhost navigation. This does not validate native browser networking or CSP.",
+  "screenshots": [
+    "CarbonSynq-demo-login.png",
+    "CarbonSynq-demo-dashboard.png",
+    "CarbonSynq-demo-invoice-review.png",
+    "CarbonSynq-demo-ceo.png",
+    "CarbonSynq-demo-mobile.png"
+  ],
+  "passed": true
+}

@@ -1,0 +1,7 @@
+Source: CarbonSynq-Complete-Backend-With-HLD(3).zip
+Original files: 295
+Unchanged at same relative paths: 295
+Missing or modified original files: 0
+Method: SHA-256 comparison after removing outer ZIP folder prefix.
+New scale source is additive; the old demo and Neon code are not silently migrated.
+Full per-file hashes: SOURCE-PRESERVATION.json

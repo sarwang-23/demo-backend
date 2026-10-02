@@ -1,0 +1,278 @@
+
+> carbonsynq-complete-backend@1.0.1 test
+> node --test tests/unit.test.mjs tests/integration.test.mjs tests/operations.test.mjs
+
+TAP version 13
+# (node:4478) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: health and static UI are served without external infrastructure
+ok 1 - health and static UI are served without external infrastructure
+  ---
+  duration_ms: 287.989956
+  type: 'test'
+  ...
+# Subtest: invalid credentials and anonymous access fail
+ok 2 - invalid credentials and anonymous access fail
+  ---
+  duration_ms: 51.637544
+  type: 'test'
+  ...
+# Subtest: leadership and reviewer cannot create consumption
+ok 3 - leadership and reviewer cannot create consumption
+  ---
+  duration_ms: 9.864815
+  type: 'test'
+  ...
+# Subtest: metadata and explicit university filters are tenant-scoped
+ok 4 - metadata and explicit university filters are tenant-scoped
+  ---
+  duration_ms: 4.151275
+  type: 'test'
+  ...
+# Subtest: hierarchy, ownership, scope, units and date validation reject invalid inputs
+ok 5 - hierarchy, ownership, scope, units and date validation reject invalid inputs
+  ---
+  duration_ms: 22.20934
+  type: 'test'
+  ...
+# Subtest: preview is read-only and drafts do not change dashboard emissions
+ok 6 - preview is read-only and drafts do not change dashboard emissions
+  ---
+  duration_ms: 19.426838
+  type: 'test'
+  ...
+# Subtest: idempotency handles replay and conflicting payloads
+ok 7 - idempotency handles replay and conflicting payloads
+  ---
+  duration_ms: 5.582118
+  type: 'test'
+  ...
+# Subtest: duplicate detection needs explicit justification for separate records
+ok 8 - duplicate detection needs explicit justification for separate records
+  ---
+  duration_ms: 5.624151
+  type: 'test'
+  ...
+# Subtest: editing cannot bypass duplicate safeguards and unchanged self-edit is allowed
+ok 9 - editing cannot bypass duplicate safeguards and unchanged self-edit is allowed
+  ---
+  duration_ms: 9.401432
+  type: 'test'
+  ...
+# Subtest: workflow order, version checks and entry-user review restrictions are enforced
+ok 10 - workflow order, version checks and entry-user review restrictions are enforced
+  ---
+  duration_ms: 9.139578
+  type: 'test'
+  ...
+# Subtest: complete maker-checker flow calculates once and updates dashboard exactly
+ok 11 - complete maker-checker flow calculates once and updates dashboard exactly
+  ---
+  duration_ms: 19.263448
+  type: 'test'
+  ...
+# Subtest: administrators cannot approve their own entry
+ok 12 - administrators cannot approve their own entry
+  ---
+  duration_ms: 6.913179
+  type: 'test'
+  ...
+# Subtest: rejection requires reason and correction returns a record to draft
+ok 13 - rejection requires reason and correction returns a record to draft
+  ---
+  duration_ms: 6.207539
+  type: 'test'
+  ...
+# Subtest: locked reporting period blocks activity writes until admin unlocks it
+ok 14 - locked reporting period blocks activity writes until admin unlocks it
+  ---
+  duration_ms: 4.457525
+  type: 'test'
+  ...
+# Subtest: cross-tenant activity reads and mutations do not reveal records
+ok 15 - cross-tenant activity reads and mutations do not reveal records
+  ---
+  duration_ms: 6.045424
+  type: 'test'
+  ...
+# Subtest: multipart PDF upload extracts actual quantity separately from money
+ok 16 - multipart PDF upload extracts actual quantity separately from money
+  ---
+  duration_ms: 9.487443
+  type: 'test'
+  ...
+# Subtest: invoice download preserves bytes and checks authentication and tenant
+ok 17 - invoice download preserves bytes and checks authentication and tenant
+  ---
+  duration_ms: 5.53058
+  type: 'test'
+  ...
+# Subtest: invoice confirmation requires human review and consumption, not totalAmount
+ok 18 - invoice confirmation requires human review and consumption, not totalAmount
+  ---
+  duration_ms: 8.899999
+  type: 'test'
+  ...
+# Subtest: different files with the same vendor and invoice number cannot double count
+ok 19 - different files with the same vendor and invoice number cannot double count
+  ---
+  duration_ms: 5.629138
+  type: 'test'
+  ...
+# Subtest: scanned invoice supports explicit manual fields without fake OCR
+ok 20 - scanned invoice supports explicit manual fields without fake OCR
+  ---
+  duration_ms: 5.47754
+  type: 'test'
+  ...
+# Subtest: uploads reject invalid signatures, multiple files and read-only actors
+ok 21 - uploads reject invalid signatures, multiple files and read-only actors
+  ---
+  duration_ms: 5.08535
+  type: 'test'
+  ...
+# Subtest: invoice-linked calculation updates evidence coverage using consumption
+ok 22 - invoice-linked calculation updates evidence coverage using consumption
+  ---
+  duration_ms: 11.118085
+  type: 'test'
+  ...
+# Subtest: audit records cannot be edited or deleted and are scoped to the caller
+ok 23 - audit records cannot be edited or deleted and are scoped to the caller
+  ---
+  duration_ms: 4.091946
+  type: 'test'
+  ...
+# Subtest: report totals reconcile with calculation rows and factor snapshots
+ok 24 - report totals reconcile with calculation rows and factor snapshots
+  ---
+  duration_ms: 6.543663
+  type: 'test'
+  ...
+# Subtest: pagination, review queue and malformed JSON return stable API errors
+ok 25 - pagination, review queue and malformed JSON return stable API errors
+  ---
+  duration_ms: 5.377089
+  type: 'test'
+  ...
+# Subtest: cross-origin requests are blocked
+ok 26 - cross-origin requests are blocked
+  ---
+  duration_ms: 1.301307
+  type: 'test'
+  ...
+# Subtest: draft deletion preserves the audit record
+ok 27 - draft deletion preserves the audit record
+  ---
+  duration_ms: 6.872809
+  type: 'test'
+  ...
+# Subtest: file-backed SQLite data persists through closing and reopening
+ok 28 - file-backed SQLite data persists through closing and reopening
+  ---
+  duration_ms: 2.807373
+  type: 'test'
+  ...
+# Subtest: logout revokes a session rather than just hiding the UI
+ok 29 - logout revokes a session rather than just hiding the UI
+  ---
+  duration_ms: 41.31774
+  type: 'test'
+  ...
+# (node:4479) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: runtime lock blocks a second live process and backup while running
+ok 30 - runtime lock blocks a second live process and backup while running
+  ---
+  duration_ms: 144.206176
+  type: 'test'
+  ...
+# Subtest: backup command creates a consistent reopenable SQLite snapshot
+ok 31 - backup command creates a consistent reopenable SQLite snapshot
+  ---
+  duration_ms: 126.871124
+  type: 'test'
+  ...
+# Subtest: reset refuses missing confirmation and preserves the current database
+ok 32 - reset refuses missing confirmation and preserves the current database
+  ---
+  duration_ms: 120.915991
+  type: 'test'
+  ...
+# Subtest: confirmed reset preserves the old folder rather than deleting it
+ok 33 - confirmed reset preserves the old folder rather than deleting it
+  ---
+  duration_ms: 133.239519
+  type: 'test'
+  ...
+# (node:4481) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: electricity PDF extraction reads the file, not a hard-coded fixture
+ok 34 - electricity PDF extraction reads the file, not a hard-coded fixture
+  ---
+  duration_ms: 3.253955
+  type: 'test'
+  ...
+# Subtest: diesel PDF uses litre consumption and keeps money separate
+ok 35 - diesel PDF uses litre consumption and keeps money separate
+  ---
+  duration_ms: 1.453877
+  type: 'test'
+  ...
+# Subtest: invoice parser cannot turn a money-only invoice into consumption
+ok 36 - invoice parser cannot turn a money-only invoice into consumption
+  ---
+  duration_ms: 0.11966
+  type: 'test'
+  ...
+# Subtest: ambiguous multi-line consumption requires manual review
+ok 37 - ambiguous multi-line consumption requires manual review
+  ---
+  duration_ms: 0.176756
+  type: 'test'
+  ...
+# Subtest: MWh normalization is explicit
+ok 38 - MWh normalization is explicit
+  ---
+  duration_ms: 0.202295
+  type: 'test'
+  ...
+# Subtest: scanned PNG never claims OCR or fabricated extracted fields
+ok 39 - scanned PNG never claims OCR or fabricated extracted fields
+  ---
+  duration_ms: 0.642557
+  type: 'test'
+  ...
+# Subtest: complex font PDF safely falls back to manual review
+ok 40 - complex font PDF safely falls back to manual review
+  ---
+  duration_ms: 0.193471
+  type: 'test'
+  ...
+# Subtest: file signature, MIME, extension, empty and size validation
+ok 41 - file signature, MIME, extension, empty and size validation
+  ---
+  duration_ms: 3.53005
+  type: 'test'
+  ...
+# Subtest: invalid calendar dates and non-finite quantities are rejected
+ok 42 - invalid calendar dates and non-finite quantities are rejected
+  ---
+  duration_ms: 0.503818
+  type: 'test'
+  ...
+# Subtest: CSV export neutralizes spreadsheet formulas
+ok 43 - CSV export neutralizes spreadsheet formulas
+  ---
+  duration_ms: 0.494214
+  type: 'test'
+  ...
+1..43
+# tests 43
+# suites 0
+# pass 43
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 853.326996

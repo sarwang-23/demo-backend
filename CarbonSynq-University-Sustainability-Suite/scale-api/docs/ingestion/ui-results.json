@@ -1,0 +1,23 @@
+{
+  "passed": 13,
+  "checks": [
+    "Login and live local HTTP domain dispatch in DOM harness",
+    "Real XLSX byte upload and parser through HTTP",
+    "Header suggestions, MWh normalization and visible skipped rows",
+    "Three actual records confirmed; repeated header and subtotal not imported",
+    "Reviewed selection creates three drafts through the existing carbon service",
+    "Browser downloads the actual normalized XLSX",
+    "Batch closes only after records resolved",
+    "Six real PDFs upload with individual processing statuses",
+    "Invoice quantity and INR amount remain distinct in review UI",
+    "Existing Scope 2 period data blocks duplicate/overlapping intake",
+    "Shared invoice setup normalizes all six files into a single review workbench",
+    "390px mobile view without page overflow",
+    "No JavaScript errors in tested UI controls"
+  ],
+  "errors": [],
+  "environment": "Chromium; real HTTP/parser/domain; synthetic memory DB, storage and scanner.",
+  "mode": "DOM_WITH_LOCAL_HTTP_BRIDGE",
+  "browserNavigationTested": false,
+  "productionCSPTested": false
+}

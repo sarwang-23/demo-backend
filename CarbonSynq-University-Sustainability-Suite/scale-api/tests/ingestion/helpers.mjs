@@ -1,0 +1,13 @@
+/** Synthetic test helpers only. No SQL, storage or virus scanner is exercised here. */
+import {id,hash} from '../../src/core.mjs';
+import {readyFixture} from '../carbon/memory.mjs';
+import * as service from '../../src/ingestion/service.mjs';
+import {XLSX_MIME} from '../../src/ingestion/parser.mjs';
+export {service};
+export function workbook(values,{hiddenRows=[],formulaCells=[],mergedCells={}}={}){return {kind:'WORKBOOK',method:'SYNTHETIC_FIXTURE',sheets:[{name:'Data',hidden:false,rows:values.map((row,i)=>({index:i+1,hidden:hiddenRows.includes(i+1),cells:row.map((v,j)=>({column:String.fromCharCode(65+j),address:String.fromCharCode(65+j)+(i+1),value:v,type:formulaCells.includes(String.fromCharCode(65+j)+(i+1))?'formula':'string',...(mergedCells[String.fromCharCode(65+j)+(i+1)]?{mergedFrom:mergedCells[String.fromCharCode(65+j)+(i+1)]}:{})}))}))}]};}
+export const standard=[['Consumption','Unit','Period start','Period end'],['1250','kWh','2026-04-01','2026-04-30'],['1.5','MWh','2026-05-01','2026-05-31']];
+export function plan(f,extra={}){return {sheet:'Data',headerRow:1,mapping:{quantity:'A',unit:'B',intervalStart:'C',intervalEnd:'D'},dateOrder:'AUTO',defaults:{sourceId:f.source.id,factorId:f.factor.id,fallbackFactorId:f.fallback?.id,fallbackReason:'Synthetic independently reviewed residual fixture.'},...extra};}
+export async function fixture(extra={}){const f=await readyFixture('ENERGY');f.e=f.s.for(f.actors.ENTRY);const extraction=extra.extraction||workbook(standard);f.doc=await f.s.insert('documents',{original_name:'synthetic.xlsx',mime_type:XLSX_MIME,file_size:'100',sha256:hash(id()),object_version:'test-only',status:'REVIEW_REQUIRED',scan_result:'CLEAN',uploaded_by:f.actors.ENTRY.id,extraction,...extra.doc});f.batch=await service.createBatch(f.e,{periodId:f.period,name:'Synthetic import batch',kind:extra.kind||'SPREADSHEET',target:extra.target||'CARBON'});const attached=await service.attachFiles(f.e,f.batch.id,{version:f.batch.version,documentIds:[f.doc.id]});f.batch=attached.batch;f.file=attached.files[0];return f;}
+export async function preview(f,plans=[plan(f)]){return service.previewFile(f.e,f.file.id,{version:(await f.e.get('u_i_files',f.file.id)).version,plans});}
+export async function review(f,rows){return service.reviewRows(f.e,f.batch.id,{quantityMeaningConfirmed:true,items:rows.map(r=>({rowId:r.id,version:r.version,action:'CONFIRM',reason:'Checked the original synthetic evidence.'}))});}
+export async function commit(f,rows){return f.e.transaction(s=>service.commitRows(s,f.batch.id,{version:f.state.tables.u_i_batches.find(b=>b.id===f.batch.id).version,rowIds:rows.map(r=>r.id),confirmed:true}));}

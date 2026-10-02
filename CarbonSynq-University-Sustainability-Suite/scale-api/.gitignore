@@ -1,0 +1,18 @@
+.env
+.env.*
+!.env.example
+node_modules/
+backups/
+*.log
+load-results.json
+ui-artifacts/
+__pycache__/
+
+.private-mail/
+private-backups/
+*.backup-bundle/
+
+# Safe example only; prepared .env and local setup lock remain private.
+!.env.neon.example
+.env.prepare.lock/
+.env.preparing-*

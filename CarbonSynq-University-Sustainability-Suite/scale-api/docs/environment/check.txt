@@ -1,0 +1,5 @@
+
+> carbonsynq-scale-api@2.4.0-operations-rc.1.env.1 check
+> node scripts/check.mjs
+
+{"syntaxFilesChecked":44,"openApiPaths":34}

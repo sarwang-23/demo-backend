@@ -1,0 +1,27 @@
+# Fragment for a TLS-terminating reverse proxy; certificate paths must be supplied by your operator.
+# The API must NOT also be publicly reachable. Do not trust client-provided proxy headers.
+upstream carbon_api {
+    least_conn;
+    server api-1:8080;
+    server api-2:8080;
+    keepalive 32;
+}
+server {
+    listen 443 ssl;
+    server_name carbon.your-university.example;
+    ssl_certificate /run/secrets/tls.crt;
+    ssl_certificate_key /run/secrets/tls.key;
+    client_max_body_size 10m;
+    client_body_timeout 30s;
+    location /metrics { deny all; }
+    location / {
+        proxy_pass http://carbon_api;
+        proxy_http_version 1.1;
+        proxy_set_header Connection "";
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-For $remote_addr;
+        proxy_set_header X-Forwarded-Proto https;
+        proxy_read_timeout 90s;
+        proxy_connect_timeout 5s;
+    }
+}

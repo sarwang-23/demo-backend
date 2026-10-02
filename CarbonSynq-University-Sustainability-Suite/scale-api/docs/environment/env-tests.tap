@@ -1,0 +1,230 @@
+
+> carbonsynq-scale-api@2.4.0-operations-rc.1.env.1 test:env
+> node --test tests/env/*.test.mjs
+
+TAP version 13
+# Subtest: template has correct port/origins but fails readiness without rotated credentials
+ok 1 - template has correct port/origins but fails readiness without rotated credentials
+  ---
+  duration_ms: 2.308045
+  type: 'test'
+  ...
+# Subtest: prepares three distinct direct URL identities and verified TLS
+ok 2 - prepares three distinct direct URL identities and verified TLS
+  ---
+  duration_ms: 1.652746
+  type: 'test'
+  ...
+# Subtest: generates fresh unpredictable values locally and does not mutate input
+ok 3 - generates fresh unpredictable values locally and does not mutate input
+  ---
+  duration_ms: 1.70845
+  type: 'test'
+  ...
+# Subtest: reruns preserve every valid previously prepared secret
+ok 4 - reruns preserve every valid previously prepared secret
+  ---
+  duration_ms: 1.449365
+  type: 'test'
+  ...
+# Subtest: a copied pooled Neon URL becomes direct and its TLS options become explicit config
+ok 5 - a copied pooled Neon URL becomes direct and its TLS options become explicit config
+  ---
+  duration_ms: 0.872306
+  type: 'test'
+  ...
+# Subtest: percent-encoded special password characters survive URL normalization
+ok 6 - percent-encoded special password characters survive URL normalization
+  ---
+  duration_ms: 2.1919
+  type: 'test'
+  ...
+# Subtest: rejects insecure SSL query options
+ok 7 - rejects insecure SSL query options
+  ---
+  duration_ms: 0.343423
+  type: 'test'
+  ...
+# Subtest: rejects hidden arbitrary connection options
+ok 8 - rejects hidden arbitrary connection options
+  ---
+  duration_ms: 0.391646
+  type: 'test'
+  ...
+# Subtest: rejects invalid URLs without including their value in errors
+ok 9 - rejects invalid URLs without including their value in errors
+  ---
+  duration_ms: 0.419493
+  type: 'test'
+  ...
+# Subtest: rejects owner URL in another database service
+ok 10 - rejects owner URL in another database service
+  ---
+  duration_ms: 0.612743
+  type: 'test'
+  ...
+# Subtest: rejects fragments so unencoded password characters cannot silently truncate URL
+ok 11 - rejects fragments so unencoded password characters cannot silently truncate URL
+  ---
+  duration_ms: 0.402607
+  type: 'test'
+  ...
+# Subtest: runtime role cannot act as migration owner
+ok 12 - runtime role cannot act as migration owner
+  ---
+  duration_ms: 0.311581
+  type: 'test'
+  ...
+# Subtest: rejects nonlocal/production profile instead of overwriting it
+ok 13 - rejects nonlocal/production profile instead of overwriting it
+  ---
+  duration_ms: 0.172034
+  type: 'test'
+  ...
+# Subtest: cannot turn off Neon TLS
+ok 14 - cannot turn off Neon TLS
+  ---
+  duration_ms: 0.254086
+  type: 'test'
+  ...
+# Subtest: explicit binding flag is enabled for API and worker config
+ok 15 - explicit binding flag is enabled for API and worker config
+  ---
+  duration_ms: 0.438782
+  type: 'test'
+  ...
+# Subtest: binding config rejects invalid values and plaintext transport
+ok 16 - binding config rejects invalid values and plaintext transport
+  ---
+  duration_ms: 0.517587
+  type: 'test'
+  ...
+# Subtest: existing runtime credentials are kept, not rotated implicitly
+ok 17 - existing runtime credentials are kept, not rotated implicitly
+  ---
+  duration_ms: 0.589957
+  type: 'test'
+  ...
+# Subtest: runtime URL and separate password mismatch is rejected
+ok 18 - runtime URL and separate password mismatch is rejected
+  ---
+  duration_ms: 0.418452
+  type: 'test'
+  ...
+# Subtest: runtime URL cannot point to another endpoint
+ok 19 - runtime URL cannot point to another endpoint
+  ---
+  duration_ms: 0.45366
+  type: 'test'
+  ...
+# Subtest: runtime URL cannot use owner permissions
+ok 20 - runtime URL cannot use owner permissions
+  ---
+  duration_ms: 0.377325
+  type: 'test'
+  ...
+# Subtest: API and worker password reuse is rejected
+ok 21 - API and worker password reuse is rejected
+  ---
+  duration_ms: 0.32159
+  type: 'test'
+  ...
+# Subtest: duplicate .env variable names are rejected
+ok 22 - duplicate .env variable names are rejected
+  ---
+  duration_ms: 0.175244
+  type: 'test'
+  ...
+# Subtest: old API/JWT keys are not silently retained in the new file
+ok 23 - old API/JWT keys are not silently retained in the new file
+  ---
+  duration_ms: 0.183346
+  type: 'test'
+  ...
+# Subtest: multiline and oversized .env input are rejected
+ok 24 - multiline and oversized .env input are rejected
+  ---
+  duration_ms: 0.1591
+  type: 'test'
+  ...
+# Subtest: comments and all configured values survive rendering and read-back
+ok 25 - comments and all configured values survive rendering and read-back
+  ---
+  duration_ms: 0.659936
+  type: 'test'
+  ...
+# Subtest: readiness returns only redacted status and makes no external verification claim
+ok 26 - readiness returns only redacted status and makes no external verification claim
+  ---
+  duration_ms: 0.551868
+  type: 'test'
+  ...
+# Subtest: readiness rejects stale public port and missing own UI origin
+ok 27 - readiness rejects stale public port and missing own UI origin
+  ---
+  duration_ms: 0.55565
+  type: 'test'
+  ...
+# Subtest: local compose profile does not claim to configure a custom CA or external storage
+ok 28 - local compose profile does not claim to configure a custom CA or external storage
+  ---
+  duration_ms: 0.600597
+  type: 'test'
+  ...
+# Subtest: readiness requires prepared direct URLs not raw pooler strings
+ok 29 - readiness requires prepared direct URLs not raw pooler strings
+  ---
+  duration_ms: 0.447985
+  type: 'test'
+  ...
+# Subtest: CLI writes private .env, preserves it on rerun and never prints secrets
+ok 30 - CLI writes private .env, preserves it on rerun and never prints secrets
+  ---
+  duration_ms: 106.55786
+  type: 'test'
+  ...
+# Subtest: CLI failure leaves invalid input unchanged and returns useful no-secret error
+ok 31 - CLI failure leaves invalid input unchanged and returns useful no-secret error
+  ---
+  duration_ms: 71.803144
+  type: 'test'
+  ...
+# Subtest: first-run CLI copies a safe template when .env is absent and then stops for owner input
+ok 32 - first-run CLI copies a safe template when .env is absent and then stops for owner input
+  ---
+  duration_ms: 54.399632
+  type: 'test'
+  ...
+# Subtest: env checker rejects conflicting shell config without printing conflicting values
+ok 33 - env checker rejects conflicting shell config without printing conflicting values
+  ---
+  duration_ms: 138.701161
+  type: 'test'
+  ...
+# Subtest: a concurrent setup lock is not removed by the losing CLI
+ok 34 - a concurrent setup lock is not removed by the losing CLI
+  ---
+  duration_ms: 49.713267
+  type: 'test'
+  ...
+# Subtest: migration rejects transaction-pooler endpoints before importing database driver
+ok 35 - migration rejects transaction-pooler endpoints before importing database driver
+  ---
+  duration_ms: 1.058063
+  type: 'test'
+  ...
+# Subtest: API and worker compose environments exclude the migration-owner URL
+ok 36 - API and worker compose environments exclude the migration-owner URL
+  ---
+  duration_ms: 0.266521
+  type: 'test'
+  ...
+1..36
+# tests 36
+# suites 0
+# pass 36
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 555.443125
