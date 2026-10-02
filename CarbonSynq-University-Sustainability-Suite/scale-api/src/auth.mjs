@@ -48,7 +48,7 @@ export async function changePassword(pool, user, body) {
         fail(401, 'INVALID_CREDENTIALS', 'Current password is incorrect.');
     const encoded = await passwordHash(body.newPassword);
     return tenantTx(pool, user.tenant_id, async (c) => {
-        const changed = await c.query('UPDATE cs.users SET password_hash=$1 WHERE tenant_id=$2 AND id=$3 AND password_hash=$4 RETURNING id', [encoded, user.tenant_id, user.id, old.password_hash]);
+        const changed = await c.query('UPDATE cs.users SET password_hash=$1,password_version=password_version+1 WHERE tenant_id=$2 AND id=$3 AND password_hash=$4 RETURNING id', [encoded, user.tenant_id, user.id, old.password_hash]);
         if (!changed.rowCount)
             fail(409, 'ACCOUNT_CHANGED', 'Account changed. Sign in again.');
         await c.query('DELETE FROM cs.sessions WHERE tenant_id=$1 AND user_id=$2', [user.tenant_id, user.id]);

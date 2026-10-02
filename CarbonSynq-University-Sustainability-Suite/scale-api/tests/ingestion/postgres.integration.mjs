@@ -3,6 +3,7 @@
  * Creates unique fixture tenants; never wipes a database. Document metadata is a
  * controlled fixture, NOT a claim that an actual file was scanned or downloaded.
  */
+import { testSsl } from '../postgres-support.mjs';
 import assert from 'node:assert/strict';
 import {migrate} from '../../scripts/migrate.mjs';
 import {createPool,tenantTx,assertRuntimeRole} from '../../src/db.mjs';
@@ -14,10 +15,11 @@ const ownerUrl=process.env.TEST_DATABASE_ADMIN_URL;
 if(!ownerUrl||!new URL(ownerUrl).pathname.endsWith('_test'))throw Error('TEST_DATABASE_ADMIN_URL must name a disposable PostgreSQL database ending in _test. No database integration tests ran.');
 const apiPass=process.env.TEST_API_PASSWORD||'only-test-api-password-32-characters',workerPass=process.env.TEST_WORKER_PASSWORD||'only-test-worker-password-32-characters';
 process.env.REQUEST_HASH_SECRET='university-integration-only-request-hash-not-production';
-await migrate(ownerUrl,{apiPassword:apiPass,workerPassword:workerPass});
-const {Client}=await import('pg'),owner=new Client({connectionString:ownerUrl});await owner.connect();
+const ssl=testSsl();
+await migrate(ownerUrl,{apiPassword:apiPass,workerPassword:workerPass,ssl});
+const {Client}=await import('pg'),owner=new Client({connectionString:ownerUrl,ssl});await owner.connect();
 const url=role=>{const u=new URL(ownerUrl);u.username=role;u.password=role==='cs_api'?apiPass:workerPass;return u.href;};
-const pool=await createPool({databaseUrl:url('cs_api'),ssl:false,poolMax:10}),worker=await createPool({databaseUrl:url('cs_worker'),ssl:false,poolMax:2});
+const pool=await createPool({databaseUrl:url('cs_api'),ssl,poolMax:10}),worker=await createPool({databaseUrl:url('cs_worker'),ssl,poolMax:2});
 let count=0;const check=async(name,fn)=>{await fn();count++;console.log('PASS '+name);};
 const req=(user,method,path,body={},query={},key='test-'+id())=>dispatch(pool,{user:{...user,requestId:id()},method,path:'/api/v2/university'+path,body,query,key}).then(r=>r.data);
 async function fixture(name){const tenant=id(),campus=id(),period=id(),document=id(),people={},encoded=await passwordHash('Only-integration-fixture-password-123!');await owner.query('BEGIN');try{await owner.query("SELECT set_config('app.tenant_id',$1,true)",[tenant]);await owner.query('INSERT INTO cs.tenants(id,name) VALUES($1,$2)',[tenant,name]);for(const role of ['ADMIN','ENTRY','REVIEWER','LEADERSHIP']){const uid=id();people[role]={id:uid,tenant_id:tenant,role};await owner.query('INSERT INTO cs.users(id,tenant_id,email,name,role,password_hash) VALUES($1,$2,$3,$4,$5,$6)',[uid,tenant,role.toLowerCase()+'@fixture.example',role,role,encoded]);}await owner.query('INSERT INTO cs.campuses(id,tenant_id,name,code) VALUES($1,$2,$3,$4)',[campus,tenant,'SYNTHETIC TEST CAMPUS','TEST']);await owner.query('INSERT INTO cs.periods(id,tenant_id,name,start_date,end_date) VALUES($1,$2,$3,$4,$5)',[period,tenant,'Synthetic annual period','2026-04-01','2027-03-31']);await owner.query(`INSERT INTO cs.documents(id,tenant_id,original_name,mime_type,file_size,sha256,object_key,object_version,status,scan_result,scan_engine,uploaded_by) VALUES($1,$2,'fixture-only.txt','text/plain',20,$3,$4,'fixture-v1','REVIEW_REQUIRED','CLEAN','TEST_METADATA_NOT_REAL_SCAN',$5)`,[document,tenant,hash('fixture-'+tenant),'fixture/'+id(),people.ENTRY.id]);await owner.query('COMMIT');return {tenant,campus,period,document,...people};}catch(e){await owner.query('ROLLBACK');throw e;}}
@@ -47,6 +49,6 @@ try {
  await check('exact request retry returns same receipt',async()=>{const again=await ingestion(a.ENTRY,'POST','/batches/'+batch.id+'/commit',body,{},idem);assert.equal(again.receipts[0].recordId,imported.receipts[0].recordId);});
  await check('imported receipts cannot be edited by API database role',()=>assert.rejects(tenantTx(pool,a.tenant,c=>c.query("UPDATE cs.u_i_rows SET review_reason='changed' WHERE id=$1",[preview.rows[0].id])),e=>e.code==='23514'));
  await check('one immutable import receipt exists',()=>tenantTx(pool,a.tenant,async c=>assert.equal((await c.query("SELECT * FROM cs.u_i_rows WHERE batch_id=$1 AND status='IMPORTED'",[batch.id])).rowCount,1)));
- await check('migration replay retains checksums at version 5',async()=>assert.equal((await migrate(ownerUrl,{apiPassword:apiPass,workerPassword:workerPass})).version,5));
+ await check('migration replay retains checksums at version 6',async()=>assert.equal((await migrate(ownerUrl,{apiPassword:apiPass,workerPassword:workerPass,ssl})).version,6));
  console.log(JSON.stringify({passed:count,postgresql:true,objectStorage:'NOT_TESTED',antivirus:'FIXTURE_METADATA_ONLY',productionCertified:false}));
 }finally{await pool.end();await worker.end();await owner.end();}

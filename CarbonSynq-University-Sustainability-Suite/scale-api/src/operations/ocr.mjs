@@ -4,7 +4,7 @@ import { hash, fail } from '../core.mjs';
 import { tenantTx, audit } from '../db.mjs';
 import { ownedJob, done } from '../jobs.mjs';
 import { parseInvoiceText } from '../invoice-text.mjs';
-export function runOcr(bytes,mime,{python=process.env.PARSER_PYTHON||'python3',timeoutMs=80000}={}) {
+export function runOcr(bytes,mime,{python=process.env.PARSER_PYTHON||(process.platform==='win32'?'python':'python3'),timeoutMs=80000}={}) {
  const kind={'application/pdf':'pdf','image/png':'png','image/jpeg':'jpeg'}[mime];
  if(!kind)throw Error('Unsupported OCR MIME');
  return new Promise((resolve,reject)=>{

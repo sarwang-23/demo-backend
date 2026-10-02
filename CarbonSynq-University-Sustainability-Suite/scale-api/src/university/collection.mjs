@@ -17,7 +17,7 @@ export async function installCatalog(s,b){fields(b,[]);const existing=await s.ro
 export async function createTask(s,b){fields(b,['periodId','campusId','departmentId','kpiId','assigneeId','reviewerId','bucket','intervalStart','intervalEnd','dueDate']);const p=await s.period(uuid(b.periodId));await s.location(uuid(b.campusId),b.departmentId?uuid(b.departmentId):null);const k=await s.get('u_kpis',uuid(b.kpiId));await s.userRef(uuid(b.assigneeId),WRITERS);await s.userRef(uuid(b.reviewerId),REVIEWERS);
   if(b.assigneeId===b.reviewerId)fail(422,'SEPARATE_REVIEWER','Choose a different assignee and reviewer.');const [start,end]=dateRange(b.intervalStart,b.intervalEnd);
   if(start<p.start_date||end>p.end_date)fail(422,'DATE_OUTSIDE_PERIOD','Collection interval must be inside the reporting period.');
-  let bucket=code(b.bucket);const due=day(b.dueDate);if(due<end)fail(422,'DUE_DATE','The due date cannot precede the end of the measurement interval.');
+  let bucket=text(b.bucket,'bucket',80);const due=day(b.dueDate);if(due<end)fail(422,'DUE_DATE','The due date cannot precede the end of the measurement interval.');
   if(k.domain==='NORMALIZATION'&&(b.departmentId||bucket!=='CAMPUS_TOTAL'||start!==p.start_date||end!==p.end_date))fail(422,'NORMALIZATION_BOUNDARY','Normalization uses one CAMPUS_TOTAL bucket for the whole annual period, without a department.');
   await s.lockKey(['task',p.id,b.campusId,k.id,bucket].join(':'));
   const prior=await s.rows('u_tasks',{period_id:p.id,campus_id:b.campusId,kpi_id:k.id,bucket});

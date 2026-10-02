@@ -102,6 +102,10 @@
       "sha256": "965f64f65c5ee7f4d2d866711fd8cafa546827ba7accd8c84003ac704fff1394",
       "bytes": 13658
     },
+    "migrations/006_worker_privilege_hardening.sql": {
+      "sha256": "0297e01f665946c97a8b9d619f1c432d64fe742ae1f41765d56af27e6f624812",
+      "bytes": 1014
+    },
     "package-lock.json": {
       "sha256": "d3dfb7472af71ea7aa1f507493bc8e8ffac358d5c4e7de888bfe5d76bc47b322",
       "bytes": 21517
@@ -247,8 +251,8 @@
       "bytes": 10926
     },
     "scripts/operations-preflight.mjs": {
-      "sha256": "6b36b77c04bfb885e6290a692b62f062141b8b9c470ef89b6e2472defc93f8a0",
-      "bytes": 973
+      "sha256": "ab562b234ec416a920e25a52bc91dcb801b24b96f11406df85c7d63ccdfc23b1",
+      "bytes": 1052
     },
     "scripts/prepare-neon-env.mjs": {
       "sha256": "d640a7e2e3660dc97351935a8b188205afde71513a7cefc4b1ab14c64e220451",
@@ -283,8 +287,8 @@
       "bytes": 10452
     },
     "src/auth.mjs": {
-      "sha256": "b246fb7c5f50d8041ed8132b4f767f820bc11b704c2bfe505bb1bef8ee96f2ce",
-      "bytes": 4665
+      "sha256": "de40504ec6e44167aef185db3435bd023ac54e16b919574be39880719c96b9fa",
+      "bytes": 4701
     },
     "src/config.mjs": {
       "sha256": "b1ed6eed929af073453b2fe669de2314a0b0203c4f6f5c601c78184f3e430175",
@@ -315,8 +319,8 @@
       "bytes": 20227
     },
     "src/ingestion/parser.mjs": {
-      "sha256": "8ac8707c9defecc8ed9a2c1241c65f0b0b8da87140cccccfb4fa4ba87e6cc2ab",
-      "bytes": 3287
+      "sha256": "27bf190a7cd6c6ad559af0e394cb6d6593199fc8d8dec6183cbfd91c9417b924",
+      "bytes": 3325
     },
     "src/ingestion/routes.mjs": {
       "sha256": "db0409cb83669af081f810eb13e804962e51f97785083a95477725d848807f9d",
@@ -355,8 +359,8 @@
       "bytes": 2579
     },
     "src/operations/accounts.mjs": {
-      "sha256": "ca57ad954eb5a3fa43526e60cec12a1fc0729b6616409cd87e60ca8464e3eaa5",
-      "bytes": 5968
+      "sha256": "6f7f5c1e21253d31c318fa955ab440d89e1fab8e05a9f5af242ecf1901677138",
+      "bytes": 6017
     },
     "src/operations/backup.mjs": {
       "sha256": "3a09e7293eca96557dd8320e60baec022d5d1e0905e0945de4345531225e0b52",
@@ -371,16 +375,16 @@
       "bytes": 9773
     },
     "src/operations/mail.mjs": {
-      "sha256": "e94ba6241381c556c837a6195d085cd37ece7455ddf40dcfa897b9aefb6cf97f",
-      "bytes": 4258
+      "sha256": "df2f77afb362df98c94cf1a09854d5590c2f53560d8188f078060a0e8f7f557a",
+      "bytes": 4251
     },
     "src/operations/management.mjs": {
       "sha256": "d6e217c4ab81ce26c07666fbc469ee11de9e50f28adadb2abdd31511c8e57b32",
       "bytes": 11131
     },
     "src/operations/ocr.mjs": {
-      "sha256": "bff3a6e7f598b76e8336e1fefed19662d4b2deae8bc2fd44978b857cc104037a",
-      "bytes": 5508
+      "sha256": "266a459bb0762b814283e07a8e83893b23a0d3ae37c548279e36c06d6e0360d8",
+      "bytes": 5546
     },
     "src/operations/reminders.mjs": {
       "sha256": "44be42e803ce806ecb0454629f815fe470e1618c0c82638b5c3217f471d27f30",
@@ -395,8 +399,8 @@
       "bytes": 1264
     },
     "src/operations/store.mjs": {
-      "sha256": "578b59281ca2384abe34697647dd25fc396177ca10bce3e7ba989ff33cd5c964",
-      "bytes": 3916
+      "sha256": "2fb924d466ce34cf77c7cf7d58ce6bfe342de549f64976bd7265665ffdbec3ba",
+      "bytes": 3971
     },
     "src/reporting.mjs": {
       "sha256": "265743dea8b9a581eb92e09153c3c202eaa90387b8f24742634559c0307324e4",
@@ -443,8 +447,8 @@
       "bytes": 10287
     },
     "src/university/collection.mjs": {
-      "sha256": "81127c571becef3dc2dbf11932ed81473d22a58beb5f14bf11ff08d8866ed90d",
-      "bytes": 10210
+      "sha256": "55af88f6561739080886217c17379ff9460cbc02e188e666e5cb7ac50a1d69a4",
+      "bytes": 10222
     },
     "src/university/core.mjs": {
       "sha256": "0a3236922120eaa4851e78d027218e95d78faf85e3f68db3202c4909428b5bbf",
@@ -483,8 +487,8 @@
       "bytes": 9817
     },
     "tests/carbon/contract.test.mjs": {
-      "sha256": "ea3f31b4336dd054658dba36308b666a19bdec19f16255f08d7464ea538d0023",
-      "bytes": 5272
+      "sha256": "046388ccdd195251eac8b8456d78761fc8a1161931785d66274061e7d8c4abc5",
+      "bytes": 5280
     },
     "tests/carbon/core.test.mjs": {
       "sha256": "9a1d6860230c0b3b199a85289192c8d939f5897f1128cd3b0f0e88a035092f66",
@@ -499,8 +503,8 @@
       "bytes": 5632
     },
     "tests/carbon/postgres.integration.mjs": {
-      "sha256": "2fda7f491006fd7ab9e49a028203d7ab73ca2b9427bffcdad5ea891654e5ba42",
-      "bytes": 9960
+      "sha256": "cb04b07417f06acd69d6044e55d1993bb0241880fc466a0a1ff065263731b3bf",
+      "bytes": 10033
     },
     "tests/carbon/ui-check.py": {
       "sha256": "6fd471bb2383a577b5f177b2232fce0f29f07e29003fa0e91880ae36fba93644",
@@ -531,8 +535,8 @@
       "bytes": 4499
     },
     "tests/ingestion/http.test.mjs": {
-      "sha256": "c0e29025254cdd236de40a5e936bea3fd072b216a34d6bfbbb0326c306e130f8",
-      "bytes": 4638
+      "sha256": "bcb87b9615f5454a365cd1043abdd0756954fcd1dee212b93266c583b0b2097c",
+      "bytes": 4640
     },
     "tests/ingestion/make-parser-fixtures.py": {
       "sha256": "43b9a4e3317b6b9c7d16e4f1ace419b7a9e08fe5c89a432b3b64bedde38ac9f7",
@@ -543,12 +547,12 @@
       "bytes": 7454
     },
     "tests/ingestion/parser.test.mjs": {
-      "sha256": "b85803e55dae4876bc24c6a268384ce39e827d5b8db345d5a44e608b8a105e84",
-      "bytes": 4594
+      "sha256": "a449939678c4ef692804c6ff0224e08b5f3809bef93fa80ca2d2a8e07177e5b7",
+      "bytes": 4632
     },
     "tests/ingestion/postgres.integration.mjs": {
-      "sha256": "dc44d70f6e4fea57f506b17a8b9ce97dc457868e60f73d8ce5d440832a3049c2",
-      "bytes": 8472
+      "sha256": "09be2889a10e5c8bd42e242f8cb8712fd59c03a35b4750fb2d82e6ba24253722",
+      "bytes": 8545
     },
     "tests/ingestion/ui-check.py": {
       "sha256": "fe2115240ba5431c491f90be68841a2c739d28f8ccd59a87c745f9eb6f6e56f6",
@@ -571,8 +575,8 @@
       "bytes": 4442
     },
     "tests/operations/postgres.integration.mjs": {
-      "sha256": "2ca481c8ded81b4497d3633211c4f5a4fa96668b177866f5265acd178c926b00",
-      "bytes": 7045
+      "sha256": "25f35e8eb12686361746e6ad3e6b72d1d6321ff2c90bdd3ee958353fadef1441",
+      "bytes": 7115
     },
     "tests/operations/security.test.mjs": {
       "sha256": "a3a41bdb04b2595a83202ff205e14410306a5a3884d10a270cd693a718b5dcde",
@@ -594,9 +598,13 @@
       "sha256": "ae7b5212d3091a0d0eae26b5ca0e1634859227de4b6dadd2770fecb3e785fcfa",
       "bytes": 8322
     },
+    "tests/postgres-support.mjs": {
+      "sha256": "44ceb3116eb3751c382a75f414e16f356ee93438189bc8a4f4cd7e2a46bc6040",
+      "bytes": 717
+    },
     "tests/postgres.integration.mjs": {
-      "sha256": "ed612171babedc5b06365ed4dd4564a937bc2b1899968f809a7abddf9013fd9f",
-      "bytes": 15966
+      "sha256": "b5adeb253d99681a21b52ea1392cd8c821694adcc983e8da7795e855177b8a88",
+      "bytes": 17043
     },
     "tests/unit.test.mjs": {
       "sha256": "bebda6239d09aee7af3063491a8a85bcf934a16968fd16090debd3c80633d453",
@@ -619,12 +627,12 @@
       "bytes": 6472
     },
     "tests/university/postgres.integration.mjs": {
-      "sha256": "556f6cbf73ba637ddba0cb295a183adfd56e696926862649a67f47144c12ce05",
-      "bytes": 12821
+      "sha256": "a78c827ba26fec5524d0876e07ff7ab121a30c89c917090ae132534e2dcbeff7",
+      "bytes": 13444
     },
     "tests/university/store.test.mjs": {
-      "sha256": "9f1454e9324437d555d69c3ce114aff662e9f2ba7579bf9578cdcf1b084ea317",
-      "bytes": 4300
+      "sha256": "c647580388e85160fa8ffaba226da9577f9cbef98933e9e6793193d9aefa0c03",
+      "bytes": 4670
     },
     "tests/university/ui-check.py": {
       "sha256": "32784756187c820b49ab6e347696e70b177e81f603ee9d482572194057face63",

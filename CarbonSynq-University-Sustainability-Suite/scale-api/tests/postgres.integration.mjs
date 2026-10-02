@@ -14,21 +14,29 @@ import { claimJob, processCalculation, processInvoice, ownedJob, reconcileUpload
 import { dashboard } from '../src/reporting.mjs';
 import { createApp } from '../src/http.mjs';
 import { services } from '../src/services.mjs';
+import { testSsl } from './postgres-support.mjs';
 const ownerUrl = process.env.TEST_DATABASE_ADMIN_URL;
 if (!ownerUrl || !new URL(ownerUrl).pathname.endsWith('_test'))
     throw Error('Set TEST_DATABASE_ADMIN_URL to an EMPTY disposable PostgreSQL database ending in _test. No integration test was executed.');
 const apiPass = process.env.TEST_API_PASSWORD || 'only-test-api-password-32-characters';
 const workerPass = process.env.TEST_WORKER_PASSWORD || 'only-test-worker-password-32-characters';
 process.env.REQUEST_HASH_SECRET = 'integration-test-HMAC-secret-not-for-production';
-await migrate(ownerUrl, { apiPassword: apiPass, workerPassword: workerPass });
+const ssl = testSsl();
+await migrate(ownerUrl, { apiPassword: apiPass, workerPassword: workerPass, ssl });
 const { Client } = await import('pg');
-const owner = new Client({ connectionString: ownerUrl });
+const owner = new Client({ connectionString: ownerUrl, ssl });
 await owner.connect();
 const appURL = role => { const u = new URL(ownerUrl); u.username = role; u.password = role === 'cs_api' ? apiPass : workerPass; return u.href; };
-const api = await createPool({ databaseUrl: appURL('cs_api'), ssl: false, poolMax: 10 });
-const worker = await createPool({ databaseUrl: appURL('cs_worker'), ssl: false, poolMax: 5 });
+const api = await createPool({ databaseUrl: appURL('cs_api'), ssl, poolMax: 10 });
+const worker = await createPool({ databaseUrl: appURL('cs_worker'), ssl, poolMax: 5 });
 let assertions = 0;
 const tested = async (name, fn) => { await fn(); assertions++; console.log('PASS ' + name); };
+/** Tenant creation auto-enqueues an OPS_SWEEP job, so the queue is not single-kind.
+ * The worker correctly claims in available_at order; claim the wanted kind explicitly. */
+async function claimKind(pool, kind, limit = 20) {
+    for (let i = 0; i < limit; i++) { const j = await claimJob(pool); if (!j) return null; if (j.kind === kind) return j; }
+    return null;
+}
 const cfg = { production: false, origins: ['http://localhost:8080'], metricsToken: 'integration-metrics-token'.repeat(2), maxInflight: 64, maxUploads: 4, maxUploadBytes: 10485760, sessionHours: 8, trustProxy: false };
 const objects = new Map();
 const storage = {
@@ -70,7 +78,14 @@ try {
     await tested('RLS with no context exposes zero tenants', async () => assert.equal((await api.query('SELECT * FROM cs.tenants')).rowCount, 0));
     await tested('tenant context cannot read another tenant or leak through pool reuse', async () => { await tenantTx(api, a.tenant, async (c) => { assert.equal((await c.query('SELECT * FROM cs.tenants')).rowCount, 1); assert.equal((await c.query('SELECT * FROM cs.users WHERE tenant_id=$1', [b.tenant])).rowCount, 0); }); assert.equal((await api.query('SELECT * FROM cs.users')).rowCount, 0); });
     await tested('RLS blocks cross-tenant inserts', async () => assert.rejects(tenantTx(api, a.tenant, c => c.query('INSERT INTO cs.campuses(id,tenant_id,name,code) VALUES($1,$2,$3,$4)', [id(), b.tenant, 'Bad', 'BAD'])), e => e.code === '42501'));
-    await tested('worker cannot read password/session tables', async () => assert.rejects(worker.query('SELECT * FROM cs.users'), e => e.code === '42501'));
+    await tested('worker cannot read password hashes but keeps the reset-link signal', async () => {
+        await assert.rejects(worker.query('SELECT * FROM cs.users'), e => e.code === '42501');
+        await assert.rejects(worker.query('SELECT password_hash FROM cs.users'), e => e.code === '42501');
+        await assert.rejects(worker.query('SELECT email,password_hash FROM cs.users'), e => e.code === '42501');
+        await assert.rejects(worker.query('SELECT * FROM cs.sessions'), e => e.code === '42501');
+        const allowed = await worker.query('SELECT id,email,active,role,password_version FROM cs.users');
+        assert.equal(allowed.rowCount, 0, 'permitted columns must still resolve, RLS hides rows without tenant context');
+    });
     const session = await login(api, { tenantId: a.tenant, email: a.ENTRY.email, password }, 'integration');
     await tested('opaque session authentication derives tenant and role', async () => { const u = await authenticate(api, 'Bearer ' + session.token); assert.equal(u.tenant_id, a.tenant); assert.equal(u.role, 'ENTRY'); assert.equal(u.password_hash, undefined); });
     const factorBody = { category: 'PURCHASED_ELECTRICITY', unit: 'kWh', value: '0.71', versionLabel: 'TEST-ONLY', source: 'SYNTHETIC integration factor; not for real reporting', sourceUrl: 'https://example.com/test-only', region: 'TEST', methodology: 'Synthetic test multiplication only', validFrom: '2026-04-01', validTo: '2027-03-31' };
@@ -95,13 +110,13 @@ try {
     activity = await transition(api, a.REVIEWER, activity.id, 'verify', { version: activity.version, factorId: factor.id });
     await tested('verification atomically enqueues exactly one calculation job', async () => assert.equal((await owner.query("SELECT count(*)::int AS n FROM cs.jobs WHERE entity_id=$1 AND kind='CALCULATE'", [activity.id])).rows[0].n, 1));
     await tested('period with pending calculation cannot lock', async () => assert.rejects(setPeriod(api, a.ADMIN, a.period, { version: 1, reason: 'Integration close test' }, true), e => e.code === 'PENDING_ACTIVITIES'));
-    const job = await claimJob(worker);
+    const job = await claimKind(worker, 'CALCULATE');
     assert.equal(job.entity_id, activity.id);
     await processCalculation(worker, job);
     await tested('NUMERIC calculation and monthly totals reconcile exactly', async () => { const row = await getActivity(api, a.ADMIN, activity.id); assert.equal(row.calculation.kg_co2e, '71.000001'); const dash = await dashboard(api, a.ADMIN); assert.equal(dash.totals.kg_co2e, '71.000001'); assert.equal(dash.totals.calculated_records, '1'); });
     await tested('stale lease cannot finalize a completed job', async () => assert.rejects(tenantTx(worker, a.tenant, c => ownedJob(c, job)), e => e.code === 'LEASE_LOST'));
     await owner.query("UPDATE cs.jobs SET status='QUEUED',available_at=now(),attempts=0 WHERE id=$1", [job.id]);
-    const redelivery = await claimJob(worker);
+    const redelivery = await claimKind(worker, 'CALCULATE');
     await processCalculation(worker, redelivery);
     await tested('job redelivery does not double-count a calculation', async () => { assert.equal((await dashboard(api, a.ADMIN)).totals.calculated_records, '1'); assert.equal((await owner.query('SELECT count(*)::int AS n FROM cs.calculations WHERE activity_id=$1', [activity.id])).rows[0].n, 1); });
     await tested('API cannot alter immutable ledger or audit', async () => { await assert.rejects(tenantTx(api, a.tenant, c => c.query('DELETE FROM cs.calculations WHERE activity_id=$1', [activity.id])), e => e.code === '42501'); await assert.rejects(tenantTx(api, a.tenant, c => c.query('DELETE FROM cs.audit_events WHERE entity_id=$1', [activity.id])), e => e.code === '42501'); });
@@ -109,7 +124,7 @@ try {
     let doc = await upload(api, storage, a.ENTRY, 'test-invoice.txt', 'text/plain', bytes, 'invoice-test-0001');
     await tested('same upload retry returns one document and one storage object', async () => { const replay = await upload(api, storage, a.ENTRY, 'test-invoice.txt', 'text/plain', bytes, 'invoice-test-0001'); assert.equal(replay.id, doc.id); assert.equal(objects.size, 1); });
     await tested('unscanned invoice cannot download or create an activity', async () => { await assert.rejects(download(api, storage, a.ADMIN, doc.id), e => e.code === 'QUARANTINED'); await assert.rejects(confirmInvoice(api, a.ENTRY, doc.id, { ...body, quantity: '200', activityDate: '2026-06-02', version: doc.version, vendor: 'Test', invoiceNumber: 'TEST-100', reviewConfirmed: true }, 'invoice-confirm-01'), e => e.code === 'INVOICE_NOT_READY'); });
-    const scanJob = await claimJob(worker);
+    const scanJob = await claimKind(worker, 'SCAN_INVOICE');
     assert.equal(scanJob.kind, 'SCAN_INVOICE');
     await processInvoice(worker, storage, async () => ({ status: 'CLEAN', engine: 'CONTROLLED TEST FIXTURE - NOT ANTIVIRUS' }), async () => ({ ocrAvailable: false, fields: {}, warnings: ['Test fixture'] }), scanJob);
     doc = await getDocument(api, a.ADMIN, doc.id);

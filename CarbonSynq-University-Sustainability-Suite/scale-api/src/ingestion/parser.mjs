@@ -3,7 +3,7 @@ import { spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { parseInvoiceText } from '../invoice-text.mjs';
 export const XLSX_MIME='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
-export function parseFile(bytes,kind,{python=process.env.PARSER_PYTHON||'python3',timeoutMs=30000,maxOutput=8*1024*1024}={}) {
+export function parseFile(bytes,kind,{python=process.env.PARSER_PYTHON||(process.platform==='win32'?'python':'python3'),timeoutMs=30000,maxOutput=8*1024*1024}={}) {
  return new Promise((resolve,reject)=>{
   if(!['xlsx','csv','pdf','export'].includes(kind))return reject(Error('Unsupported internal parser kind'));
   const child=spawn(python,[fileURLToPath(new URL('../../python/document_parser.py',import.meta.url)),kind],{stdio:['pipe','pipe','pipe'],shell:false,detached:process.platform!=='win32',env:{...Object.fromEntries(['PATH','LANG','LC_ALL','TMPDIR','TEMP','TMP','SystemRoot'].filter(k=>process.env[k]).map(k=>[k,process.env[k]])),PYTHONNOUSERSITE:'1',PYTHONDONTWRITEBYTECODE:'1',OPENBLAS_NUM_THREADS:'1'}});

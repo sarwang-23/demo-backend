@@ -8,7 +8,7 @@ async function issue(s, cfg, { purpose, account, email, name, accountRole }, now
   await s.revokeCredentials(email);
   const tokenId=id(),raw=credentialToken(s.tenant,tokenId),expires=new Date(+now+(purpose==='RESET'?30*60:24*60*60)*1000).toISOString();
   const row={id:tokenId,tenant_id:s.tenant,purpose,user_id:account?.id||null,email,name:name||null,role:accountRole||null,
-    token_hash:digest(raw),password_stamp:account?digest(account.password_hash):null,expires_at:expires,created_by:s.user.id||null};
+    token_hash:digest(raw),password_stamp:account?digest(account.password_hash):null,password_version:account?.password_version??null,expires_at:expires,created_by:s.user.id||null};
   await s.credential(row);
   const mailId=id(),action=purpose==='RESET'?'Reset your password':'Accept your staff invitation';
   const link=`${cfg.origin}/account#token=${encodeURIComponent(raw)}`;

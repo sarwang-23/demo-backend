@@ -4,7 +4,7 @@ import path from 'node:path';
 import { tenantTx, audit } from '../db.mjs';
 import { ownedJob, done } from '../jobs.mjs';
 import { uuid } from '../core.mjs';
-import { unseal, digest } from './crypto.mjs';
+import { unseal } from './crypto.mjs';
 /** External provider must honor Idempotency-Key for effective deduplication after uncertain delivery. */
 export async function deliverMessage(message,outboxId,cfg,{fetchImpl=fetch,now=new Date()}={}) {
  uuid(outboxId);
@@ -33,7 +33,7 @@ export async function processMail(pool,job,cfg,transport=deliverMessage) {
   let valid=tenant?.status==='ACTIVE'&&(!m.expires_at||Date.parse(m.expires_at)>Date.now());
   if(m.credential_id){const r=(await c.query('SELECT * FROM cs.u_o_credentials WHERE tenant_id=$1 AND id=$2',[job.tenant_id,m.credential_id])).rows[0];valid=valid&&r&&!r.revoked_at&&!r.consumed_at&&Date.parse(r.expires_at)>Date.now();
    if(valid&&r.purpose==='INVITE'){const issuer=(await c.query('SELECT active,role FROM cs.users WHERE tenant_id=$1 AND id=$2',[job.tenant_id,r.created_by])).rows[0];valid=!!issuer?.active&&issuer.role==='ADMIN';}
-   if(valid&&r.purpose==='RESET'){const u=(await c.query('SELECT active,password_hash FROM cs.users WHERE tenant_id=$1 AND id=$2',[job.tenant_id,r.user_id])).rows[0];valid=!!u?.active&&digest(u.password_hash)===r.password_stamp;}
+    if(valid&&r.purpose==='RESET'){const u=(await c.query('SELECT active,password_version FROM cs.users WHERE tenant_id=$1 AND id=$2',[job.tenant_id,r.user_id])).rows[0];valid=!!u?.active&&u.password_version===r.password_version;}
   }
   if(m.user_id){const u=(await c.query('SELECT active FROM cs.users WHERE tenant_id=$1 AND id=$2',[job.tenant_id,m.user_id])).rows[0];valid=valid&&!!u?.active;}
   if(!valid){await c.query("UPDATE cs.u_o_mail SET status='CANCELLED',envelope=NULL,error_code='EXPIRED_OR_REVOKED' WHERE tenant_id=$1 AND id=$2",[job.tenant_id,m.id]);await done(c,job);return null;}return m;

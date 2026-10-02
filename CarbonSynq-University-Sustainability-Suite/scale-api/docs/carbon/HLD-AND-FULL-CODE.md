@@ -1,6 +1,6 @@
 # CarbonSynq University Scope 1/2 - HLD and complete integrated scale-api source
 
-Version 2.2.0-scope12-rc.1. 149 complete source/configuration/API/test files follow the HLD. No code files in this selection are shortened.
+Version 2.2.0-scope12-rc.1. 151 complete source/configuration/API/test files follow the HLD. No code files in this selection are shortened.
 
 This book covers the integrated PostgreSQL scale-api, including its original core and university extensions. The older SQLite demo and original Neon repository are also preserved in the ZIP; they are not repeated in this book. Credentials, installed dependencies, binary data, generated QA screenshots and historical backup copies are excluded. Real infrastructure acceptance testing remains outstanding.
 
@@ -49219,6 +49219,26 @@ REVOKE ALL ON FUNCTION cs.o_notify_audit(), cs.c_source_owner_only() FROM PUBLIC
 
 ```
 
+## scale-api/migrations/006_worker_privilege_hardening.sql
+
+SHA-256: `0297e01f665946c97a8b9d619f1c432d64fe742ae1f41765d56af27e6f624812`
+
+```sql
+-- Worker privilege hardening. Closes the password_hash exposure re-introduced by 005_operations.sql.
+-- 005 granted blanket SELECT on cs.users to cs_worker, undoing the revoke in 001_core.sql.
+-- The worker only needs the reset-link validity signal, so it now reads a counter
+-- instead of the hash and holds column-level grants on non-secret columns only.
+ALTER TABLE cs.users ADD COLUMN password_version integer NOT NULL DEFAULT 1;
+-- Stamp existing RESET credentials with the user's current version so links issued before this
+-- migration stay valid, and remain invalidated once the password changes.
+ALTER TABLE cs.u_o_credentials ADD COLUMN password_version integer;
+UPDATE cs.u_o_credentials c SET password_version=u.password_version FROM cs.users u
+ WHERE u.tenant_id=c.tenant_id AND u.id=c.user_id AND c.password_version IS NULL;
+REVOKE ALL ON cs.users,cs.sessions FROM cs_worker;
+GRANT SELECT (id,tenant_id,email,name,role,active,created_at,email_verified_at,password_version) ON cs.users TO cs_worker;
+
+```
+
 ## scale-api/package-lock.json
 
 SHA-256: `d3dfb7472af71ea7aa1f507493bc8e8ffac358d5c4e7de888bfe5d76bc47b322`
@@ -51571,12 +51591,12 @@ export function safeFailure(error) {
 
 ## scale-api/scripts/operations-preflight.mjs
 
-SHA-256: `6b36b77c04bfb885e6290a692b62f062141b8b9c470ef89b6e2472defc93f8a0`
+SHA-256: `ab562b234ec416a920e25a52bc91dcb801b24b96f11406df85c7d63ccdfc23b1`
 
 ```javascript
 /** Non-mutating local prerequisite check. It does not certify PostgreSQL/S3/ClamAV integration. */
 import {spawnSync} from 'node:child_process';import {operationsConfig} from '../src/operations/crypto.mjs';import {migrationPlan} from './migrate.mjs';
-const cfg=operationsConfig(),tools={};for(const [tool,args]of [['python3',['--version']],['pdfinfo',['-v']],['pdftoppm',['-v']],['tesseract',['--version']],['pg_dump',['--version']],['docker',['compose','version']]]){const r=spawnSync(tool,args,{encoding:'utf8',timeout:5000});tools[tool]={available:r.status===0,version:r.status===0?(r.stdout||r.stderr).trim().split('\n')[0]:null};}
+const cfg=operationsConfig(),tools={},python=process.env.PARSER_PYTHON||(process.platform==='win32'?'python':'python3');for(const [tool,args]of [[python,['--version']],['pdfinfo',['-v']],['pdftoppm',['-v']],['tesseract',['--version']],['pg_dump',['--version']],['docker',['compose','version']]]){const r=spawnSync(tool,args,{encoding:'utf8',timeout:5000});tools[tool]={available:r.status===0,version:r.status===0?(r.stdout||r.stderr).trim().split('\n')[0]:null};}
 console.log(JSON.stringify({node:process.version,mailMode:cfg.mailMode,localCaptureNotEmail:cfg.mailMode==='capture',ocrEnabled:cfg.ocrEnabled,tools,migrations:(await migrationPlan()).map(x=>x.version),externalIntegrationTested:false,next:'Run the real deployment acceptance workflow in docs/operations/PRODUCTION-GATES.md.'},null,2));
 
 ```
@@ -52011,7 +52031,7 @@ export async function confirmInvoice(pool, user, documentId, body, key) {
 
 ## scale-api/src/auth.mjs
 
-SHA-256: `b246fb7c5f50d8041ed8132b4f767f820bc11b704c2bfe505bb1bef8ee96f2ce`
+SHA-256: `de40504ec6e44167aef185db3435bd023ac54e16b919574be39880719c96b9fa`
 
 ```javascript
 import { hash, uuid, text, fail, passwordVerify, passwordHash, sessionToken, parseToken } from './core.mjs';
@@ -52064,7 +52084,7 @@ export async function changePassword(pool, user, body) {
         fail(401, 'INVALID_CREDENTIALS', 'Current password is incorrect.');
     const encoded = await passwordHash(body.newPassword);
     return tenantTx(pool, user.tenant_id, async (c) => {
-        const changed = await c.query('UPDATE cs.users SET password_hash=$1 WHERE tenant_id=$2 AND id=$3 AND password_hash=$4 RETURNING id', [encoded, user.tenant_id, user.id, old.password_hash]);
+        const changed = await c.query('UPDATE cs.users SET password_hash=$1,password_version=password_version+1 WHERE tenant_id=$2 AND id=$3 AND password_hash=$4 RETURNING id', [encoded, user.tenant_id, user.id, old.password_hash]);
         if (!changed.rowCount)
             fail(409, 'ACCOUNT_CHANGED', 'Account changed. Sign in again.');
         await c.query('DELETE FROM cs.sessions WHERE tenant_id=$1 AND user_id=$2', [user.tenant_id, user.id]);
@@ -52937,7 +52957,7 @@ export function safeCsvCell(value){let s=String(value??'');if(/^[\s]*[=+\-@\t\r]
 
 ## scale-api/src/ingestion/parser.mjs
 
-SHA-256: `8ac8707c9defecc8ed9a2c1241c65f0b0b8da87140cccccfb4fa4ba87e6cc2ab`
+SHA-256: `27bf190a7cd6c6ad559af0e394cb6d6593199fc8d8dec6183cbfd91c9417b924`
 
 ```javascript
 /** Out-of-process parser. No shell, user-controlled paths, eval, or remote AI calls. */
@@ -52945,7 +52965,7 @@ import { spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { parseInvoiceText } from '../invoice-text.mjs';
 export const XLSX_MIME='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
-export function parseFile(bytes,kind,{python=process.env.PARSER_PYTHON||'python3',timeoutMs=30000,maxOutput=8*1024*1024}={}) {
+export function parseFile(bytes,kind,{python=process.env.PARSER_PYTHON||(process.platform==='win32'?'python':'python3'),timeoutMs=30000,maxOutput=8*1024*1024}={}) {
  return new Promise((resolve,reject)=>{
   if(!['xlsx','csv','pdf','export'].includes(kind))return reject(Error('Unsupported internal parser kind'));
   const child=spawn(python,[fileURLToPath(new URL('../../python/document_parser.py',import.meta.url)),kind],{stdio:['pipe','pipe','pipe'],shell:false,detached:process.platform!=='win32',env:{...Object.fromEntries(['PATH','LANG','LC_ALL','TMPDIR','TEMP','TMP','SystemRoot'].filter(k=>process.env[k]).map(k=>[k,process.env[k]])),PYTHONNOUSERSITE:'1',PYTHONDONTWRITEBYTECODE:'1',OPENBLAS_NUM_THREADS:'1'}});
@@ -53740,7 +53760,7 @@ export async function assertEvidenceAccess(c, user, d) {
 
 ## scale-api/src/operations/accounts.mjs
 
-SHA-256: `ca57ad954eb5a3fa43526e60cec12a1fc0729b6616409cd87e60ca8464e3eaa5`
+SHA-256: `6f7f5c1e21253d31c318fa955ab440d89e1fab8e05a9f5af242ecf1901677138`
 
 ```javascript
 import { id, fail, role, passwordHash, passwordVerify } from '../core.mjs';
@@ -53753,7 +53773,7 @@ async function issue(s, cfg, { purpose, account, email, name, accountRole }, now
   await s.revokeCredentials(email);
   const tokenId=id(),raw=credentialToken(s.tenant,tokenId),expires=new Date(+now+(purpose==='RESET'?30*60:24*60*60)*1000).toISOString();
   const row={id:tokenId,tenant_id:s.tenant,purpose,user_id:account?.id||null,email,name:name||null,role:accountRole||null,
-    token_hash:digest(raw),password_stamp:account?digest(account.password_hash):null,expires_at:expires,created_by:s.user.id||null};
+    token_hash:digest(raw),password_stamp:account?digest(account.password_hash):null,password_version:account?.password_version??null,expires_at:expires,created_by:s.user.id||null};
   await s.credential(row);
   const mailId=id(),action=purpose==='RESET'?'Reset your password':'Accept your staff invitation';
   const link=`${cfg.origin}/account#token=${encodeURIComponent(raw)}`;
@@ -53976,7 +53996,7 @@ export async function downloadExport(s,storage,rid,{preview=false}={}) {
 
 ## scale-api/src/operations/mail.mjs
 
-SHA-256: `e94ba6241381c556c837a6195d085cd37ece7455ddf40dcfa897b9aefb6cf97f`
+SHA-256: `df2f77afb362df98c94cf1a09854d5590c2f53560d8188f078060a0e8f7f557a`
 
 ```javascript
 import { createHmac } from 'node:crypto';
@@ -53985,7 +54005,7 @@ import path from 'node:path';
 import { tenantTx, audit } from '../db.mjs';
 import { ownedJob, done } from '../jobs.mjs';
 import { uuid } from '../core.mjs';
-import { unseal, digest } from './crypto.mjs';
+import { unseal } from './crypto.mjs';
 /** External provider must honor Idempotency-Key for effective deduplication after uncertain delivery. */
 export async function deliverMessage(message,outboxId,cfg,{fetchImpl=fetch,now=new Date()}={}) {
  uuid(outboxId);
@@ -54014,7 +54034,7 @@ export async function processMail(pool,job,cfg,transport=deliverMessage) {
   let valid=tenant?.status==='ACTIVE'&&(!m.expires_at||Date.parse(m.expires_at)>Date.now());
   if(m.credential_id){const r=(await c.query('SELECT * FROM cs.u_o_credentials WHERE tenant_id=$1 AND id=$2',[job.tenant_id,m.credential_id])).rows[0];valid=valid&&r&&!r.revoked_at&&!r.consumed_at&&Date.parse(r.expires_at)>Date.now();
    if(valid&&r.purpose==='INVITE'){const issuer=(await c.query('SELECT active,role FROM cs.users WHERE tenant_id=$1 AND id=$2',[job.tenant_id,r.created_by])).rows[0];valid=!!issuer?.active&&issuer.role==='ADMIN';}
-   if(valid&&r.purpose==='RESET'){const u=(await c.query('SELECT active,password_hash FROM cs.users WHERE tenant_id=$1 AND id=$2',[job.tenant_id,r.user_id])).rows[0];valid=!!u?.active&&digest(u.password_hash)===r.password_stamp;}
+    if(valid&&r.purpose==='RESET'){const u=(await c.query('SELECT active,password_version FROM cs.users WHERE tenant_id=$1 AND id=$2',[job.tenant_id,r.user_id])).rows[0];valid=!!u?.active&&u.password_version===r.password_version;}
   }
   if(m.user_id){const u=(await c.query('SELECT active FROM cs.users WHERE tenant_id=$1 AND id=$2',[job.tenant_id,m.user_id])).rows[0];valid=valid&&!!u?.active;}
   if(!valid){await c.query("UPDATE cs.u_o_mail SET status='CANCELLED',envelope=NULL,error_code='EXPIRED_OR_REVOKED' WHERE tenant_id=$1 AND id=$2",[job.tenant_id,m.id]);await done(c,job);return null;}return m;
@@ -54122,7 +54142,7 @@ export async function requestOcr(s,documentId,b,cfg) {
 
 ## scale-api/src/operations/ocr.mjs
 
-SHA-256: `bff3a6e7f598b76e8336e1fefed19662d4b2deae8bc2fd44978b857cc104037a`
+SHA-256: `266a459bb0762b814283e07a8e83893b23a0d3ae37c548279e36c06d6e0360d8`
 
 ```javascript
 import { spawn } from 'node:child_process';
@@ -54131,7 +54151,7 @@ import { hash, fail } from '../core.mjs';
 import { tenantTx, audit } from '../db.mjs';
 import { ownedJob, done } from '../jobs.mjs';
 import { parseInvoiceText } from '../invoice-text.mjs';
-export function runOcr(bytes,mime,{python=process.env.PARSER_PYTHON||'python3',timeoutMs=80000}={}) {
+export function runOcr(bytes,mime,{python=process.env.PARSER_PYTHON||(process.platform==='win32'?'python':'python3'),timeoutMs=80000}={}) {
  const kind={'application/pdf':'pdf','image/png':'png','image/jpeg':'jpeg'}[mime];
  if(!kind)throw Error('Unsupported OCR MIME');
  return new Promise((resolve,reject)=>{
@@ -54328,7 +54348,7 @@ export const OPS_JSON = ['totals', 'before_state', 'after_state', 'previous_extr
 
 ## scale-api/src/operations/store.mjs
 
-SHA-256: `578b59281ca2384abe34697647dd25fc396177ca10bce3e7ba989ff33cd5c964`
+SHA-256: `2fb924d466ce34cf77c7cf7d58ce6bfe342de549f64976bd7265665ffdbec3ba`
 
 ```javascript
 import { UniversityStore } from '../university/store.mjs';
@@ -54341,14 +54361,14 @@ export class OperationsStore extends UniversityStore {
   async activeTenant() { return (await this.client.query('SELECT status FROM cs.tenants WHERE id=$1 FOR SHARE', [this.tenant])).rows[0]?.status === 'ACTIVE'; }
   async tokenById(id, lock = false) { return (await this.client.query(`SELECT * FROM cs.u_o_credentials WHERE tenant_id=$1 AND id=$2${lock ? ' FOR UPDATE' : ''}`, [this.tenant, uuid(id)])).rows[0] || null; }
   async credential(row) {
-    const keys = ['id','tenant_id','purpose','user_id','email','name','role','token_hash','password_stamp','expires_at','created_by'];
+    const keys = ['id','tenant_id','purpose','user_id','email','name','role','token_hash','password_stamp','password_version','expires_at','created_by'];
     await this.client.query(`INSERT INTO cs.u_o_credentials(${keys.join(',')}) VALUES(${keys.map((_,i)=>'$'+(i+1)).join(',')})`, keys.map(k => row[k] ?? null)); return row;
   }
   async revokeCredentials(email) { await this.client.query('UPDATE cs.u_o_credentials SET revoked_at=now() WHERE tenant_id=$1 AND email=$2 AND consumed_at IS NULL AND revoked_at IS NULL', [this.tenant, email]); }
   async consumeCredential(id) { await this.client.query('UPDATE cs.u_o_credentials SET consumed_at=now() WHERE tenant_id=$1 AND id=$2', [this.tenant, id]); }
   async revokeCredential(id) { const r = await this.client.query('UPDATE cs.u_o_credentials SET revoked_at=now() WHERE tenant_id=$1 AND id=$2 AND consumed_at IS NULL RETURNING id', [this.tenant, uuid(id)]); if (!r.rows.length) fail(404, 'NOT_FOUND', 'Active invitation not found.'); }
   async createInvitedAccount(row, passwordHash) { const userId = id(); await this.client.query('INSERT INTO cs.users(id,tenant_id,name,email,role,password_hash,email_verified_at) VALUES($1,$2,$3,$4,$5,$6,now())', [userId,this.tenant,row.name,row.email,row.role,passwordHash]); return userId; }
-  async setAccountPassword(userId, passwordHash) { await this.client.query('UPDATE cs.users SET password_hash=$3,email_verified_at=coalesce(email_verified_at,now()) WHERE tenant_id=$1 AND id=$2', [this.tenant,userId,passwordHash]); await this.client.query('DELETE FROM cs.sessions WHERE tenant_id=$1 AND user_id=$2', [this.tenant,userId]); }
+  async setAccountPassword(userId, passwordHash) { await this.client.query('UPDATE cs.users SET password_hash=$3,password_version=password_version+1,email_verified_at=coalesce(email_verified_at,now()) WHERE tenant_id=$1 AND id=$2', [this.tenant,userId,passwordHash]); await this.client.query('DELETE FROM cs.sessions WHERE tenant_id=$1 AND user_id=$2', [this.tenant,userId]); }
   async enqueueMail(row) {
     const keys = ['id','tenant_id','user_id','credential_id','kind','envelope','dedupe_key','expires_at'];
     const r=await this.client.query(`INSERT INTO cs.u_o_mail(${keys.join(',')}) VALUES(${keys.map((_,i)=>'$'+(i+1)).join(',')}) ON CONFLICT(tenant_id,dedupe_key) DO NOTHING RETURNING id`, keys.map(k=>row[k]??null));
@@ -55051,7 +55071,7 @@ export async function portal(s,parsed,body=null){const raw=await s.maybe('u_invi
 
 ## scale-api/src/university/collection.mjs
 
-SHA-256: `81127c571becef3dc2dbf11932ed81473d22a58beb5f14bf11ff08d8866ed90d`
+SHA-256: `55af88f6561739080886217c17379ff9460cbc02e188e666e5cb7ac50a1d69a4`
 
 ```javascript
 import { role, WRITERS, REVIEWERS, version } from '../core.mjs';
@@ -55073,7 +55093,7 @@ export async function installCatalog(s,b){fields(b,[]);const existing=await s.ro
 export async function createTask(s,b){fields(b,['periodId','campusId','departmentId','kpiId','assigneeId','reviewerId','bucket','intervalStart','intervalEnd','dueDate']);const p=await s.period(uuid(b.periodId));await s.location(uuid(b.campusId),b.departmentId?uuid(b.departmentId):null);const k=await s.get('u_kpis',uuid(b.kpiId));await s.userRef(uuid(b.assigneeId),WRITERS);await s.userRef(uuid(b.reviewerId),REVIEWERS);
   if(b.assigneeId===b.reviewerId)fail(422,'SEPARATE_REVIEWER','Choose a different assignee and reviewer.');const [start,end]=dateRange(b.intervalStart,b.intervalEnd);
   if(start<p.start_date||end>p.end_date)fail(422,'DATE_OUTSIDE_PERIOD','Collection interval must be inside the reporting period.');
-  let bucket=code(b.bucket);const due=day(b.dueDate);if(due<end)fail(422,'DUE_DATE','The due date cannot precede the end of the measurement interval.');
+  let bucket=text(b.bucket,'bucket',80);const due=day(b.dueDate);if(due<end)fail(422,'DUE_DATE','The due date cannot precede the end of the measurement interval.');
   if(k.domain==='NORMALIZATION'&&(b.departmentId||bucket!=='CAMPUS_TOTAL'||start!==p.start_date||end!==p.end_date))fail(422,'NORMALIZATION_BOUNDARY','Normalization uses one CAMPUS_TOTAL bucket for the whole annual period, without a department.');
   await s.lockKey(['task',p.id,b.campusId,k.id,bucket].join(':'));
   const prior=await s.rows('u_tasks',{period_id:p.id,campus_id:b.campusId,kpi_id:k.id,bucket});
@@ -55876,7 +55896,7 @@ report={'checksPassed':len(checks),'checks':checks,'pageErrors':errors,'apiReque
 
 ## scale-api/tests/carbon/contract.test.mjs
 
-SHA-256: `ea3f31b4336dd054658dba36308b666a19bdec19f16255f08d7464ea538d0023`
+SHA-256: `046388ccdd195251eac8b8456d78761fc8a1161931785d66274061e7d8c4abc5`
 
 ```javascript
 import test from 'node:test';import assert from 'node:assert/strict';import {readFile} from 'node:fs/promises';import {once} from 'node:events';
@@ -55888,7 +55908,7 @@ test('49 real operations have schema and matching permission metadata',async()=>
 test('carbon contract has 10 unique tenant tables, not dynamically accepted SQL',async()=>{assert.equal(Object.keys(CARBON_TABLES).length,10);const sql=await readFile(new URL('../../migrations/003_scope12.sql',import.meta.url),'utf8');for(const name of Object.keys(CARBON_TABLES))assert.ok(sql.includes('CREATE TABLE cs.'+name));assert.match(sql,/FORCE ROW LEVEL SECURITY/);assert.match(sql,/security_invoker=true/);assert.match(sql,/c_legacy_mode_guard/);assert.match(sql,/c_activate_mode_guard/);});
 test('all mutation routes exclude leadership and previews have no idempotent write cache',()=>{for(const r of routes){if(r.write)assert.ok(!r.roles.includes('LEADERSHIP'));if(r.path.endsWith('/preview')){assert.equal(r.write,false);assert.equal(r.cache,false);}}});
 test('query tenant switching fails before any database access',async()=>{await assert.rejects(()=>dispatch({}, {user:{id:id(),tenant_id:id(),role:'ADMIN'},method:'GET',path:'/api/v2/university/carbon/sources',query:{tenantId:id()}}),e=>e.code==='UNKNOWN_FIELD');});
-test('migrations remain contiguous through operations version 5',async()=>assert.deepEqual((await migrationPlan()).map(x=>x.version),[1,2,3,4,5]));
+test('migrations remain contiguous through worker hardening version 6',async()=>assert.deepEqual((await migrationPlan()).map(x=>x.version),[1,2,3,4,5,6]));
 test('allocation-used SQL filters tenant, calculated records and approved voids',async()=>{let call;const store=new UniversityStore({query:async(sql,params)=>{call={sql,params};return {rows:[{used:'12.000000'}]};}},{id:id(),tenant_id:id(),role:'ADMIN'});const instrument=id();assert.equal(await store.carbonAllocationUsed(instrument),'12.000000');assert.equal(call.params[0],store.tenant);assert.equal(call.params[1],instrument);assert.match(call.sql,/CALCULATED/);assert.match(call.sql,/NOT EXISTS/);});
 test('full HTTP middleware to domain: create, submit, approve, inventory and unauthorized checks',async()=>{const f=await readyFixture();const services={authenticate:async h=>{const u=f.actors[String(h).replace('Bearer ','')];if(!u)fail(401,'UNAUTHENTICATED','Fixture actor required');return {...u};},limit:async()=>{},university:async r=>{const m=matchRoute(r.method,r.path);role(r.user,m.route.roles);fields(r.query,m.route.query);const data=await f.s.for(r.user).transaction(s=>m.route.fn(s,r.body,m.params,r.query));return m.route.file?{file:data}:{data,status:m.route.status||200};}};
  const cfg={production:false,origins:[],maxInflight:32,maxUploads:2,maxUploadBytes:10485760,metricsToken:'test',trustProxy:false};const app=createApp(cfg,services,{log:()=>{}});app.server.listen(0,'127.0.0.1');await once(app.server,'listening');const base='http://127.0.0.1:'+app.server.address().port;cfg.origins.push(base);const P='/api/v2/university/carbon';
@@ -56045,7 +56065,7 @@ export async function instrument(f,extra={}){const factor=await approvedFactor(f
 
 ## scale-api/tests/carbon/postgres.integration.mjs
 
-SHA-256: `2fda7f491006fd7ab9e49a028203d7ab73ca2b9427bffcdad5ea891654e5ba42`
+SHA-256: `cb04b07417f06acd69d6044e55d1993bb0241880fc466a0a1ff065263731b3bf`
 
 ```javascript
 /** Actual PostgreSQL acceptance tests. NOT part of unit-test results.
@@ -56053,6 +56073,7 @@ SHA-256: `2fda7f491006fd7ab9e49a028203d7ab73ca2b9427bffcdad5ea891654e5ba42`
  * Creates unique fixture tenants; never wipes a database. Document metadata is a
  * controlled fixture, NOT a claim that an actual file was scanned or downloaded.
  */
+import { testSsl } from '../postgres-support.mjs';
 import assert from 'node:assert/strict';
 import {migrate} from '../../scripts/migrate.mjs';
 import {createPool,tenantTx,assertRuntimeRole} from '../../src/db.mjs';
@@ -56064,10 +56085,11 @@ const ownerUrl=process.env.TEST_DATABASE_ADMIN_URL;
 if(!ownerUrl||!new URL(ownerUrl).pathname.endsWith('_test'))throw Error('TEST_DATABASE_ADMIN_URL must name a disposable PostgreSQL database ending in _test. No database integration tests ran.');
 const apiPass=process.env.TEST_API_PASSWORD||'only-test-api-password-32-characters',workerPass=process.env.TEST_WORKER_PASSWORD||'only-test-worker-password-32-characters';
 process.env.REQUEST_HASH_SECRET='university-integration-only-request-hash-not-production';
-await migrate(ownerUrl,{apiPassword:apiPass,workerPassword:workerPass});
-const {Client}=await import('pg'),owner=new Client({connectionString:ownerUrl});await owner.connect();
+const ssl=testSsl();
+await migrate(ownerUrl,{apiPassword:apiPass,workerPassword:workerPass,ssl});
+const {Client}=await import('pg'),owner=new Client({connectionString:ownerUrl,ssl});await owner.connect();
 const url=role=>{const u=new URL(ownerUrl);u.username=role;u.password=role==='cs_api'?apiPass:workerPass;return u.href;};
-const pool=await createPool({databaseUrl:url('cs_api'),ssl:false,poolMax:10}),worker=await createPool({databaseUrl:url('cs_worker'),ssl:false,poolMax:2});
+const pool=await createPool({databaseUrl:url('cs_api'),ssl,poolMax:10}),worker=await createPool({databaseUrl:url('cs_worker'),ssl,poolMax:2});
 let count=0;const check=async(name,fn)=>{await fn();count++;console.log('PASS '+name);};
 const req=(user,method,path,body={},query={},key='test-'+id())=>dispatch(pool,{user:{...user,requestId:id()},method,path:'/api/v2/university'+path,body,query,key}).then(r=>r.data);
 async function fixture(name){const tenant=id(),campus=id(),period=id(),document=id(),people={},encoded=await passwordHash('Only-integration-fixture-password-123!');await owner.query('BEGIN');try{await owner.query("SELECT set_config('app.tenant_id',$1,true)",[tenant]);await owner.query('INSERT INTO cs.tenants(id,name) VALUES($1,$2)',[tenant,name]);for(const role of ['ADMIN','ENTRY','REVIEWER','LEADERSHIP']){const uid=id();people[role]={id:uid,tenant_id:tenant,role};await owner.query('INSERT INTO cs.users(id,tenant_id,email,name,role,password_hash) VALUES($1,$2,$3,$4,$5,$6)',[uid,tenant,role.toLowerCase()+'@fixture.example',role,role,encoded]);}await owner.query('INSERT INTO cs.campuses(id,tenant_id,name,code) VALUES($1,$2,$3,$4)',[campus,tenant,'SYNTHETIC TEST CAMPUS','TEST']);await owner.query('INSERT INTO cs.periods(id,tenant_id,name,start_date,end_date) VALUES($1,$2,$3,$4,$5)',[period,tenant,'Synthetic annual period','2026-04-01','2027-03-31']);await owner.query(`INSERT INTO cs.documents(id,tenant_id,original_name,mime_type,file_size,sha256,object_key,object_version,status,scan_result,scan_engine,uploaded_by) VALUES($1,$2,'fixture-only.txt','text/plain',20,$3,$4,'fixture-v1','REVIEW_REQUIRED','CLEAN','TEST_METADATA_NOT_REAL_SCAN',$5)`,[document,tenant,hash('fixture-'+tenant),'fixture/'+id(),people.ENTRY.id]);await owner.query('COMMIT');return {tenant,campus,period,document,...people};}catch(e){await owner.query('ROLLBACK');throw e;}}
@@ -56102,7 +56124,7 @@ try {
  await check('period close refuses missing source coverage and pending records',()=>assert.rejects(setPeriod(pool,a.ADMIN,a.period,{version:1,reason:note},true),e=>e.code==='PENDING_SCOPE12_DATA'));
  let v=await api(a.ENTRY,'POST','/records/'+winner.id+'/request-void',{version:winner.version,reason:note});v=await api(a.REVIEWER,'POST','/voids/'+v.id+'/approve',{version:v.version});
  await check('approved correction releases capacity but keeps calculation history',async()=>{const r=await api(a.REVIEWER,'POST','/records/'+loser.id+'/approve',{version:loser.version});assert.equal(r.calculation.market_kg,'63.000000');await tenantTx(pool,a.tenant,async c=>{assert.equal((await c.query('SELECT * FROM cs.u_c_calculations')).rowCount,2);assert.equal((await c.query('SELECT * FROM cs.u_c_active')).rowCount,1);});});
- await check('migration replay respects original checksums and version 5',async()=>{const m=await migrate(ownerUrl,{apiPassword:apiPass,workerPassword:workerPass});assert.equal(m.version,5);assert.equal(m.alreadyApplied,true);});
+ await check('migration replay respects original checksums and version 6',async()=>{const m=await migrate(ownerUrl,{apiPassword:apiPass,workerPassword:workerPass,ssl});assert.equal(m.version,6);assert.equal(m.alreadyApplied,true);});
  console.log(JSON.stringify({passed:count,postgresql:true,objectStorage:'NOT_TESTED',antivirus:'FIXTURE_METADATA_ONLY',productionCertified:false}));
 } finally {await pool.end();await worker.end();await owner.end();}
 
@@ -56488,14 +56510,14 @@ if(process.argv[1]===fileURLToPath(import.meta.url)){if(process.env.INGESTION_UI
 
 ## scale-api/tests/ingestion/http.test.mjs
 
-SHA-256: `c0e29025254cdd236de40a5e936bea3fd072b216a34d6bfbbb0326c306e130f8`
+SHA-256: `bcb87b9615f5454a365cd1043abdd0756954fcd1dee212b93266c583b0b2097c`
 
 ```javascript
 import test from'node:test';import assert from'node:assert/strict';import{readFile}from'node:fs/promises';import{id}from'../../src/core.mjs';import{ROUTES}from'../../src/university/router.mjs';import{migrationPlan}from'../../scripts/migrate.mjs';import{INGESTION_TABLES}from'../../src/ingestion/schema.mjs';import{httpFixture}from'./http-fixture.mjs';
 const p='/api/v2/university/ingestion';async function withHttp(fn){const f=await httpFixture();try{await fn(f);}finally{await f.close();}}
 const req=async(f,path,{role='ENTRY',body,key=id(),method=body?'POST':'GET',headers={}}={})=>{const r=await fetch(f.url+path,{method,headers:{Authorization:'Bearer TEST-'+role,...(body?{'Content-Type':'application/json','Idempotency-Key':key}:{}),...headers},body:body?JSON.stringify(body):undefined});return{r,body:r.headers.get('content-type')?.includes('application/json')?await r.json():await r.text()};};
 test('17 unique ingestion operations inherit role and retry metadata',()=>{const a=ROUTES.filter(r=>r.path.includes('/ingestion/'));assert.equal(a.length,17);for(const r of a.filter(r=>r.write)){assert.ok(r.cache);assert.ok(!r.roles.includes('LEADERSHIP'));assert.ok(!r.roles.includes('REVIEWER'));}});
-test('migration 4 adds four forced RLS tables and immutable receipts',async()=>{assert.deepEqual((await migrationPlan()).map(m=>m.version),[1,2,3,4,5]);const s=await readFile('migrations/004_ingestion.sql','utf8');for(const t of Object.keys(INGESTION_TABLES))assert.match(s,new RegExp('CREATE TABLE cs.'+t));assert.match(s,/FORCE ROW LEVEL SECURITY/);assert.match(s,/Imported staging receipts are immutable/);assert.match(s,/UNIQUE INDEX u_i_import_receipt/);assert.match(s,/FOREIGN KEY\(tenant_id,batch_id,file_id\)/);});
+test('migration 4 adds four forced RLS tables and immutable receipts',async()=>{assert.deepEqual((await migrationPlan()).map(m=>m.version),[1,2,3,4,5,6]);const s=await readFile('migrations/004_ingestion.sql','utf8');for(const t of Object.keys(INGESTION_TABLES))assert.match(s,new RegExp('CREATE TABLE cs.'+t));assert.match(s,/FORCE ROW LEVEL SECURITY/);assert.match(s,/Imported staging receipts are immutable/);assert.match(s,/UNIQUE INDEX u_i_import_receipt/);assert.match(s,/FOREIGN KEY\(tenant_id,batch_id,file_id\)/);});
 test('new UI is real static HTTP with CSP and no external scripts',()=>withHttp(async f=>{let r=await fetch(f.url+'/university/imports');assert.equal(r.status,200);assert.match(r.headers.get('content-security-policy'),/script-src 'self'/);assert.match(await r.text(),/Messy files/);for(const path of ['/ingestion/app.js','/ingestion/style.css'])assert.equal((await fetch(f.url+path)).status,200);}));
 test('imports require login and do not accept tenant query switching',()=>withHttp(async f=>{assert.equal((await fetch(f.url+p+'/batches')).status,401);const r=await req(f,p+'/batches?tenantId='+f.tenant);assert.equal(r.r.status,422);}));
 test('leadership cannot create import batch',()=>withHttp(async f=>{const r=await req(f,p+'/batches',{role:'LEADERSHIP',body:{name:'Blocked import',kind:'SPREADSHEET',target:'CARBON',periodId:f.period}});assert.equal(r.r.status,403);}));
@@ -56601,12 +56623,12 @@ test('CSV formula injection neutralized without dropping text',()=>{assert.equal
 
 ## scale-api/tests/ingestion/parser.test.mjs
 
-SHA-256: `b85803e55dae4876bc24c6a268384ce39e827d5b8db345d5a44e608b8a105e84`
+SHA-256: `a449939678c4ef692804c6ff0224e08b5f3809bef93fa80ca2d2a8e07177e5b7`
 
 ```javascript
 import test from 'node:test';import assert from 'node:assert/strict';import {execFileSync}from'node:child_process';import{mkdtemp,readFile,rm}from'node:fs/promises';import{tmpdir}from'node:os';import path from'node:path';
 import {parseFile,extractImport,exportWorkbook,XLSX_MIME}from'../../src/ingestion/parser.mjs';import{validateUpload}from'../../src/storage.mjs';
-const temporary=await mkdtemp(path.join(tmpdir(),'cs-import-tests-'));execFileSync(process.env.PARSER_PYTHON||'python3',['tests/ingestion/make-parser-fixtures.py',temporary],{timeout:15000});test.after(()=>rm(temporary,{recursive:true,force:true}));
+const temporary=await mkdtemp(path.join(tmpdir(),'cs-import-tests-'));execFileSync(process.env.PARSER_PYTHON||(process.platform==='win32'?'python':'python3'),['tests/ingestion/make-parser-fixtures.py',temporary],{timeout:15000});test.after(()=>rm(temporary,{recursive:true,force:true}));
 const parse=name=>readFile(path.join(temporary,name)).then(b=>parseFile(b,name.endsWith('.pdf')?'pdf':'xlsx'));
 test('actual XLSX reads all three sheets and ignores formula cache',async()=>{const e=await parseFile(await readFile('samples/ingestion/University-Messy-Data.xlsx'),'xlsx');assert.equal(e.sheets.length,3);const formula=e.sheets[0].rows.find(r=>r.index===10).cells.find(c=>c.column==='E');assert.equal(formula.type,'formula');assert.equal(formula.value,null);assert.equal(formula.formula,'=1250+1500+1100');});
 test('typed Excel dates are ISO, hidden rows and merged metadata preserved',async()=>{const e=await parse('dates-formula.xlsx');assert.equal(e.sheets[0].rows[1].cells[2].value,'2026-05-03');assert.equal(e.sheets[0].rows[2].hidden,true);assert.ok(e.sheets[0].mergedRanges.includes('D1:F1'));assert.equal(e.sheets[0].rows[0].cells.find(c=>c.column==='E').mergedFrom,'D1');});
@@ -56625,7 +56647,7 @@ test('upload accepts XLSX only with correct extension, signature and MIME',async
 
 ## scale-api/tests/ingestion/postgres.integration.mjs
 
-SHA-256: `dc44d70f6e4fea57f506b17a8b9ce97dc457868e60f73d8ce5d440832a3049c2`
+SHA-256: `09be2889a10e5c8bd42e242f8cb8712fd59c03a35b4750fb2d82e6ba24253722`
 
 ```javascript
 /** Real PostgreSQL ingestion acceptance. NOT executed in the delivery environment.
@@ -56633,6 +56655,7 @@ SHA-256: `dc44d70f6e4fea57f506b17a8b9ce97dc457868e60f73d8ce5d440832a3049c2`
  * Creates unique fixture tenants; never wipes a database. Document metadata is a
  * controlled fixture, NOT a claim that an actual file was scanned or downloaded.
  */
+import { testSsl } from '../postgres-support.mjs';
 import assert from 'node:assert/strict';
 import {migrate} from '../../scripts/migrate.mjs';
 import {createPool,tenantTx,assertRuntimeRole} from '../../src/db.mjs';
@@ -56644,10 +56667,11 @@ const ownerUrl=process.env.TEST_DATABASE_ADMIN_URL;
 if(!ownerUrl||!new URL(ownerUrl).pathname.endsWith('_test'))throw Error('TEST_DATABASE_ADMIN_URL must name a disposable PostgreSQL database ending in _test. No database integration tests ran.');
 const apiPass=process.env.TEST_API_PASSWORD||'only-test-api-password-32-characters',workerPass=process.env.TEST_WORKER_PASSWORD||'only-test-worker-password-32-characters';
 process.env.REQUEST_HASH_SECRET='university-integration-only-request-hash-not-production';
-await migrate(ownerUrl,{apiPassword:apiPass,workerPassword:workerPass});
-const {Client}=await import('pg'),owner=new Client({connectionString:ownerUrl});await owner.connect();
+const ssl=testSsl();
+await migrate(ownerUrl,{apiPassword:apiPass,workerPassword:workerPass,ssl});
+const {Client}=await import('pg'),owner=new Client({connectionString:ownerUrl,ssl});await owner.connect();
 const url=role=>{const u=new URL(ownerUrl);u.username=role;u.password=role==='cs_api'?apiPass:workerPass;return u.href;};
-const pool=await createPool({databaseUrl:url('cs_api'),ssl:false,poolMax:10}),worker=await createPool({databaseUrl:url('cs_worker'),ssl:false,poolMax:2});
+const pool=await createPool({databaseUrl:url('cs_api'),ssl,poolMax:10}),worker=await createPool({databaseUrl:url('cs_worker'),ssl,poolMax:2});
 let count=0;const check=async(name,fn)=>{await fn();count++;console.log('PASS '+name);};
 const req=(user,method,path,body={},query={},key='test-'+id())=>dispatch(pool,{user:{...user,requestId:id()},method,path:'/api/v2/university'+path,body,query,key}).then(r=>r.data);
 async function fixture(name){const tenant=id(),campus=id(),period=id(),document=id(),people={},encoded=await passwordHash('Only-integration-fixture-password-123!');await owner.query('BEGIN');try{await owner.query("SELECT set_config('app.tenant_id',$1,true)",[tenant]);await owner.query('INSERT INTO cs.tenants(id,name) VALUES($1,$2)',[tenant,name]);for(const role of ['ADMIN','ENTRY','REVIEWER','LEADERSHIP']){const uid=id();people[role]={id:uid,tenant_id:tenant,role};await owner.query('INSERT INTO cs.users(id,tenant_id,email,name,role,password_hash) VALUES($1,$2,$3,$4,$5,$6)',[uid,tenant,role.toLowerCase()+'@fixture.example',role,role,encoded]);}await owner.query('INSERT INTO cs.campuses(id,tenant_id,name,code) VALUES($1,$2,$3,$4)',[campus,tenant,'SYNTHETIC TEST CAMPUS','TEST']);await owner.query('INSERT INTO cs.periods(id,tenant_id,name,start_date,end_date) VALUES($1,$2,$3,$4,$5)',[period,tenant,'Synthetic annual period','2026-04-01','2027-03-31']);await owner.query(`INSERT INTO cs.documents(id,tenant_id,original_name,mime_type,file_size,sha256,object_key,object_version,status,scan_result,scan_engine,uploaded_by) VALUES($1,$2,'fixture-only.txt','text/plain',20,$3,$4,'fixture-v1','REVIEW_REQUIRED','CLEAN','TEST_METADATA_NOT_REAL_SCAN',$5)`,[document,tenant,hash('fixture-'+tenant),'fixture/'+id(),people.ENTRY.id]);await owner.query('COMMIT');return {tenant,campus,period,document,...people};}catch(e){await owner.query('ROLLBACK');throw e;}}
@@ -56677,7 +56701,7 @@ try {
  await check('exact request retry returns same receipt',async()=>{const again=await ingestion(a.ENTRY,'POST','/batches/'+batch.id+'/commit',body,{},idem);assert.equal(again.receipts[0].recordId,imported.receipts[0].recordId);});
  await check('imported receipts cannot be edited by API database role',()=>assert.rejects(tenantTx(pool,a.tenant,c=>c.query("UPDATE cs.u_i_rows SET review_reason='changed' WHERE id=$1",[preview.rows[0].id])),e=>e.code==='23514'));
  await check('one immutable import receipt exists',()=>tenantTx(pool,a.tenant,async c=>assert.equal((await c.query("SELECT * FROM cs.u_i_rows WHERE batch_id=$1 AND status='IMPORTED'",[batch.id])).rowCount,1)));
- await check('migration replay retains checksums at version 5',async()=>assert.equal((await migrate(ownerUrl,{apiPassword:apiPass,workerPassword:workerPass})).version,5));
+ await check('migration replay retains checksums at version 6',async()=>assert.equal((await migrate(ownerUrl,{apiPassword:apiPass,workerPassword:workerPass,ssl})).version,6));
  console.log(JSON.stringify({passed:count,postgresql:true,objectStorage:'NOT_TESTED',antivirus:'FIXTURE_METADATA_ONLY',productionCertified:false}));
 }finally{await pool.end();await worker.end();await owner.end();}
 
@@ -56878,17 +56902,18 @@ export function mailedToken(f,index=-1){const m=f.state.tables.u_o_mail.at(index
 
 ## scale-api/tests/operations/postgres.integration.mjs
 
-SHA-256: `2ca481c8ded81b4497d3633211c4f5a4fa96668b177866f5265acd178c926b00`
+SHA-256: `25f35e8eb12686361746e6ad3e6b72d1d6321ff2c90bdd3ee958353fadef1441`
 
 ```javascript
 /** Opt-in REAL PostgreSQL acceptance. Never run against live data.
  * Requires a disposable database ending in _test. Creates named synthetic fixtures,
  * does not wipe an existing schema. Mail, S3, OCR engine and antivirus are NOT tested here.
  */
+import { testSsl } from '../postgres-support.mjs';
 import assert from 'node:assert/strict';import {migrate} from '../../scripts/migrate.mjs';import {createPool,tenantTx,assertRuntimeRole} from '../../src/db.mjs';import {id,hash,passwordHash} from '../../src/core.mjs';import {dispatchOperations} from '../../src/operations/routes.mjs';import {operationsConfig} from '../../src/operations/crypto.mjs';import {getDocument} from '../../src/documents.mjs';
 const url=process.env.TEST_DATABASE_ADMIN_URL;if(!url||!new URL(url).pathname.endsWith('_test'))throw Error('Provide a disposable TEST_DATABASE_ADMIN_URL ending in _test; no integration tests ran.');
 const apiPass=process.env.TEST_API_PASSWORD||'only-test-api-password-32-characters',workerPass=process.env.TEST_WORKER_PASSWORD||'only-test-worker-password-32-characters';process.env.REQUEST_HASH_SECRET='operations-test-only-request-hash-secret-not-production';
-await migrate(url,{apiPassword:apiPass,workerPassword:workerPass});const {Client}=await import('pg'),owner=new Client({connectionString:url});await owner.connect();const roleUrl=r=>{const u=new URL(url);u.username=r;u.password=r==='cs_api'?apiPass:workerPass;return u.href;};const pool=await createPool({databaseUrl:roleUrl('cs_api'),ssl:false,poolMax:5}),worker=await createPool({databaseUrl:roleUrl('cs_worker'),ssl:false,poolMax:2});
+const ssl=testSsl();await migrate(url,{apiPassword:apiPass,workerPassword:workerPass,ssl});const {Client}=await import('pg'),owner=new Client({connectionString:url,ssl});await owner.connect();const roleUrl=r=>{const u=new URL(url);u.username=r;u.password=r==='cs_api'?apiPass:workerPass;return u.href;};const pool=await createPool({databaseUrl:roleUrl('cs_api'),ssl,poolMax:5}),worker=await createPool({databaseUrl:roleUrl('cs_worker'),ssl,poolMax:2});
 const cfg=operationsConfig({MAIL_MODE:'disabled',PUBLIC_BASE_URL:'http://localhost:8080',OCR_ENABLED:'false'});let passed=0;async function check(name,fn){await fn();passed++;console.log('PASS '+name);}const call=(user,method,path,body={})=>dispatchOperations(pool,{user,method,path:'/api/v2/operations'+path,body,query:{},key:'integration-'+id()},{cfg}).then(r=>r.data);
 async function seed(label){const tenant=id(),campus=id(),period=id(),document=id(),actors={},encoded=await passwordHash('Synthetic-acceptance-password-123!');await owner.query('BEGIN');try{await owner.query("SELECT set_config('app.tenant_id',$1,true)",[tenant]);await owner.query('INSERT INTO cs.tenants(id,name) VALUES($1,$2)',[tenant,label]);for(const role of ['ADMIN','ENTRY','REVIEWER','LEADERSHIP']){const uid=id();actors[role]={id:uid,tenant_id:tenant,role};await owner.query('INSERT INTO cs.users(id,tenant_id,name,email,role,password_hash) VALUES($1,$2,$3,$4,$5,$6)',[uid,tenant,role,role.toLowerCase()+'@test.invalid',role,encoded]);}await owner.query('INSERT INTO cs.campuses(id,tenant_id,name,code) VALUES($1,$2,$3,$4)',[campus,tenant,'Synthetic campus','TEST']);await owner.query('INSERT INTO cs.periods(id,tenant_id,name,start_date,end_date) VALUES($1,$2,$3,$4,$5)',[period,tenant,'Synthetic FY','2026-04-01','2027-03-31']);await owner.query("INSERT INTO cs.documents(id,tenant_id,original_name,mime_type,file_size,sha256,object_key,object_version,status,scan_result,scan_engine,uploaded_by) VALUES($1,$2,'fixture.txt','text/plain',20,$3,$4,'fixture-version','REVIEW_REQUIRED','CLEAN','FIXTURE_NOT_REAL_SCAN',$5)",[document,tenant,hash(tenant),'test/'+id(),actors.ADMIN.id]);await owner.query('COMMIT');return {tenant,campus,period,document,...actors};}catch(e){await owner.query('ROLLBACK');throw e;}}
 try{await assertRuntimeRole(pool);await assertRuntimeRole(worker,true);const a=await seed('SYNTHETIC Operations Acceptance'),b=await seed('SYNTHETIC Other University');
@@ -56904,7 +56929,7 @@ try{await assertRuntimeRole(pool);await assertRuntimeRole(worker,true);const a=a
  const eid=id();await tenantTx(pool,a.tenant,async c=>{await c.query("INSERT INTO cs.u_o_exports(id,tenant_id,period_id,period_version,title,format,status,created_by) VALUES($1,$2,$3,1,'Synthetic artifact','csv','QUEUED',$4)",[eid,a.tenant,a.period,a.ADMIN.id]);await c.query("INSERT INTO cs.audit_events(tenant_id,actor_id,action,entity_id) VALUES($1,$2,'O_EXPORT_READY',$3)",[a.tenant,a.ADMIN.id,eid]);});
  await check('actual audit trigger atomically creates the intended in-app notification',()=>tenantTx(pool,a.tenant,async c=>{const r=await c.query("SELECT * FROM cs.u_o_notifications WHERE user_id=$1 AND entity_id=$2 AND kind='O_EXPORT_READY'",[a.ADMIN.id,eid]);assert.equal(r.rowCount,1);}));
  await check('database forbids self-approved export state',()=>assert.rejects(tenantTx(pool,a.tenant,c=>c.query("UPDATE cs.u_o_exports SET status='APPROVED',approved_by=created_by,sha256=$1,object_version='fixture-v1' WHERE id=$2",['a'.repeat(64),eid])),e=>e.code==='23514'));
- await check('replaying all migrations leaves checksums at version five',async()=>{const r=await migrate(url,{apiPassword:apiPass,workerPassword:workerPass});assert.equal(r.version,5);assert.equal(r.alreadyApplied,true);});
+ await check('replaying all migrations leaves checksums at version six',async()=>{const r=await migrate(url,{apiPassword:apiPass,workerPassword:workerPass,ssl});assert.equal(r.version,6);assert.equal(r.alreadyApplied,true);});
  console.log(JSON.stringify({passed,realPostgreSQL:true,realObjectStorage:false,realScanner:false,restoreExecuted:false}));
 }finally{await pool.end();await worker.end();await owner.end();}
 
@@ -57075,9 +57100,30 @@ test('suspended universities defer recurring reminder sweep without reading task
 
 ```
 
+## scale-api/tests/postgres-support.mjs
+
+SHA-256: `44ceb3116eb3751c382a75f414e16f356ee93438189bc8a4f4cd7e2a46bc6040`
+
+```javascript
+/** Shared helpers for the opt-in real-PostgreSQL acceptance suites.
+ * These suites are never run by `npm test`; absence of infrastructure must fail loudly.
+ * TLS follows the same trust rules as the application (src/config.mjs): verified
+ * certificates when DB_SSL=true, optionally pinned with DB_CA_FILE. Without this a
+ * suite could only ever run against a plaintext local PostgreSQL, never a provider
+ * such as Neon or RDS that refuses insecure connections.
+ */
+import { readFileSync } from 'node:fs';
+
+export function testSsl(env = process.env) {
+    if (env.DB_SSL !== 'true') return false;
+    return { rejectUnauthorized: true, ...(env.DB_CA_FILE ? { ca: readFileSync(env.DB_CA_FILE, 'utf8') } : {}) };
+}
+
+```
+
 ## scale-api/tests/postgres.integration.mjs
 
-SHA-256: `ed612171babedc5b06365ed4dd4564a937bc2b1899968f809a7abddf9013fd9f`
+SHA-256: `b5adeb253d99681a21b52ea1392cd8c821694adcc983e8da7795e855177b8a88`
 
 ```javascript
 /** Real PostgreSQL integration suite; object storage and antivirus are controlled fixtures.
@@ -57096,21 +57142,29 @@ import { claimJob, processCalculation, processInvoice, ownedJob, reconcileUpload
 import { dashboard } from '../src/reporting.mjs';
 import { createApp } from '../src/http.mjs';
 import { services } from '../src/services.mjs';
+import { testSsl } from './postgres-support.mjs';
 const ownerUrl = process.env.TEST_DATABASE_ADMIN_URL;
 if (!ownerUrl || !new URL(ownerUrl).pathname.endsWith('_test'))
     throw Error('Set TEST_DATABASE_ADMIN_URL to an EMPTY disposable PostgreSQL database ending in _test. No integration test was executed.');
 const apiPass = process.env.TEST_API_PASSWORD || 'only-test-api-password-32-characters';
 const workerPass = process.env.TEST_WORKER_PASSWORD || 'only-test-worker-password-32-characters';
 process.env.REQUEST_HASH_SECRET = 'integration-test-HMAC-secret-not-for-production';
-await migrate(ownerUrl, { apiPassword: apiPass, workerPassword: workerPass });
+const ssl = testSsl();
+await migrate(ownerUrl, { apiPassword: apiPass, workerPassword: workerPass, ssl });
 const { Client } = await import('pg');
-const owner = new Client({ connectionString: ownerUrl });
+const owner = new Client({ connectionString: ownerUrl, ssl });
 await owner.connect();
 const appURL = role => { const u = new URL(ownerUrl); u.username = role; u.password = role === 'cs_api' ? apiPass : workerPass; return u.href; };
-const api = await createPool({ databaseUrl: appURL('cs_api'), ssl: false, poolMax: 10 });
-const worker = await createPool({ databaseUrl: appURL('cs_worker'), ssl: false, poolMax: 5 });
+const api = await createPool({ databaseUrl: appURL('cs_api'), ssl, poolMax: 10 });
+const worker = await createPool({ databaseUrl: appURL('cs_worker'), ssl, poolMax: 5 });
 let assertions = 0;
 const tested = async (name, fn) => { await fn(); assertions++; console.log('PASS ' + name); };
+/** Tenant creation auto-enqueues an OPS_SWEEP job, so the queue is not single-kind.
+ * The worker correctly claims in available_at order; claim the wanted kind explicitly. */
+async function claimKind(pool, kind, limit = 20) {
+    for (let i = 0; i < limit; i++) { const j = await claimJob(pool); if (!j) return null; if (j.kind === kind) return j; }
+    return null;
+}
 const cfg = { production: false, origins: ['http://localhost:8080'], metricsToken: 'integration-metrics-token'.repeat(2), maxInflight: 64, maxUploads: 4, maxUploadBytes: 10485760, sessionHours: 8, trustProxy: false };
 const objects = new Map();
 const storage = {
@@ -57152,7 +57206,14 @@ try {
     await tested('RLS with no context exposes zero tenants', async () => assert.equal((await api.query('SELECT * FROM cs.tenants')).rowCount, 0));
     await tested('tenant context cannot read another tenant or leak through pool reuse', async () => { await tenantTx(api, a.tenant, async (c) => { assert.equal((await c.query('SELECT * FROM cs.tenants')).rowCount, 1); assert.equal((await c.query('SELECT * FROM cs.users WHERE tenant_id=$1', [b.tenant])).rowCount, 0); }); assert.equal((await api.query('SELECT * FROM cs.users')).rowCount, 0); });
     await tested('RLS blocks cross-tenant inserts', async () => assert.rejects(tenantTx(api, a.tenant, c => c.query('INSERT INTO cs.campuses(id,tenant_id,name,code) VALUES($1,$2,$3,$4)', [id(), b.tenant, 'Bad', 'BAD'])), e => e.code === '42501'));
-    await tested('worker cannot read password/session tables', async () => assert.rejects(worker.query('SELECT * FROM cs.users'), e => e.code === '42501'));
+    await tested('worker cannot read password hashes but keeps the reset-link signal', async () => {
+        await assert.rejects(worker.query('SELECT * FROM cs.users'), e => e.code === '42501');
+        await assert.rejects(worker.query('SELECT password_hash FROM cs.users'), e => e.code === '42501');
+        await assert.rejects(worker.query('SELECT email,password_hash FROM cs.users'), e => e.code === '42501');
+        await assert.rejects(worker.query('SELECT * FROM cs.sessions'), e => e.code === '42501');
+        const allowed = await worker.query('SELECT id,email,active,role,password_version FROM cs.users');
+        assert.equal(allowed.rowCount, 0, 'permitted columns must still resolve, RLS hides rows without tenant context');
+    });
     const session = await login(api, { tenantId: a.tenant, email: a.ENTRY.email, password }, 'integration');
     await tested('opaque session authentication derives tenant and role', async () => { const u = await authenticate(api, 'Bearer ' + session.token); assert.equal(u.tenant_id, a.tenant); assert.equal(u.role, 'ENTRY'); assert.equal(u.password_hash, undefined); });
     const factorBody = { category: 'PURCHASED_ELECTRICITY', unit: 'kWh', value: '0.71', versionLabel: 'TEST-ONLY', source: 'SYNTHETIC integration factor; not for real reporting', sourceUrl: 'https://example.com/test-only', region: 'TEST', methodology: 'Synthetic test multiplication only', validFrom: '2026-04-01', validTo: '2027-03-31' };
@@ -57177,13 +57238,13 @@ try {
     activity = await transition(api, a.REVIEWER, activity.id, 'verify', { version: activity.version, factorId: factor.id });
     await tested('verification atomically enqueues exactly one calculation job', async () => assert.equal((await owner.query("SELECT count(*)::int AS n FROM cs.jobs WHERE entity_id=$1 AND kind='CALCULATE'", [activity.id])).rows[0].n, 1));
     await tested('period with pending calculation cannot lock', async () => assert.rejects(setPeriod(api, a.ADMIN, a.period, { version: 1, reason: 'Integration close test' }, true), e => e.code === 'PENDING_ACTIVITIES'));
-    const job = await claimJob(worker);
+    const job = await claimKind(worker, 'CALCULATE');
     assert.equal(job.entity_id, activity.id);
     await processCalculation(worker, job);
     await tested('NUMERIC calculation and monthly totals reconcile exactly', async () => { const row = await getActivity(api, a.ADMIN, activity.id); assert.equal(row.calculation.kg_co2e, '71.000001'); const dash = await dashboard(api, a.ADMIN); assert.equal(dash.totals.kg_co2e, '71.000001'); assert.equal(dash.totals.calculated_records, '1'); });
     await tested('stale lease cannot finalize a completed job', async () => assert.rejects(tenantTx(worker, a.tenant, c => ownedJob(c, job)), e => e.code === 'LEASE_LOST'));
     await owner.query("UPDATE cs.jobs SET status='QUEUED',available_at=now(),attempts=0 WHERE id=$1", [job.id]);
-    const redelivery = await claimJob(worker);
+    const redelivery = await claimKind(worker, 'CALCULATE');
     await processCalculation(worker, redelivery);
     await tested('job redelivery does not double-count a calculation', async () => { assert.equal((await dashboard(api, a.ADMIN)).totals.calculated_records, '1'); assert.equal((await owner.query('SELECT count(*)::int AS n FROM cs.calculations WHERE activity_id=$1', [activity.id])).rows[0].n, 1); });
     await tested('API cannot alter immutable ledger or audit', async () => { await assert.rejects(tenantTx(api, a.tenant, c => c.query('DELETE FROM cs.calculations WHERE activity_id=$1', [activity.id])), e => e.code === '42501'); await assert.rejects(tenantTx(api, a.tenant, c => c.query('DELETE FROM cs.audit_events WHERE entity_id=$1', [activity.id])), e => e.code === '42501'); });
@@ -57191,7 +57252,7 @@ try {
     let doc = await upload(api, storage, a.ENTRY, 'test-invoice.txt', 'text/plain', bytes, 'invoice-test-0001');
     await tested('same upload retry returns one document and one storage object', async () => { const replay = await upload(api, storage, a.ENTRY, 'test-invoice.txt', 'text/plain', bytes, 'invoice-test-0001'); assert.equal(replay.id, doc.id); assert.equal(objects.size, 1); });
     await tested('unscanned invoice cannot download or create an activity', async () => { await assert.rejects(download(api, storage, a.ADMIN, doc.id), e => e.code === 'QUARANTINED'); await assert.rejects(confirmInvoice(api, a.ENTRY, doc.id, { ...body, quantity: '200', activityDate: '2026-06-02', version: doc.version, vendor: 'Test', invoiceNumber: 'TEST-100', reviewConfirmed: true }, 'invoice-confirm-01'), e => e.code === 'INVOICE_NOT_READY'); });
-    const scanJob = await claimJob(worker);
+    const scanJob = await claimKind(worker, 'SCAN_INVOICE');
     assert.equal(scanJob.kind, 'SCAN_INVOICE');
     await processInvoice(worker, storage, async () => ({ status: 'CLEAN', engine: 'CONTROLLED TEST FIXTURE - NOT ANTIVIRUS' }), async () => ({ ocrAvailable: false, fields: {}, warnings: ['Test fixture'] }), scanJob);
     doc = await getDocument(api, a.ADMIN, doc.id);
@@ -57513,7 +57574,7 @@ export function emissionBody(f,factorId,extra={}){return {periodId:f.period,camp
 
 ## scale-api/tests/university/postgres.integration.mjs
 
-SHA-256: `556f6cbf73ba637ddba0cb295a183adfd56e696926862649a67f47144c12ce05`
+SHA-256: `a78c827ba26fec5524d0876e07ff7ab121a30c89c917090ae132534e2dcbeff7`
 
 ```javascript
 /** Actual PostgreSQL acceptance tests. NOT part of unit-test results.
@@ -57521,6 +57582,7 @@ SHA-256: `556f6cbf73ba637ddba0cb295a183adfd56e696926862649a67f47144c12ce05`
  * Creates unique fixture tenants; never wipes a database. Document metadata is a
  * controlled fixture, NOT a claim that an actual file was scanned or downloaded.
  */
+import { testSsl } from '../postgres-support.mjs';
 import assert from 'node:assert/strict';
 import {migrate} from '../../scripts/migrate.mjs';
 import {createPool,tenantTx,assertRuntimeRole} from '../../src/db.mjs';
@@ -57531,18 +57593,19 @@ const ownerUrl=process.env.TEST_DATABASE_ADMIN_URL;
 if(!ownerUrl||!new URL(ownerUrl).pathname.endsWith('_test'))throw Error('TEST_DATABASE_ADMIN_URL must name a disposable PostgreSQL database ending in _test. No database integration tests ran.');
 const apiPass=process.env.TEST_API_PASSWORD||'only-test-api-password-32-characters',workerPass=process.env.TEST_WORKER_PASSWORD||'only-test-worker-password-32-characters';
 process.env.REQUEST_HASH_SECRET='university-integration-only-request-hash-not-production';
-await migrate(ownerUrl,{apiPassword:apiPass,workerPassword:workerPass});
-const {Client}=await import('pg'),owner=new Client({connectionString:ownerUrl});await owner.connect();
+const ssl=testSsl();
+await migrate(ownerUrl,{apiPassword:apiPass,workerPassword:workerPass,ssl});
+const {Client}=await import('pg'),owner=new Client({connectionString:ownerUrl,ssl});await owner.connect();
 const url=role=>{const u=new URL(ownerUrl);u.username=role;u.password=role==='cs_api'?apiPass:workerPass;return u.href;};
-const pool=await createPool({databaseUrl:url('cs_api'),ssl:false,poolMax:10}),worker=await createPool({databaseUrl:url('cs_worker'),ssl:false,poolMax:2});
+const pool=await createPool({databaseUrl:url('cs_api'),ssl,poolMax:10}),worker=await createPool({databaseUrl:url('cs_worker'),ssl,poolMax:2});
 let count=0;const check=async(name,fn)=>{await fn();count++;console.log('PASS '+name);};
 const req=(user,method,path,body={},query={},key='test-'+id())=>dispatch(pool,{user:{...user,requestId:id()},method,path:'/api/v2/university'+path,body,query,key}).then(r=>r.data);
 async function fixture(name){const tenant=id(),campus=id(),period=id(),document=id(),people={},encoded=await passwordHash('Only-integration-fixture-password-123!');await owner.query('BEGIN');try{await owner.query("SELECT set_config('app.tenant_id',$1,true)",[tenant]);await owner.query('INSERT INTO cs.tenants(id,name) VALUES($1,$2)',[tenant,name]);for(const role of ['ADMIN','ENTRY','REVIEWER','LEADERSHIP']){const uid=id();people[role]={id:uid,tenant_id:tenant,role};await owner.query('INSERT INTO cs.users(id,tenant_id,email,name,role,password_hash) VALUES($1,$2,$3,$4,$5,$6)',[uid,tenant,role.toLowerCase()+'@fixture.example',role,role,encoded]);}await owner.query('INSERT INTO cs.campuses(id,tenant_id,name,code) VALUES($1,$2,$3,$4)',[campus,tenant,'SYNTHETIC TEST CAMPUS','TEST']);await owner.query('INSERT INTO cs.periods(id,tenant_id,name,start_date,end_date) VALUES($1,$2,$3,$4,$5)',[period,tenant,'Synthetic annual period','2026-04-01','2027-03-31']);await owner.query(`INSERT INTO cs.documents(id,tenant_id,original_name,mime_type,file_size,sha256,object_key,object_version,status,scan_result,scan_engine,uploaded_by) VALUES($1,$2,'fixture-only.txt','text/plain',20,$3,$4,'fixture-v1','REVIEW_REQUIRED','CLEAN','TEST_METADATA_NOT_REAL_SCAN',$5)`,[document,tenant,hash('fixture-'+tenant),'fixture/'+id(),people.ENTRY.id]);await owner.query('COMMIT');return {tenant,campus,period,document,...people};}catch(e){await owner.query('ROLLBACK');throw e;}}
 try{
  const a=await fixture('University acceptance A'),b=await fixture('University acceptance B');
  await check('application role is non-owner and does not bypass RLS',()=>assertRuntimeRole(pool));
- await check('worker has no new university table access',()=>assert.rejects(worker.query('SELECT * FROM cs.u_emissions'),e=>e.code==='42501'));
- await check('repeat migration preserves checksum history',async()=>{const m=await migrate(ownerUrl,{apiPassword:apiPass,workerPassword:workerPass});assert.equal(m.alreadyApplied,true);assert.equal(m.version,5);});
+ await check('worker reads operational university data but no master data and cannot alter emissions',async()=>{await assert.rejects(worker.query('SELECT * FROM cs.u_kpis'),e=>e.code==='42501');await assert.rejects(worker.query('SELECT * FROM cs.u_factors'),e=>e.code==='42501');await assert.rejects(worker.query('SELECT * FROM cs.u_suppliers'),e=>e.code==='42501');await assert.rejects(worker.query('SELECT * FROM cs.u_departments'),e=>e.code==='42501');await assert.rejects(tenantTx(worker,a.tenant,c=>c.query('UPDATE cs.u_emissions SET quantity=0 WHERE false')),e=>e.code==='42501');await worker.query('SELECT * FROM cs.u_emissions');await worker.query('SELECT * FROM cs.u_submissions');});
+ await check('repeat migration preserves checksum history',async()=>{const m=await migrate(ownerUrl,{apiPassword:apiPass,workerPassword:workerPass,ssl});assert.equal(m.alreadyApplied,true);assert.equal(m.version,6);});
  await check('22 definitions install once without seeding measurements',async()=>{assert.equal((await req(a.ADMIN,'POST','/catalog/install')).added,22);assert.equal((await req(a.ADMIN,'POST','/catalog/install')).added,0);});
  await check('unscoped university read returns no rows',async()=>assert.equal((await pool.query('SELECT * FROM cs.u_kpis')).rowCount,0));
  await check('tenant B cannot read tenant A KPI rows even without tenant WHERE',()=>tenantTx(pool,b.tenant,async c=>assert.equal((await c.query('SELECT * FROM cs.u_kpis')).rowCount,0)));
@@ -57589,7 +57652,7 @@ try{
 
 ## scale-api/tests/university/store.test.mjs
 
-SHA-256: `9f1454e9324437d555d69c3ce114aff662e9f2ba7579bf9578cdcf1b084ea317`
+SHA-256: `c647580388e85160fa8ffaba226da9577f9cbef98933e9e6793193d9aefa0c03`
 
 ```javascript
 import test from 'node:test';
@@ -57610,7 +57673,7 @@ test('repository user reference queries never select password hashes',async()=>{
 test('lexical search escapes wildcard characters and never interpolates user text',async()=>{const c=client(),s=new UniversityStore(c,user);await s.searchApproved("x%' OR true --");assert.ok(c.calls[0].params[1].includes('\\%'));assert.ok(!c.calls[0].sql.includes("x%'"));});
 test('transaction snapshot sets isolation before its first query and keeps tenant local',async()=>{const c=client();await universityTx({connect:async()=>c},user,async()=>42,{snapshot:true});assert.equal(c.calls[0].sql,'BEGIN ISOLATION LEVEL REPEATABLE READ');assert.match(c.calls[1].sql,/set_config\('app.tenant_id',\$1,true\)/);assert.ok(c.calls.some(q=>q.sql==='COMMIT'));assert.equal(c.calls.at(-1).release,true);});
 test('transaction failure rolls back and releases the connection',async()=>{const c=client();await assert.rejects(()=>universityTx({connect:async()=>c},user,async()=>{throw Error('sentinel');}),/sentinel/);assert.ok(c.calls.some(q=>q.sql==='ROLLBACK'));assert.ok(!c.calls.some(q=>q.sql==='COMMIT'));assert.equal(c.calls.at(-1).release,true);});
-test('migration plan includes unchanged core plus additive university migration',async()=>{const plan=await migrationPlan();assert.deepEqual(plan.map(p=>p.version),[1,2,3,4,5]);assert.equal(plan[0].file,'001_core.sql');assert.match(plan[1].sql,/security_invoker=true/);});
+test('migration plan includes unchanged core plus additive university and hardening migrations',async()=>{const plan=await migrationPlan();assert.deepEqual(plan.map(p=>p.version),[1,2,3,4,5,6]);assert.equal(plan[0].file,'001_core.sql');assert.match(plan[1].sql,/security_invoker=true/);assert.equal(plan[5].file,'006_worker_privilege_hardening.sql');assert.match(plan[5].sql,/REVOKE ALL ON cs\.users,cs\.sessions FROM cs_worker/);assert.match(plan[5].sql,/GRANT SELECT \(id,tenant_id,email,name,role,active,created_at,email_verified_at,password_version\) ON cs\.users TO cs_worker/);assert.doesNotMatch(plan[5].sql,/password_hash,active/);});
 test('university migration declares forced RLS, tenant composite references and immutable snapshots',async()=>{const sql=await readFile(new URL('../../migrations/002_university.sql',import.meta.url),'utf8');assert.match(sql,/FORCE ROW LEVEL SECURITY/);assert.match(sql,/FOREIGN KEY\(tenant_id,campus_id,department_id\)/);assert.match(sql,/REVOKE UPDATE ON cs/);assert.match(sql,/snapshot_immutable/);assert.match(sql,/u_one_pending_revision/);});
 
 ```
